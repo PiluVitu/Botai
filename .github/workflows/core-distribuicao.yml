@@ -1,0 +1,343 @@
+name: Core Distribuição
+
+# Tag core-v*: binários Bun dos 6 alvos + SHA256SUMS + install.sh no GitHub Release e a
+# imagem ghcr.io/piluvitu/botai. PR e dispatch rodam tudo, menos as duas publicações.
+on:
+  push:
+    tags: ['core-v*']
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/core/**'
+      - '.bun-version'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/core-distribuicao.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: core-distribuicao-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  pacote:
+    name: Core (lint, testes, build e tarball do npm)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      versao: ${{ steps.versao.outputs.versao }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Versão (packages/core/package.json)
+        id: versao
+        run: echo "versao=$(node -p "require('./packages/core/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Tag = core-v<versão>, num commit da main
+        if: github.event_name == 'push'
+        env:
+          VERSAO: ${{ steps.versao.outputs.versao }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_REF_NAME" != "core-v$VERSAO" ]; then
+            echo "::error::a tag $GITHUB_REF_NAME não bate com a versão $VERSAO de packages/core/package.json"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::o commit da tag $GITHUB_REF_NAME não está na main"
+            exit 1
+          fi
+
+      - name: Lint (tsc + ShellCheck)
+        run: pnpm --filter @pilutech/botai-core run lint
+
+      - name: Testes (Jest)
+        run: pnpm --filter @pilutech/botai-core run test
+
+      - name: Build e tarball do npm (a imagem instala exatamente ele)
+        run: pnpm --filter @pilutech/botai-core run tarball
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: core-pacote
+          path: |
+            packages/core/dist/
+            packages/core/pacote/
+          if-no-files-found: error
+          retention-days: 7
+
+  binarios:
+    name: Binários Bun (6 alvos; os do macOS assinados ad-hoc)
+    needs: pacote
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: core-pacote
+          path: packages/core
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Compilar os 6 alvos
+        working-directory: packages/core
+        run: bash scripts/binarios.sh darwin-arm64 darwin-x64 linux-x64 linux-arm64 windows-x64 windows-arm64
+
+      - name: SHA256SUMS
+        working-directory: packages/core/dist-bin
+        run: |
+          shasum -a 256 botai-* > SHA256SUMS
+          cat SHA256SUMS
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: core-binarios
+          path: packages/core/dist-bin/
+          if-no-files-found: error
+          retention-days: 7
+
+  fumaca-binarios:
+    name: Binário ${{ matrix.alvo }} no próprio sistema
+    needs: binarios
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { alvo: linux-x64, runner: ubuntu-24.04, arquivo: botai-linux-x64 }
+          - {
+              alvo: linux-arm64,
+              runner: ubuntu-24.04-arm,
+              arquivo: botai-linux-arm64,
+            }
+          - {
+              alvo: darwin-arm64,
+              runner: macos-15,
+              arquivo: botai-darwin-arm64,
+            }
+          - {
+              alvo: darwin-x64,
+              runner: macos-15-intel,
+              arquivo: botai-darwin-x64,
+            }
+          - {
+              alvo: windows-x64,
+              runner: windows-2025,
+              arquivo: botai-windows-x64.exe,
+            }
+          - {
+              alvo: windows-arm64,
+              runner: windows-11-arm,
+              arquivo: botai-windows-arm64.exe,
+            }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      # A imagem Windows vem com core.autocrlf=true: os dourados .sql sairiam com CRLF e não bateriam.
+      - name: Checkout sem conversão de fim de linha (Windows)
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: core-binarios
+          path: packages/core/dist-bin
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+
+      - name: Permissão de execução (o artifact não guarda o bit)
+        if: runner.os != 'Windows'
+        run: chmod +x "packages/core/dist-bin/${{ matrix.arquivo }}"
+
+      - name: Assinatura ad-hoc válida (macOS)
+        if: runner.os == 'macOS'
+        run: codesign -v "packages/core/dist-bin/${{ matrix.arquivo }}"
+
+      - name: SHA256, dourados, serve e SIGTERM
+        working-directory: packages/core
+        run: node scripts/fumaca.mjs --binario "dist-bin/${{ matrix.arquivo }}"
+
+  imagem:
+    name: Imagem (fumaça e push no GHCR)
+    needs: [pacote, fumaca-binarios]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: core-pacote
+          path: packages/core
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build amd64 para a fumaça
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: packages/core
+          platforms: linux/amd64
+          load: true
+          tags: botai:fumaca
+
+      - name: Fumaça da imagem (HEALTHCHECK, dourados, usuário, SIGTERM)
+        working-directory: packages/core
+        run: bash scripts/fumaca-imagem.sh botai:fumaca
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push de ghcr.io/piluvitu/botai (versão e latest; amd64 e arm64)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: packages/core
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/piluvitu/botai:${{ needs.pacote.outputs.versao }}
+            ghcr.io/piluvitu/botai:latest
+
+  # A imagem publicada como service de um job, do jeito que um projeto de outra linguagem a usaria.
+  imagem-publicada:
+    name: Imagem publicada como service (projeto de teste)
+    needs: [pacote, imagem]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    services:
+      botai:
+        image: ghcr.io/piluvitu/botai:${{ needs.pacote.outputs.versao }}
+        credentials:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        ports:
+          - 8790:8790
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+
+      - name: Fumaça contra o service
+        working-directory: packages/core
+        run: node scripts/fumaca.mjs --url http://127.0.0.1:8790
+
+  release:
+    name: GitHub Release (binários, SHA256SUMS e install.sh)
+    needs: [pacote, imagem-publicada]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: core-binarios
+          path: dist-bin
+
+      - name: Notas (commits do core desde a tag core-v anterior)
+        env:
+          VERSAO: ${{ needs.pacote.outputs.versao }}
+        run: |
+          set -euo pipefail
+          anterior=$(git describe --tags --abbrev=0 --match 'core-v*' "$GITHUB_REF_NAME^" 2>/dev/null || true)
+          instalar="curl -fsSL https://github.com/PiluVitu/Botai/releases/download/$GITHUB_REF_NAME/install.sh | BOTAI_VERSAO=$VERSAO sh"
+          {
+            echo "## @pilutech/botai-core $VERSAO"
+            echo
+            echo "Binário desta versão: \`$instalar\`"
+            echo
+            echo "Imagem: \`docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:$VERSAO\`"
+            echo
+            git log --no-merges --format='- %s (%h)' "${anterior:+$anterior..}$GITHUB_REF_NAME" -- packages/core
+          } > notas.md
+          cat notas.md
+
+      # O release pode já existir (criado por outro workflow da mesma tag): aí só anexa.
+      - name: Criar o release ou anexar a ele
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSAO: ${{ needs.pacote.outputs.versao }}
+        run: |
+          set -euo pipefail
+          arquivos=(dist-bin/botai-* dist-bin/SHA256SUMS packages/core/scripts/install.sh)
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "${arquivos[@]}" --clobber
+            gh release edit "$GITHUB_REF_NAME" --latest
+          else
+            gh release create "$GITHUB_REF_NAME" "${arquivos[@]}" \
+              --verify-tag \
+              --title "botai-core $VERSAO" \
+              --notes-file notas.md \
+              --latest
+          fi
+
+  actionlint:
+    name: actionlint dos workflows
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: actionlint (imagem fixada por digest)
+        run: >-
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo" --workdir /repo
+          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+          -color
