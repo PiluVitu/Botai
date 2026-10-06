@@ -3,9 +3,9 @@ import { join } from 'node:path'
 import { render, screen, within } from '@testing-library/react'
 import TermosPage from './page'
 
-const PESSOA = join(__dirname, '../../../../packages/tools/src/pessoa.ts')
+const PESSOA = join(__dirname, '../../../packages/core/src/pessoa.ts')
 
-// Cada gerador que monta a pessoa (packages/tools/src/pessoa.ts) e o dado dele que
+// Cada gerador que monta a pessoa (packages/core/src/pessoa.ts) e o dado dele que
 // pode ser de alguém de verdade. Os documentos saem com dígito verificador válido e
 // sem faixa de teste; o celular tem DDD real; o número da casa é sorteado na
 // numeração real do CEP. null: não sorteia documento, telefone nem endereço (o
@@ -69,7 +69,7 @@ describe('/termos', () => {
   it('a MIT, com o link para o LICENSE, vale sobre o código', () => {
     expect(screen.getByRole('link', { name: 'licença MIT' })).toHaveAttribute(
       'href',
-      'https://github.com/PiluVitu/PiluVitu-Dev/blob/main/apps/botai/LICENSE',
+      'https://github.com/PiluVitu/Botai/blob/main/extensao/LICENSE',
     )
     expect(document.body).toHaveTextContent(
       'Se algum trecho destes termos parecer limitar o que a MIT permite fazer com o código, vale a MIT.',
@@ -151,7 +151,7 @@ describe('/termos', () => {
       screen.getByRole('link', { name: 'histórico do código-fonte do site' }),
     ).toHaveAttribute(
       'href',
-      'https://github.com/PiluVitu/PiluVitu-Dev/commits/main/apps/botai-site/app/termos/page.tsx',
+      'https://github.com/PiluVitu/Botai/commits/main/site/app/termos/page.tsx',
     )
   })
 

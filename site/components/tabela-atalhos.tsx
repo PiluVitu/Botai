@@ -1,4 +1,4 @@
-import { ATALHOS, type Loja, type Sistema } from '@piluvitu/tools/pilulabs'
+import { ATALHOS, type Loja, type Sistema } from '@pilutech/botai-core/atalhos'
 
 const NAVEGADORES: { loja: Loja; nome: string }[] = [
   { loja: 'chrome', nome: 'Chrome' },

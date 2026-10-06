@@ -120,7 +120,15 @@ describe('metadataDoSite', () => {
 })
 
 const CSS_DO_DESIGN_SYSTEM = readFileSync(
-  join(__dirname, '..', '..', '..', 'packages', 'ui', 'src', 'styles.css'),
+  join(
+    __dirname,
+    '..',
+    'node_modules',
+    '@piluvitu',
+    'ui',
+    'dist',
+    'styles.css',
+  ),
   'utf8',
 )
 

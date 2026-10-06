@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { JsonLd } from '@/components/json-ld'
 import { Landing } from '@/components/landing'
-import { lerUrlsDasLojas } from '@/lib/cms'
+import { lerUrlsDasLojas } from '@/lib/lojas'
 import { jsonLdDaHome } from '@/lib/json-ld'
 import { modeloDaLanding } from '@/lib/modelo'
 import { DESCRICAO_DA_HOME, metadataDaPagina, TITULO_DA_HOME } from '@/lib/seo'

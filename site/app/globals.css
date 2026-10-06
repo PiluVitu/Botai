@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @import '@fortawesome/fontawesome-svg-core/styles.css' layer(base);
 @import '@piluvitu/ui/styles.css';
-@source '../../../packages/ui/src';
+@source '../node_modules/@piluvitu/ui/dist';
 /* A documentação do app não pode mudar o CSS da landing (o Tailwind varre os .md). */
 @source not '../*.md';
 @plugin '@tailwindcss/typography';

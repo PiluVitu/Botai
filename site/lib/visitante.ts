@@ -1,4 +1,4 @@
-import { ATALHOS, type Sistema } from '@piluvitu/tools/pilulabs'
+import { ATALHOS, type Sistema } from '@pilutech/botai-core/atalhos'
 
 export type NavegadorDoVisitante = {
   userAgent: string

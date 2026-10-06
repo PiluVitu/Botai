@@ -19,7 +19,7 @@ describe('CAPTURAS', () => {
     ])
   })
 
-  // Os nomes vêm do gerador das lojas (apps/botai/loja/pecas.ts): o número do arquivo muda com o tema.
+  // Os nomes vêm do gerador das lojas (extensao/loja/pecas.ts): o número do arquivo muda com o tema.
   it('cada cena aponta para o PNG de cada tema', () => {
     expect(
       CAPTURAS.map((c) => [c.variantes.escuro.src, c.variantes.claro.src]),

@@ -1,4 +1,4 @@
-import type { Sistema } from '@piluvitu/tools/pilulabs'
+import type { Sistema } from '@pilutech/botai-core/atalhos'
 import {
   atalhoDoVisitante,
   ehFirefox,

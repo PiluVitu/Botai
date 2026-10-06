@@ -5,7 +5,7 @@ import {
   type Fase,
   type Loja,
   type UrlsDasLojas,
-} from '@piluvitu/tools/pilulabs'
+} from './pilulabs'
 
 export type BotaoDeLoja = { loja: Loja; url: string | null }
 export type ModeloDaLanding = {

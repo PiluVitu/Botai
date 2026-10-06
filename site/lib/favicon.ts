@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { icoDePngs } from '@piluvitu/tools/ico'
+import { icoDePngs } from './ico'
 
 export const ICONES_DA_EXTENSAO = join(
   process.cwd(),
   '..',
-  'botai',
+  'extensao',
   'public',
   'icon',
 )

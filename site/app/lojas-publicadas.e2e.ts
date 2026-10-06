@@ -1,9 +1,9 @@
 import { join } from 'node:path'
 import { expect, test } from '@playwright/test'
-import { lerUrlsDasLojas } from '../lib/cms'
+import { lerUrlsDasLojas } from '../lib/lojas'
 
-// Roda só pelo playwright.lojas.config.ts, que builda a landing com este YAML no lugar do CMS.
-const URLS = lerUrlsDasLojas(join(__dirname, 'lojas-publicadas.yaml'))
+// Roda só pelo playwright.lojas.config.ts, que builda a landing com este arquivo no lugar do lojas.json.
+const URLS = lerUrlsDasLojas(join(__dirname, 'lojas-publicadas.json'))
 
 test('a fixture: Firefox publicado, Chrome com link de outra loja, Edge em http', () => {
   expect(URLS.firefoxUrl).toMatch(/^https:\/\/addons\.mozilla\.org\//)

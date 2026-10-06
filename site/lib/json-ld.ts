@@ -1,4 +1,4 @@
-import { lojasPublicadas, type UrlsDasLojas } from '@piluvitu/tools/pilulabs'
+import { lojasPublicadas, type UrlsDasLojas } from './pilulabs'
 import { CAPTURAS } from './capturas'
 import {
   NOME,

@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { render, screen } from '@testing-library/react'
 import PrivacidadePage from './page'
 
-const BOTAI = join(__dirname, '..', '..', '..', 'botai')
+const BOTAI = join(__dirname, '..', '..', '..', 'extensao')
 const ler = (arquivo: string) => readFileSync(join(BOTAI, arquivo), 'utf8')
 
 describe('/privacidade', () => {
@@ -170,7 +170,7 @@ describe('/privacidade', () => {
       screen.getByRole('link', { name: 'histórico do código-fonte do site' }),
     ).toHaveAttribute(
       'href',
-      'https://github.com/PiluVitu/PiluVitu-Dev/commits/main/apps/botai-site/app/privacidade/page.tsx',
+      'https://github.com/PiluVitu/Botai/commits/main/site/app/privacidade/page.tsx',
     )
   })
 

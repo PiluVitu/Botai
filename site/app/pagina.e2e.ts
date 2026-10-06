@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { LOJA_UI } from '../components/lojas-ui'
 import { CAPTURAS } from '../lib/capturas'
-import { lerUrlsDasLojas } from '../lib/cms'
+import { lerUrlsDasLojas } from '../lib/lojas'
 import { botoesDasLojas } from '../lib/modelo'
 
-// O esperado sai do mesmo YAML que a página lê no build.
+// O esperado sai do mesmo lojas.json que a página lê no build.
 const botoes = botoesDasLojas(lerUrlsDasLojas())
 
 test.describe('/', () => {
@@ -37,7 +37,7 @@ test.describe('/', () => {
     expect(erros).toEqual([])
   })
 
-  test('botões de loja seguem o CMS: link na publicada, "Em breve" sem link na que falta', async ({
+  test('botões de loja seguem o lojas.json: link na publicada, "Em breve" sem link na que falta', async ({
     page,
   }) => {
     await page.goto('/')

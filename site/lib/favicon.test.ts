@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { imagensDoIco } from '@piluvitu/tools/ico'
+import { imagensDoIco } from './ico'
 import { ICONES_DA_EXTENSAO, LADOS_DO_FAVICON, faviconDoBotai } from './favicon'
 
 describe('faviconDoBotai', () => {
   // O ícone do site é o da extensão: os PNGs que vão no manifest, sem redesenhar.
-  it('lê os ícones da própria extensão, no apps/botai', () => {
-    expect(ICONES_DA_EXTENSAO).toMatch(/apps\/botai\/public\/icon$/)
+  it('lê os ícones da própria extensão, no extensao', () => {
+    expect(ICONES_DA_EXTENSAO).toMatch(/extensao\/public\/icon$/)
   })
 
   it('empacota os PNGs de 16, 32 e 48 px da extensão, byte a byte', () => {

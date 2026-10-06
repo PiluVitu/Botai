@@ -15,7 +15,7 @@ import {
 } from './conteudo'
 
 const WXT_CONFIG = readFileSync(
-  join(__dirname, '..', '..', 'botai', 'wxt.config.ts'),
+  join(__dirname, '..', '..', 'extensao', 'wxt.config.ts'),
   'utf8',
 )
 
@@ -47,15 +47,15 @@ describe('conteúdo da landing', () => {
 describe('documentos e código-fonte', () => {
   it('o histórico de um arquivo do site no GitHub', () => {
     expect(historicoDe('app/privacidade/page.tsx')).toBe(
-      'https://github.com/PiluVitu/PiluVitu-Dev/commits/main/apps/botai-site/app/privacidade/page.tsx',
+      'https://github.com/PiluVitu/Botai/commits/main/site/app/privacidade/page.tsx',
     )
   })
 
   // Os termos dizem que o código é MIT: o link e o arquivo têm de bater.
   it('a licença citada nos termos é o LICENSE MIT do Botaí', () => {
-    expect(URL_DA_LICENCA).toBe(`${REPOSITORIO}/blob/main/apps/botai/LICENSE`)
+    expect(URL_DA_LICENCA).toBe(`${REPOSITORIO}/blob/main/extensao/LICENSE`)
     const licenca = readFileSync(
-      join(__dirname, '..', '..', 'botai', 'LICENSE'),
+      join(__dirname, '..', '..', 'extensao', 'LICENSE'),
       'utf8',
     )
     expect(licenca).toMatch(/^MIT License\n\nCopyright \(c\) \d{4} PiluTech\n/)

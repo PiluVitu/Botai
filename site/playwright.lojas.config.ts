@@ -18,6 +18,6 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 300_000,
     cwd: '.',
-    env: { BOTAI_CMS_ITEM: join(__dirname, 'app', 'lojas-publicadas.yaml') },
+    env: { BOTAI_LOJAS: join(__dirname, 'app', 'lojas-publicadas.json') },
   },
 })

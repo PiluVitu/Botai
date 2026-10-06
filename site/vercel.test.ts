@@ -13,19 +13,18 @@ describe('vercel.json (Ignored Build Step)', () => {
     expect(comando).toBe('git diff --quiet HEAD^ HEAD')
   })
 
-  // A entrada do Botaí no CMS mora no apps/web: sem ela aqui, publicar uma loja pelo /admin não rebuilda a landing.
-  // O favicon.ico sai dos ícones da extensão: sem a pasta, um ícone novo não chega ao site.
-  it('vigia o app, os pacotes, a entrada do Botaí no CMS, os ícones da extensão e os arquivos de install e build', () => {
+  // As lojas moram no lojas.json (dentro do site); o favicon.ico sai dos ícones da extensão;
+  // o @piluvitu/ui muda pelo lockfile.
+  it('vigia o site, o core, os ícones da extensão e os arquivos de install e build', () => {
     expect(caminhos.split(' ')).toEqual([
       '.',
-      '../../packages/ui',
-      '../../packages/tools',
-      '../web/content/pilulabs/botai',
-      '../botai/public/icon',
-      '../../pnpm-lock.yaml',
-      '../../pnpm-workspace.yaml',
-      '../../package.json',
-      '../../scripts/check-tailwind-source.mjs',
+      '../packages/core',
+      '../extensao/public/icon',
+      '../pnpm-lock.yaml',
+      '../pnpm-workspace.yaml',
+      '../package.json',
+      '../.npmrc',
+      '../scripts/check-tailwind-source.mjs',
     ])
   })
 

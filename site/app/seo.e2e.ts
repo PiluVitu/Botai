@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
-import { lojasPublicadas } from '@piluvitu/tools/pilulabs'
+import { lojasPublicadas } from '../lib/pilulabs'
 import type { AxeResults, RunOptions } from 'axe-core'
-import { lerUrlsDasLojas } from '../lib/cms'
+import { lerUrlsDasLojas } from '../lib/lojas'
 import { faviconDoBotai } from '../lib/favicon'
 import {
   DESCRICAO_DA_HOME,
@@ -177,7 +177,7 @@ for (const rota of ROTAS) {
   })
 }
 
-test('JSON-LD de /: SoftwareApplication gratuito, sem nota, com as lojas do CMS', async ({
+test('JSON-LD de /: SoftwareApplication gratuito, sem nota, com as lojas do lojas.json', async ({
   page,
 }) => {
   await page.goto('/')

@@ -6,7 +6,7 @@ import {
   faIdCard,
   faLocationDot,
 } from '@fortawesome/free-solid-svg-icons'
-import { EMAIL_DA_PILUTECH, mailtoDaPilutech } from '@piluvitu/tools/contato'
+import { EMAIL_DA_PILUTECH, mailtoDaPilutech } from './contato'
 
 export const NOME = 'Botaí'
 export const PROPOSTA =
@@ -19,8 +19,8 @@ export const MAILTO = {
   privacidade: mailtoDaPilutech(NOME, 'Privacidade'),
   termos: mailtoDaPilutech(NOME, 'Termos de uso'),
 } as const
-export const REPOSITORIO = 'https://github.com/PiluVitu/PiluVitu-Dev'
-export const URL_DA_LICENCA = `${REPOSITORIO}/blob/main/apps/botai/LICENSE`
+export const REPOSITORIO = 'https://github.com/PiluVitu/Botai'
+export const URL_DA_LICENCA = `${REPOSITORIO}/blob/main/extensao/LICENSE`
 
 export const DOCUMENTOS = [
   { href: '/privacidade', rotulo: 'Privacidade' },
@@ -28,7 +28,7 @@ export const DOCUMENTOS = [
 ]
 
 export function historicoDe(arquivo: string): string {
-  return `${REPOSITORIO}/commits/main/apps/botai-site/${arquivo}`
+  return `${REPOSITORIO}/commits/main/site/${arquivo}`
 }
 
 export type Recurso = { titulo: string; texto: string; icone: IconDefinition }
