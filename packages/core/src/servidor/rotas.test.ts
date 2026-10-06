@@ -243,6 +243,21 @@ describe('responder', () => {
     expect(r.cabecalhos.Allow).toBe('GET')
   })
 
+  // O node:http entrega o alvo em forma absoluta sem validar; um throw aqui derruba o servidor.
+  test.each(['http://[', 'http://a:b:c/pessoa', 'http://%/x', 'http://[::1/x'])(
+    'alvo que não é URL (%s) → 400, sem lançar',
+    (alvo) => {
+      const r = responder('GET', alvo)
+      expect(r.status).toBe(400)
+      expect(r.cabecalhos['Content-Type']).toBe(
+        'application/json; charset=utf-8',
+      )
+      expect(r.cabecalhos['Cache-Control']).toBe('no-store')
+      expect(r.cabecalhos['X-Content-Type-Options']).toBe('nosniff')
+      expect(JSON.parse(r.corpo).erro).toBe(`alvo inválido: ${alvo}`)
+    },
+  )
+
   test('toda resposta leva no-store e nosniff', () => {
     for (const alvo of ['/saude', '/pessoa?semente=1', '/x', '/pessoas']) {
       const r = responder('GET', alvo)

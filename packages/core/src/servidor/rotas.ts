@@ -52,8 +52,17 @@ function pessoas(params: URLSearchParams): Resposta {
   return texto(200, TIPO_POR_FORMATO[pedido.formato], corpo)
 }
 
+function urlDe(alvo: string): URL | undefined {
+  try {
+    return new URL(alvo, 'http://botai.local')
+  } catch {
+    return undefined
+  }
+}
+
 export function responder(metodo: string, alvo: string): Resposta {
-  const url = new URL(alvo, 'http://botai.local')
+  const url = urlDe(alvo)
+  if (url === undefined) return json(400, { erro: `alvo inválido: ${alvo}` })
   if (!(ROTAS as readonly string[]).includes(url.pathname))
     return json(404, {
       erro: `rota desconhecida: ${url.pathname} (rotas: ${ROTAS.join(', ')})`,
