@@ -105,6 +105,13 @@ describe('aoClicarMenu', () => {
     expect(abrir).toHaveBeenCalledWith({ url: P.email.caixaUrl })
   })
 
+  it('"Abrir caixa de entrada" com pessoa sem caixa pública (outro domínio) não abre aba', async () => {
+    await pessoaItem.setValue({ ...P, email: { ...P.email, caixaUrl: null } })
+    const abrir = vi.spyOn(fakeBrowser.tabs, 'create')
+    await aoClicarMenu(clique('botai-abrir-caixa'), ABA)
+    expect(abrir).not.toHaveBeenCalled()
+  })
+
   it('"Abrir caixa de entrada" sem pessoa gera uma antes', async () => {
     await pessoaItem.setValue(null)
     const abrir = vi.spyOn(fakeBrowser.tabs, 'create')

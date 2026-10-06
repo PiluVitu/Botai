@@ -1,8 +1,8 @@
 import { cryptoRandomBytes } from './entropia'
-import { gerarPessoa, type Pessoa } from '@pilutech/botai-core/pessoa'
+import { hojeEmSaoPaulo } from '@pilutech/botai-core'
+import { montarPessoa, type Pessoa } from '@pilutech/botai-core/pessoa'
 import { seedFromBytes } from '@pilutech/botai-core/prng'
 import { storage } from 'wxt/utils/storage'
-import { hojeISO } from './hoje'
 
 export const pessoaItem = storage.defineItem<Pessoa | null>(
   'local:botai_pessoa',
@@ -13,7 +13,10 @@ export const pessoaItem = storage.defineItem<Pessoa | null>(
 )
 
 export async function gerarPessoaNova(): Promise<Pessoa> {
-  const pessoa = gerarPessoa(seedFromBytes(cryptoRandomBytes(16)), hojeISO())
+  const pessoa = montarPessoa(
+    seedFromBytes(cryptoRandomBytes(16)),
+    hojeEmSaoPaulo(),
+  )
   await pessoaItem.setValue(pessoa)
   return pessoa
 }

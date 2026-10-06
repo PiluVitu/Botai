@@ -2,7 +2,7 @@ import { type FieldDescriptor } from './campos'
 import { caber, escolherOpcao, valorPara } from './campos-formatar'
 import type { Pessoa } from './pessoa'
 
-// A pessoa dourada (gerarPessoa(sfc32(1,2,3,4), '2026-10-01')) escrita por extenso:
+// A pessoa dourada (montarPessoa(sfc32(1,2,3,4), '2026-10-01')) escrita por extenso:
 // os testes de formatação não dependem dos geradores.
 const P: Pessoa = {
   nome: {

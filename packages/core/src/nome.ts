@@ -131,16 +131,21 @@ export const DOMINIO_EMAIL = 'tuamaeaquelaursa.com'
 export interface Email {
   usuario: string
   endereco: string
-  caixaUrl: string
+  caixaUrl: string | null
 }
 
-export function gerarEmail(rng: Rng, nome: Nome): Email {
+export function gerarEmail(
+  rng: Rng,
+  nome: Nome,
+  dominio: string = DOMINIO_EMAIL,
+): Email {
   const primeiro = slugNome(nome.prenome.split(' ')[0])
   const ultimo = slugNome(nome.sobrenomes[1])
   const usuario = `${primeiro}-${ultimo}-${digitosAleatorios(rng, 4).join('')}`
   return {
     usuario,
-    endereco: `${usuario}@${DOMINIO_EMAIL}`,
-    caixaUrl: `https://${DOMINIO_EMAIL}/${usuario}`,
+    endereco: `${usuario}@${dominio}`,
+    caixaUrl:
+      dominio === DOMINIO_EMAIL ? `https://${DOMINIO_EMAIL}/${usuario}` : null,
   }
 }

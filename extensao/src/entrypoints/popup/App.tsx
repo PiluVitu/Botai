@@ -1,4 +1,5 @@
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
+import { hojeEmSaoPaulo } from '@pilutech/botai-core'
 import { useEffect, useState, type ReactNode } from 'react'
 import { browser } from 'wxt/browser'
 import { NenhumCampo } from '../../components/nenhum-campo'
@@ -17,7 +18,7 @@ import {
   verDados,
   type EstadoPopup,
 } from '../../lib/estado-popup'
-import { hojeISO, idadeEm } from '../../lib/hoje'
+import { idadeEm } from '../../lib/hoje'
 import { enviar, type RespostaPreencher } from '../../lib/mensagens'
 import {
   detectarNavegador,
@@ -103,8 +104,10 @@ function TelaDoPopup({
   const [navegador] = useState(detectarNavegador)
   const abrirAtalhos = () => abrirPaginaDeAtalhos(navegador)
   const abrirPiluTech = () => void browser.tabs.create({ url: SITE_PILUTECH })
-  const abrirCaixa = (dono: Pessoa) =>
-    void browser.tabs.create({ url: dono.email.caixaUrl })
+  const abrirCaixa = (dono: Pessoa) => {
+    if (dono.email.caixaUrl)
+      void browser.tabs.create({ url: dono.email.caixaUrl })
+  }
   const irParaOsDados = () => setEstado(verDados)
 
   async function preencher() {
@@ -165,7 +168,7 @@ function TelaDoPopup({
     conteudo = (
       <PessoaPronta
         pessoa={pessoa}
-        idade={idadeEm(pessoa.nascimento.iso, hojeISO())}
+        idade={idadeEm(pessoa.nascimento.iso, hojeEmSaoPaulo())}
         atalho={atalho}
         preencherDesabilitado={aba === null || estado.situacao !== 'ok'}
         onPreencher={() => void preencher()}

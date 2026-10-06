@@ -39,7 +39,8 @@ export async function aoClicarMenu(
   }
   if (id === MENU.abrirCaixa) {
     const pessoa = await obterOuGerarPessoa()
-    await browser.tabs.create({ url: pessoa.email.caixaUrl })
+    if (pessoa.email.caixaUrl)
+      await browser.tabs.create({ url: pessoa.email.caixaUrl })
     return
   }
   if (aba?.id === undefined) return

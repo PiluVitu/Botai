@@ -48,6 +48,17 @@ describe('nome', () => {
     expect(e.caixaUrl).toBe(`https://tuamaeaquelaursa.com/${e.usuario}`)
   })
 
+  test('e-mail com outro domínio: mesmo usuario, sem caixa pública', () => {
+    const nome = gerarNome(sfc32(1, 2, 3, 4))
+    const padrao = gerarEmail(sfc32(5, 5, 5, 5), nome)
+    const outro = gerarEmail(sfc32(5, 5, 5, 5), nome, 'example.com')
+    expect(outro).toEqual({
+      usuario: padrao.usuario,
+      endereco: `${padrao.usuario}@example.com`,
+      caixaUrl: null,
+    })
+  })
+
   // O tuamaeaquelaursa.com normaliza o nome da caixa (cópia da função do bundle
   // do site): sem acento, minúsculas, e tudo que não é [a-z0-9] vira um traço.
   // Com ponto, a URL `/maria.ribeiro.4821` abria outra caixa, e o e-mail

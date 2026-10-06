@@ -100,10 +100,10 @@ test('o build gera a mesma pessoa dourada que o código-fonte', async () => {
   const { sfc32 } = await import(
     pathToFileURL(join(PACOTE, 'dist', 'prng.js')).href
   )
-  const { gerarPessoa } = await import(
+  const { montarPessoa } = await import(
     pathToFileURL(join(PACOTE, 'dist', 'pessoa.js')).href
   )
-  const pessoa = gerarPessoa(sfc32(1, 2, 3, 4), '2026-10-01')
+  const pessoa = montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01')
   assert.equal(pessoa.cpf, '647.692.234-39')
   assert.equal(
     pessoa.email.endereco,

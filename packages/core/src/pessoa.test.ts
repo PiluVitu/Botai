@@ -1,21 +1,22 @@
 import { sfc32 } from './prng'
-import { gerarPessoa } from './pessoa'
+import { montarPessoa } from './pessoa'
 import { validarCPF } from './cpf'
 import { validarCNPJ } from './cnpj'
 import { validarRG } from './rg'
 import { validarPIS } from './pis'
 import { validarTituloEleitor } from './titulo-eleitor'
-import { CODIGO_UF_TITULO, REGIAO_FISCAL_CPF } from './uf'
+import { CODIGO_UF_TITULO, REGIAO_FISCAL_CPF, type UF, UFS } from './uf'
+import { ErroDeOpcao } from './opcoes'
 import { senhaAtendeRegrasComuns } from './senha'
 import { LOGRADOUROS } from './endereco'
 import { luhnValido } from './cartao'
 import { slugNome } from './nome'
 import { sementes } from './rng-teste'
 
-describe('gerarPessoa', () => {
+describe('montarPessoa', () => {
   // Snapshot de propósito: muda quando um gerador muda, e a mudança tem que ser revista aqui.
   test('pessoa dourada: semente (1,2,3,4) em 2026-10-01', () => {
-    expect(gerarPessoa(sfc32(1, 2, 3, 4), '2026-10-01')).toEqual({
+    expect(montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01')).toEqual({
       nome: {
         sexo: 'M',
         prenome: 'Vinícius',
@@ -70,14 +71,14 @@ describe('gerarPessoa', () => {
   })
 
   test('mesma semente ⇒ mesma pessoa', () => {
-    expect(gerarPessoa(sfc32(9, 8, 7, 6), '2026-10-01')).toEqual(
-      gerarPessoa(sfc32(9, 8, 7, 6), '2026-10-01'),
+    expect(montarPessoa(sfc32(9, 8, 7, 6), '2026-10-01')).toEqual(
+      montarPessoa(sfc32(9, 8, 7, 6), '2026-10-01'),
     )
   })
 
   test('1000 sementes: todo documento válido e todo campo coerente', () => {
     for (const r of sementes(1000)) {
-      const p = gerarPessoa(r, '2026-10-01')
+      const p = montarPessoa(r, '2026-10-01')
       expect(validarCPF(p.cpf)).toBe(true)
       expect(validarRG(p.rg.numero)).toBe(true)
       expect(validarPIS(p.pis)).toBe(true)
@@ -115,4 +116,64 @@ describe('gerarPessoa', () => {
       expect(p.nascimento.idade).toBeLessThanOrEqual(65)
     }
   })
+})
+
+describe('montarPessoa com opções', () => {
+  const DOURADA = () => montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01')
+
+  test('opções vazias não mudam a pessoa dourada', () => {
+    expect(montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {})).toEqual(DOURADA())
+  })
+
+  test('uf fixa o endereço, e CPF, título e DDD seguem a UF', () => {
+    for (const uf of UFS) {
+      const p = montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', { uf })
+      expect(p.endereco.uf).toBe(uf)
+      expect(Number(p.cpf[10])).toBe(REGIAO_FISCAL_CPF[uf])
+      expect(p.tituloEleitor.replace(/\s/g, '').slice(8, 10)).toBe(
+        CODIGO_UF_TITULO[uf],
+      )
+      expect(p.celular.ddd).toBe(p.endereco.ddd)
+      expect(p.nome).toEqual(DOURADA().nome)
+    }
+  })
+
+  test('uf em minúscula vale; uf desconhecida lança ErroDeOpcao', () => {
+    expect(
+      montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', { uf: 'pi' as UF }).endereco
+        .uf,
+    ).toBe('PI')
+    expect(() =>
+      montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', { uf: 'XX' as UF }),
+    ).toThrow(ErroDeOpcao)
+  })
+
+  test('dominioEmail troca só o domínio do e-mail e zera a caixa', () => {
+    const p = montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {
+      dominioEmail: 'Example.COM',
+    })
+    expect(p.email).toEqual({
+      usuario: 'vinicius-costa-6607',
+      endereco: 'vinicius-costa-6607@example.com',
+      caixaUrl: null,
+    })
+    expect({ ...p, email: DOURADA().email }).toEqual(DOURADA())
+  })
+
+  test('dominioEmail igual ao padrão mantém a caixa pública', () => {
+    expect(
+      montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {
+        dominioEmail: 'tuamaeaquelaursa.com',
+      }),
+    ).toEqual(DOURADA())
+  })
+
+  test.each(['localhost', '', 'a b.com'])(
+    'dominioEmail %j lança ErroDeOpcao',
+    (dominioEmail) => {
+      expect(() =>
+        montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', { dominioEmail }),
+      ).toThrow(ErroDeOpcao)
+    },
+  )
 })

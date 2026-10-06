@@ -1,10 +1,11 @@
+import { hojeEmSaoPaulo } from '@pilutech/botai-core'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Browser } from 'wxt/browser'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import { pessoaItem } from '../../lib/armazenamento'
-import { hojeISO, idadeEm } from '../../lib/hoje'
+import { idadeEm } from '../../lib/hoje'
 import type { RespostaPreencher } from '../../lib/mensagens'
 import { PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
 import { LINHAS_DO_DESIGN, resumoDe } from '../../test/resumos'
@@ -67,7 +68,7 @@ describe('App do popup', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: P.nome.completo }),
     ).toBeInTheDocument()
-    const idade = idadeEm(P.nascimento.iso, hojeISO())
+    const idade = idadeEm(P.nascimento.iso, hojeEmSaoPaulo())
     expect(
       screen.getByText(
         `${idade} anos · ${P.endereco.cidade}, ${P.endereco.uf}`,
@@ -135,6 +136,16 @@ describe('App do popup', () => {
       .setup()
       .click(await screen.findByRole('button', { name: 'Caixa de entrada' }))
     expect(abrir).toHaveBeenCalledWith({ url: P.email.caixaUrl })
+  })
+
+  it('"Caixa de entrada" de pessoa sem caixa pública não abre aba', async () => {
+    const abrir = vi.spyOn(fakeBrowser.tabs, 'create')
+    await pessoaItem.setValue({ ...P, email: { ...P.email, caixaUrl: null } })
+    render(<App />)
+    await userEvent
+      .setup()
+      .click(await screen.findByRole('button', { name: 'Caixa de entrada' }))
+    expect(abrir).not.toHaveBeenCalled()
   })
 
   it('"Nova pessoa" troca a pessoa guardada', async () => {

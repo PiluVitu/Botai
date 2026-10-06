@@ -2,7 +2,7 @@ import type { FieldKind } from '@pilutech/botai-core/campos'
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { browser } from 'wxt/browser'
 import { obterOuGerarPessoa } from '../../lib/armazenamento'
-import { hojeISO } from '../../lib/hoje'
+import { hojeEmSaoPaulo } from '@pilutech/botai-core'
 import type { RespostaPreencher } from '../../lib/mensagens'
 import { erroEhPaginaProibida } from '../../lib/paginas'
 import { somarFrames } from '../../lib/resultado'
@@ -86,7 +86,7 @@ export async function preencherPagina(
         target: { tabId, allFrames: true },
         func: (p: Pessoa, hoje: string) =>
           (globalThis as ComBotai).__botai?.preencher(p, hoje) ?? null,
-        args: [pessoa, hojeISO()],
+        args: [pessoa, hojeEmSaoPaulo()],
       }),
       0,
     )

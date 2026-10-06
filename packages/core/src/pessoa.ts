@@ -6,10 +6,12 @@ import { type Empresa, gerarEmpresa } from './empresa'
 import { type Endereco, gerarEndereco } from './endereco'
 import { type Nascimento, gerarNascimento } from './nascimento'
 import { type Email, type Nome, gerarEmail, gerarNome } from './nome'
+import { lerDominioEmail, lerUF } from './opcoes'
 import { gerarPIS } from './pis'
 import { gerarRG } from './rg'
 import { gerarSenha } from './senha'
 import { gerarTituloEleitor } from './titulo-eleitor'
+import type { UF } from './uf'
 
 export interface Pessoa {
   nome: Nome
@@ -26,10 +28,24 @@ export interface Pessoa {
   cartao: Cartao
 }
 
+export interface OpcoesDaMontagem {
+  uf?: UF
+  dominioEmail?: string
+}
+
 // A ordem das chamadas a rng é parte do contrato: mudar a ordem muda a pessoa de uma semente.
-export function gerarPessoa(rng: Rng, hojeISO: string): Pessoa {
+export function montarPessoa(
+  rng: Rng,
+  hojeISO: string,
+  opcoes: OpcoesDaMontagem = {},
+): Pessoa {
+  const uf = opcoes.uf === undefined ? undefined : lerUF(opcoes.uf)
+  const dominio =
+    opcoes.dominioEmail === undefined
+      ? undefined
+      : lerDominioEmail(opcoes.dominioEmail)
   const nome = gerarNome(rng)
-  const endereco = gerarEndereco(rng)
+  const endereco = gerarEndereco(rng, uf)
   const nascimento = gerarNascimento(rng, hojeISO)
   return {
     nome,
@@ -39,7 +55,7 @@ export function gerarPessoa(rng: Rng, hojeISO: string): Pessoa {
     pis: gerarPIS(rng),
     tituloEleitor: gerarTituloEleitor(rng, endereco.uf),
     celular: gerarCelular(rng, endereco.ddd),
-    email: gerarEmail(rng, nome),
+    email: gerarEmail(rng, nome, dominio),
     senha: gerarSenha(rng),
     endereco,
     empresa: gerarEmpresa(rng, nome.sobrenomes),
