@@ -6,15 +6,17 @@ Gerador de dados fake para formulários (CPF, CNPJ, CEP), da [PiluTech](https://
 - **Chrome e Edge:** [Chrome Web Store](https://chromewebstore.google.com/detail/bota%C3%AD/mblmjomopainbcdjipkdmioglamdinnc). Firefox e Opera: em revisão nas lojas.
 - **Biblioteca:** [`@pilutech/botai-core`](https://www.npmjs.com/package/@pilutech/botai-core), o mesmo motor da extensão, para Node e navegador.
 - **Servidor, imagem e binários:** `botai serve`, a imagem `ghcr.io/piluvitu/botai` e binários sem Node ([`packages/core/README.md`](./packages/core/README.md)).
+- `@pilutech/botai-playwright`: fixture do Playwright ([README](packages/playwright/README.md)).
 
 ## O que tem aqui
 
-| Pasta               | O quê                                                                                                                         |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `extensao/`         | a extensão para Chrome, Edge, Opera e Firefox (WXT + React 19); instalar e usar: [`extensao/README.md`](./extensao/README.md) |
-| `site/`             | a landing em botai.pilutech.com.br (Next 16), com a política de privacidade e os termos de uso                                |
-| `packages/core/`    | `@pilutech/botai-core`, publicado no npm: [`packages/core/README.md`](./packages/core/README.md)                              |
-| `docs/superpowers/` | specs, planos, design e pesquisa                                                                                              |
+| Pasta                  | O quê                                                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `extensao/`            | a extensão para Chrome, Edge, Opera e Firefox (WXT + React 19); instalar e usar: [`extensao/README.md`](./extensao/README.md) |
+| `site/`                | a landing em botai.pilutech.com.br (Next 16), com a política de privacidade e os termos de uso                                |
+| `packages/core/`       | `@pilutech/botai-core`, publicado no npm: [`packages/core/README.md`](./packages/core/README.md)                              |
+| `packages/playwright/` | `@pilutech/botai-playwright`, publicado no npm: [`packages/playwright/README.md`](./packages/playwright/README.md)            |
+| `docs/superpowers/`    | specs, planos, design e pesquisa                                                                                              |
 
 ## Desenvolvimento
 

@@ -208,3 +208,50 @@ jobs:
 
       - name: Build (+ gate do @source + rotas estáticas)
         run: pnpm --filter @pilutech/botai-site run build
+
+  playwright:
+    name: Plugin do Playwright (lint + Jest + E2E nos 3 navegadores + pacote)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (tsc)
+        run: pnpm --filter @pilutech/botai-playwright run lint
+
+      - name: Jest (lógica + relatório do projeto filho)
+        run: pnpm --filter @pilutech/botai-playwright run test
+
+      - name: Navegadores do Playwright
+        run: pnpm --filter @pilutech/botai-playwright exec playwright install --with-deps chromium firefox webkit
+
+      - name: E2E (Chromium, Firefox e WebKit)
+        run: pnpm --filter @pilutech/botai-playwright run test:e2e
+
+      - name: Build e conferência do pacote
+        run: |
+          pnpm --filter @pilutech/botai-playwright run build
+          node packages/playwright/scripts/conferir-pacote.mjs
+
+      - name: Rastros do Playwright
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-plugin
+          path: packages/playwright/test-results/
+          if-no-files-found: ignore
+          retention-days: 7

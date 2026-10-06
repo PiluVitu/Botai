@@ -1,5 +1,6 @@
 .PHONY: test lint stop \
         test-core build-core imagem fumaca-imagem binario-local \
+        test-playwright test-e2e-playwright \
         dev-botai build-botai test-botai test-e2e-botai storybook-botai zip-botai versao-botai release-botai capturas-botai \
         dev-botai-site build-botai-site test-botai-site test-e2e-botai-site storybook-botai-site
 
@@ -32,6 +33,14 @@ fumaca-imagem: imagem ## Sobe a botai:local e confere contra os dourados
 binario-local: ## Binário Bun desta máquina (Bun do .bun-version) + fumaça contra os dourados
 	pnpm --filter @pilutech/botai-core run build
 	cd packages/core && b=$$(BUN="$$(bash scripts/bun-fixo.sh)" bash scripts/binarios.sh local) && node scripts/fumaca.mjs --binario "$$b"
+
+# --- plugin do Playwright (@pilutech/botai-playwright, publicado no npm) ---
+# Os 3 navegadores uma vez: packages/playwright/node_modules/.bin/playwright install chromium firefox webkit
+test-playwright:
+	pnpm --filter @pilutech/botai-playwright run test
+
+test-e2e-playwright:
+	pnpm --filter @pilutech/botai-playwright run test:e2e
 
 # --- extensão (MV3 para Chrome, Edge, Opera e Firefox, WXT) ---
 # Dev em 3018 e Storybook em 6018. Carregar .output/chrome-mv3-dev sem empacotar; o dev acrescenta `tabs` e
