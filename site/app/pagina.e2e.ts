@@ -224,7 +224,10 @@ test.describe('/', () => {
     }) => {
       const contexto = await browser.newContext({ javaScriptEnabled: false })
       const page = await contexto.newPage()
-      await page.goto('/')
+      // Sem JS o Chromium baixa já as imagens lazy, e o `next start` (Next 16.3.8) prende para sempre a
+      // chave do /_next/image cujo 1º pedido foi abortado (um teste anterior que fecha a página no meio).
+      // O que se mede aqui é o HTML: esperar o `load` deixaria o teste refém daquela imagem.
+      await page.goto('/', { waitUntil: 'domcontentloaded' })
       await expect(page.getByRole('banner').locator('kbd')).toHaveText(
         'Ctrl+Shift+Y',
       )
