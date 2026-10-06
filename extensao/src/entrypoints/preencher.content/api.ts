@@ -59,7 +59,9 @@ export function criarApi(ctx: ContentScriptContext): ApiBotai {
       ultimo = preencherDocumento(pessoa, hojeISO, registro, contornos, (e) =>
         escritos.push(e),
       )
-      agendarSegundaPassada(escritos, (acao, ms) => ctx.setTimeout(acao, ms))
+      void agendarSegundaPassada(escritos, (acao, ms) =>
+        ctx.setTimeout(acao, ms),
+      )
       if (window !== window.top)
         ctx.setTimeout(() => contornos.limpar(), LIMPEZA_NOS_FRAMES_FILHOS_MS)
       return ultimo

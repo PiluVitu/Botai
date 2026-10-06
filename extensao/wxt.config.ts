@@ -35,6 +35,8 @@ export default defineConfig({
       'extensao/.output/**',
       'extensao/.wxt/**',
       'packages/core/dist/**',
+      'packages/core/dist-bin/**',
+      'packages/core/pacote/**',
       '**/storybook-static/**',
       '**/test-results/**',
       '**/playwright-report/**',

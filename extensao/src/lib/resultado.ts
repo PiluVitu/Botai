@@ -1,16 +1,12 @@
+import type { ResultadoFrame } from '@pilutech/botai-core/navegador'
+
+export type { ResultadoFrame }
+
 export interface LinhaCampo {
   documentId: string
   idx: number
   rotulo: string
   seletor: string
-}
-
-export interface ResultadoFrame {
-  preenchidos: Omit<LinhaCampo, 'documentId'>[]
-  naoReconhecidos: Omit<LinhaCampo, 'documentId'>[]
-  recusados: Omit<LinhaCampo, 'documentId'>[]
-  contentType: string
-  iframesDeFora: number
 }
 
 export interface ResumoPreenchimento {
