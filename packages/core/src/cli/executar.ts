@@ -7,7 +7,12 @@ import {
   pessoasDoLote,
   resolverOpcoes,
 } from '../gerar'
-import { ErroDeOpcao, lerUF, type NomeDaOpcao } from '../opcoes'
+import {
+  ErroDeOpcao,
+  lerDominioEmail,
+  lerUF,
+  type NomeDaOpcao,
+} from '../opcoes'
 import {
   cabecalhoCsv,
   COLUNAS,
@@ -97,7 +102,8 @@ function opcoesDaPessoa(lidos: ArgumentosLidos): OpcoesResolvidas {
   if (semente !== undefined) opcoes.semente = semente
   if (hoje !== undefined) opcoes.hoje = hoje
   if (uf !== undefined) opcoes.uf = lerUF(uf)
-  if (dominioEmail !== undefined) opcoes.dominioEmail = dominioEmail
+  if (dominioEmail !== undefined)
+    opcoes.dominioEmail = lerDominioEmail(dominioEmail)
   return resolverOpcoes(opcoes)
 }
 
