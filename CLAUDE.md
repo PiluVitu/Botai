@@ -2,11 +2,11 @@
 
 Guia do Claude Code para o repositório do **Botaí** (`github.com/PiluVitu/Botai`). Este arquivo cobre o que é transversal; cada workspace tem o seu `CLAUDE.md`, e o Claude Code carrega este junto com o do workspace em que você mexe. Cada fato mora num arquivo só.
 
-| Workspace        | Pacote                                     | `CLAUDE.md`               | Cobre                                                                                                                                                                                       |
-| ---------------- | ------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `extensao/`      | `@pilutech/botai` (privado; vai às lojas)  | `extensao/CLAUDE.md`      | a extensão MV3 para Chrome, Edge, Opera e Firefox (WXT 0.21.4 + React 19 + `@piluvitu/ui`): atalho, popup, menu `Inserir`, aviso na página, 3 builds, zip de fontes da AMO, release e lojas |
-| `site/`          | `@pilutech/botai-site` (privado; Vercel)   | `site/CLAUDE.md`          | a landing em `botai.pilutech.com.br` (Next 16): `/`, `/privacidade`, `/termos`, lojas de `lojas.json`, SEO, deploy                                                                          |
-| `packages/core/` | `@pilutech/botai-core` (npm, público, MIT) | `packages/core/CLAUDE.md` | o motor: pessoa de teste, geradores de documento, classificador de campos, valor de cada campo, atalho; build e publicação no npm                                                           |
+| Workspace        | Pacote                                     | `CLAUDE.md`               | Cobre                                                                                                                                                                                              |
+| ---------------- | ------------------------------------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extensao/`      | `@pilutech/botai` (privado; vai às lojas)  | `extensao/CLAUDE.md`      | a extensão MV3 para Chrome, Edge, Opera e Firefox (WXT 0.21.4 + React 19 + `@piluvitu/ui`): atalho, popup, menu `Inserir`, aviso na página, 3 builds, zip de fontes da AMO, release e lojas        |
+| `site/`          | `@pilutech/botai-site` (privado; Vercel)   | `site/CLAUDE.md`          | a landing em `botai.pilutech.com.br` (Next 16): `/`, `/privacidade`, `/termos`, lojas de `lojas.json`, SEO, deploy                                                                                 |
+| `packages/core/` | `@pilutech/botai-core` (npm, público, MIT) | `packages/core/CLAUDE.md` | o motor: pessoa de teste, geradores de documento, classificador de campos, valor de cada campo, atalho; CLI `botai` (fase 1), servidor (fase 2) e `/navegador` (fase 3); build e publicação no npm |
 
 > **Regra de manutenção:** tecnologia nova ou fluxo mudado → atualize o `CLAUDE.md` do workspace onde mexeu (ou este, se for transversal).
 
@@ -44,27 +44,31 @@ Até o `@piluvitu/ui` 0.1.0 estar no npm há 24 h, o `pnpm-workspace.yaml` tem `
 
 ## Comandos
 
-| Comando                     | O quê                                                                                   |
-| --------------------------- | --------------------------------------------------------------------------------------- |
-| `make test`                 | todos os testes (`pnpm -r test` + `node --test scripts/*.test.mjs`)                     |
-| `make lint`                 | `pnpm -r lint`                                                                          |
-| `make stop`                 | libera as portas 3018, 6018, 3020 e 6019                                                |
-| `make test-core`            | Jest + `node --test` do core (o pacote de verdade é montado e conferido)                |
-| `make build-core`           | `dist/` do core (`.js` + `.d.ts`)                                                       |
-| `make dev-botai`            | `wxt dev` na 3018 (carregar `extensao/.output/chrome-mv3-dev`)                          |
-| `make build-botai`          | `wxt build` + gate do `@source` em `.output/chrome-mv3`                                 |
-| `make test-botai`           | Vitest da extensão                                                                      |
-| `make test-e2e-botai`       | builds de Chrome, Firefox e Opera + build e2e + Playwright com a extensão desempacotada |
-| `make storybook-botai`      | Storybook da extensão na 6018                                                           |
-| `make zip-botai`            | os 3 pacotes e o zip de fontes da AMO em `extensao/.output/`                            |
-| `make versao-botai V=x.y.z` | PR de versão da extensão (branch da `origin/main`, bump sem tag, `gh pr create`)        |
-| `make release-botai`        | na `main`, depois do merge: tag anotada `botai-v<versão>` + push                        |
-| `make capturas-botai`       | imagens das lojas e cópias para o `site/` (rode no Mac)                                 |
-| `make dev-botai-site`       | `next dev` na 3020                                                                      |
-| `make build-botai-site`     | `next build` + gate do `@source` + conferência das rotas estáticas                      |
-| `make test-botai-site`      | Jest + `node --test` do site                                                            |
-| `make test-e2e-botai-site`  | 2 builds de produção (lojas de teste, depois o `lojas.json` real) + Playwright (`CI=1`) |
-| `make storybook-botai-site` | Storybook do site na 6019                                                               |
+| Comando                                         | O quê                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `make test`                                     | todos os testes (`pnpm -r test` + `node --test scripts/*.test.mjs`)                      |
+| `make lint`                                     | `pnpm -r lint`                                                                           |
+| `make stop`                                     | libera as portas 3018, 6018, 3020 e 6019                                                 |
+| `make test-core`                                | Jest + `node --test` do core (o pacote de verdade é montado e conferido)                 |
+| `make build-core`                               | `dist/` do core (`.js` + `.d.ts`)                                                        |
+| `pnpm --filter @pilutech/botai-core build`      | `gerar-versao` + build do core (o `test` do core já roda o build antes)                  |
+| `node packages/core/dist/bin/botai.js --help`   | a CLI do build local (`npx` do pacote publicado faz o mesmo)                             |
+| `node packages/core/scripts/gerar-dourados.mjs` | regrava `packages/core/dourado/v1` a partir do `dist/`. Mudou um dourado? É versão major |
+| `node packages/core/scripts/gerar-versao.mjs`   | regrava `packages/core/src/versao.ts` depois de mudar a versão do `package.json`         |
+| `make dev-botai`                                | `wxt dev` na 3018 (carregar `extensao/.output/chrome-mv3-dev`)                           |
+| `make build-botai`                              | `wxt build` + gate do `@source` em `.output/chrome-mv3`                                  |
+| `make test-botai`                               | Vitest da extensão                                                                       |
+| `make test-e2e-botai`                           | builds de Chrome, Firefox e Opera + build e2e + Playwright com a extensão desempacotada  |
+| `make storybook-botai`                          | Storybook da extensão na 6018                                                            |
+| `make zip-botai`                                | os 3 pacotes e o zip de fontes da AMO em `extensao/.output/`                             |
+| `make versao-botai V=x.y.z`                     | PR de versão da extensão (branch da `origin/main`, bump sem tag, `gh pr create`)         |
+| `make release-botai`                            | na `main`, depois do merge: tag anotada `botai-v<versão>` + push                         |
+| `make capturas-botai`                           | imagens das lojas e cópias para o `site/` (rode no Mac)                                  |
+| `make dev-botai-site`                           | `next dev` na 3020                                                                       |
+| `make build-botai-site`                         | `next build` + gate do `@source` + conferência das rotas estáticas                       |
+| `make test-botai-site`                          | Jest + `node --test` do site                                                             |
+| `make test-e2e-botai-site`                      | 2 builds de produção (lojas de teste, depois o `lojas.json` real) + Playwright (`CI=1`)  |
+| `make storybook-botai-site`                     | Storybook do site na 6019                                                                |
 
 Ordem antes de commit/PR: `make lint` → `make test` → `make build-botai` e `make build-botai-site`. O pre-commit (`.husky/pre-commit` → `pnpm exec lint-staged`) formata só o que está staged: Prettier na raiz e no core; ESLint + Prettier na `extensao/` e no `site/` (a config fica no `package.json` de cada um, porque o ESLint flat só resolve com o cwd do workspace). O `prepare` do husky também roda no install do revisor da AMO e, sem `.git`, só avisa e sai com 0.
 

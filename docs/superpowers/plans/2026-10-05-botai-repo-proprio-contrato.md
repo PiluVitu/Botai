@@ -261,3 +261,17 @@ export function sementeDoTeste(identidade: {
 - `scripts/salvaguardas.test.mjs` (raiz do repo novo) exige os workflows da fase 0, toda action de **todo** workflow fixada por SHA, `cooldown` em **todo** ecossistema do Dependabot e, em todo workflow que roda `npm publish`, o environment `npm`, um só `id-token: write` e `--provenance`. Workflow ou ecossistema novo das fases 2 e 3 entra sem mexer no teste, desde que cumpra isso.
 - O `botai-release.yml` cria o release da extensão com `--latest=false`.
 - Só na fase 0: `vendor/piluvitu-ui-0.1.0.tgz` (versionado) + `overrides` no `pnpm-workspace.yaml` do repo novo, até o `@piluvitu/ui` 0.1.0 estar no npm há 24 h (passo C4, que tira os dois num commit).
+
+## Fase 1 (0.2.0): nomes que as fases 2 e 3 usam
+
+Plano: `docs/superpowers/plans/2026-10-05-botai-fase1-core-cli.md`.
+
+- `/pessoa`: `montarPessoa(rng, hojeISO, opcoes?: OpcoesDaMontagem)`, `OpcoesDaMontagem { uf?: UF; dominioEmail?: string }`; `Email.caixaUrl: string | null` (`null` fora de `tuamaeaquelaursa.com`).
+- Raiz, além do que está acima: `gerarEnvelopeDaPessoa(opcoes?)`, `gerarEnvelopeDasPessoas(n, opcoes?)`, `LIMITE_DO_LOTE = 100_000`, `ErroDeOpcao` (`.opcao: 'semente' | 'hoje' | 'uf' | 'dominioEmail' | 'n'`), tipos `NomeDaOpcao`, `Pessoa`, `Prng`, `UF`.
+- Internos do pacote (fora da raiz; o servidor da fase 2 importa de `src/`): `resolverOpcoes(opcoes?): OpcoesResolvidas` (`{ semente: string; hoje: string; uf?; dominioEmail? }`), `pessoaResolvida(r)`, `pessoasDoLote(n, r): Generator<{ semente; pessoa }>` (valida `n` na chamada), `envelopar(semente, hoje, pessoa)`, `envelopeDoLote(n, r)`, `lerUF`, `lerHoje`, `lerDominioEmail`, `lerQuantidade`.
+- `/plano`: `COLUNAS` (33), `Coluna`, `PessoaPlana`, `pessoaPlana`, `lerCampos(texto)`, `cabecalhoCsv`, `linhaCsv`, `paraCsv`, `FORMATOS`, `Formato`, `DIALETOS`, `Dialeto`, `lerDialeto`, `lerTabela`, `insertSql(pessoa, { dialeto?, tabela?, colunas? })`, `paraSql`, `ErroDoPlano`.
+- CLI: `executar(argv, saida: { dados, mensagem }): number`, `SAIDA = { ok: 0, invalido: 1, uso: 2, interno: 3 }`, bin em `dist/bin/botai.js`. Formatos: `json` = `EnvelopeDasPessoas`; `ndjson` = um `EnvelopeDaPessoa` por linha, com a semente exata (`S/i` ou `S/i/k`); `csv` com cabeçalho e CRLF; `sql` com a linha `-- botai: formato 1, motor <v>, semente <S>, hoje <H>` antes dos `INSERT`.
+- Erro de opção (`ErroDeOpcao`, `ErroDoPlano`) vira saída 2 na CLI e 400 no servidor.
+- Dourados: `packages/core/dourado/v1/indice.json` (`{ arquivo, n?, compacto?, opcoes, derivados? }[]`) e `pessoa-semente-numero.json`, `pessoa-semente-texto.json`, `pessoa-semente-unicode.json`, `pessoa-uf.json`, `pessoa-dominio-email.json`, `pessoa-29-de-fevereiro.json`, `pessoas-lote.json` (+ `.csv`, `.postgres.sql`, `.mysql.sql`, `.sqlite.sql`), `pessoas-1000.json`. As comparações ignoram `motor`.
+- JSON Schema: `@pilutech/botai-core/esquema/envelope-v1.schema.json`.
+- Ponto de confirmação do dono da fase 1 (fora dos workflows; ponto 9 da lista acima): push da tag `core-v0.2.0`, criada localmente no merge da fase 1, que dispara o `publicar-core.yml` atrás do environment `npm`. A `main` sobe no C5 da fase 0.

@@ -7,8 +7,8 @@ O motor do Botaí, publicado no npm. O Claude Code carrega este arquivo junto co
 TypeScript puro, sem dependência de runtime e sem DOM: a pessoa de teste, os geradores de documento, o classificador de campos, o valor de cada campo e o atalho da extensão. A `extensao/` e o `site/` o consomem como código-fonte (workspace); o `/tools` do PiluVitu (monorepo `PiluVitu/PiluVitu-Dev`) usa CPF e CNPJ pelo npm, com versão exata.
 
 - **Origem:** os módulos do Botaí do `@piluvitu/tools` do monorepo, com o histórico (`git filter-repo`, 2026-10). `prng` é cópia (a roleta do monorepo usa o original). `atalhos` saiu do `pilulabs.ts` de lá.
-- **0.1.0 = a API de hoje:** os mesmos nomes de módulo e de função do `@piluvitu/tools`, um subpath por módulo, sem barrel na raiz. A API amigável (semente, lote, envelope, CLI) é a 0.2.0 (fase 1; ver o contrato `docs/superpowers/plans/2026-10-05-botai-repo-proprio-contrato.md`).
-- **Sem `lib: dom`:** o `tsconfig.json` tem só `es2022` e os tipos do Jest, e o Jest roda com `testEnvironment: 'node'`. Um uso acidental de DOM quebra o `lint` e os testes. O `@types/node` está nas devDependencies para os testes de script das fases seguintes, mas não entra no `types`.
+- **0.1.0 (fase 0):** os mesmos nomes de módulo e de função do `@piluvitu/tools`, um subpath por módulo, sem barrel na raiz. A 0.2.0 (fase 1) acrescenta a raiz com a API amigável (semente, lote, envelope), o `/plano` e a CLI (ver "API da raiz" abaixo e o contrato `docs/superpowers/plans/2026-10-05-botai-repo-proprio-contrato.md`).
+- **Sem `lib: dom`:** o `tsconfig.json` tem só `es2022` e os tipos do Jest e do Node, e o Jest roda com `testEnvironment: 'node'`. Um uso acidental de DOM quebra o `lint` e os testes. Os tipos do Node servem aos testes (arquivo, processo filho); o `tsconfig.build.json` zera o `types`, e o `portabilidade.test.ts` barra API de Node fora de `src/bin`.
 
 ## Atalho da extensão (`atalhos`)
 
@@ -41,7 +41,7 @@ Cada módulo é exportado só por subpath, com o nome do arquivo (`@pilutech/bot
 | `empresa`        | `gerarEmpresa(rng, sobrenomes)` → razão social `{S1} & {S2} {ramo} Ltda`, fantasia `{S2} {sufixo}` e CNPJ                                                                                                                                                                                                |
 | `cartao`         | **Só os números de teste da Stripe** (Visa `4242 4242 4242 4242`, Mastercard `5555 5555 5555 4444`); validade entre hoje + 12 e hoje + 59 meses, CVV de 3 dígitos. Número aleatório que passa no Luhn não aprova em sandbox e pode ser de um cartão real                                                 |
 
-### `gerarPessoa(rng, hojeISO)` (`pessoa`)
+### `montarPessoa(rng, hojeISO, opcoes?)` (`pessoa`)
 
 - **Coerência:** a região do CPF e o código do título são os da UF do endereço; o DDD do celular é o do CEP; o e-mail sai do nome; a empresa, dos sobrenomes; o nome impresso no cartão, da pessoa. O RG é sempre `SSP/SP`, o modelo do gerador.
 - **A ordem das chamadas a `rng` é contrato:** trocá-la muda a pessoa de toda semente.
@@ -81,3 +81,63 @@ Jest + ts-jest (`testEnvironment: 'node'`), `*.test.ts` ao lado do fonte; `node 
 ## Dependências
 
 Nenhuma de runtime, e assim fica (spec §5.4). As devDependencies seguem a política da raiz.
+
+## API da raiz (0.2.0, fase 1)
+
+Plano: `docs/superpowers/plans/2026-10-05-botai-fase1-core-cli.md`. Os nomes são os do contrato (`docs/superpowers/plans/2026-10-05-botai-repo-proprio-contrato.md`), e `src/index.test.ts` trava a lista exata do que a raiz exporta: mudou a raiz, mude o contrato no mesmo PR.
+
+- `gerarPessoa(opcoes?)`, `gerarPessoas(n, opcoes?)`, `gerarEnvelopeDaPessoa`, `gerarEnvelopeDasPessoas`, `rngDeSemente`, `sementeAleatoria`, `hojeEmSaoPaulo`, `FORMATO`, `MOTOR`, `DOMINIO_EMAIL_PADRAO`, `LIMITE_DO_LOTE`, `ErroDeOpcao`.
+- Opções (`src/opcoes.ts`): `semente` (inteiro seguro, ou texto de 1 a 256 caracteres sem caractere de controle), `hoje` (`AAAA-MM-DD` que existe), `uf` (sigla, qualquer caixa), `dominioEmail` (hostname ASCII com 2 ou mais rótulos, guardado em minúsculas). Opção inválida lança `ErroDeOpcao` com `.opcao`; a CLI transforma em saída 2 com o nome da flag, e o servidor da fase 2 transforma em 400.
+- Subpath novo entra no `exports` (`./src/<m>.ts`, para o workspace) **e** no `publishConfig.exports` (`dist/`, para o tarball); arquivo novo no tarball entra na lista de `scripts/pacote.test.mjs`. A conferência é sempre pelo `pnpm pack`, que é quem aplica o `publishConfig`.
+- `resolverOpcoes` sorteia a semente e usa `hojeEmSaoPaulo()` quando faltam. `pessoasDoLote(n, resolvidas)` é o gerador que a CLI percorre linha a linha. `loteCom` recebe o montador por parâmetro só para o teste forçar repetição.
+
+## Semente
+
+- `rngDeSemente(s) = sfc32(cyrb128(bytes UTF-8 de NFC(String(s))))`. TS puro, sem WebCrypto, para dar o mesmo resultado em Node, Bun, navegador e na extensão. `42 ≡ '42'`.
+- `semente.test.ts` fixa os primeiros valores de `42`, `'botai'` e `'ação 🧀'`. Mudar o hash, a codificação, a normalização ou o `sfc32` muda a pessoa de toda semente: versão major (na 0.x, a minor) e dourados regravados no mesmo PR.
+- `sementeAleatoria()`: 16 hex de `crypto.getRandomValues`, com `Math.random` só onde não existe `crypto`.
+
+## `montarPessoa(rng, hojeISO, opcoes?)` (`/pessoa`)
+
+- É o antigo `gerarPessoa(rng, hojeISO)`. Sem opções, a pessoa de um `rng` não mudou (a pessoa dourada de `pessoa.test.ts` está igual).
+- `uf` vai para `gerarEndereco`; o número de chamadas ao `rng` não muda, então o nome é o mesmo com ou sem `uf`.
+- `dominioEmail` muda só o domínio do e-mail. `email.caixaUrl` é `null` fora de `tuamaeaquelaursa.com` (o tipo virou `string | null`; a extensão só abre aba quando há URL).
+
+## Lote
+
+- Pessoa `i` = semente `S/i`. Se `email.endereco`, `cpf` ou `empresa.cnpj` repetem um anterior do lote, sai `S/i/2`, `S/i/3`… até `TENTATIVAS_POR_PESSOA` (1000) e então lança, em vez de travar.
+- Caso real fixado em teste: na semente `mil-3`, `mil-3/971` repete o e-mail de `mil-3/387`, e a pessoa 971 sai de `mil-3/971/2`.
+- Prefixo estável: as primeiras `k` pessoas de um lote de `n` são o lote de `k`.
+- Nome, endereço e CEP repetem (34 logradouros); só e-mail, CPF e CNPJ são únicos.
+- `LIMITE_DO_LOTE` = 100 000 (100 mil pessoas em cerca de 1,6 s no Node 22, medido no protótipo da fase 1).
+
+## Envelope, esquema e dourados
+
+- `{ formato: 1, motor, semente, hoje, pessoa | pessoas }`; `semente` é a resolvida (texto, NFC) e `motor` é `MOTOR`.
+- `esquema/envelope-v1.schema.json` (JSON Schema 2020-12) vai no pacote. `envelope.esquema.test.ts` o valida com o Ajv (só devDependency) contra todos os dourados e casos extras.
+- `dourado/v1/indice.json` diz que entradas geram cada arquivo; `scripts/gerar-dourados.mjs` regrava tudo a partir do `dist/`. **Regravar um dourado quer dizer que a pessoa de uma semente mudou: versão major.** As comparações ignoram `motor`.
+- `pessoas-1000.json` fica compacto (1,1 MB). A pasta está no `.prettierignore` e fora do `files` (não vai para o npm).
+- Quem confere os dourados: `envelope.dourado.test.ts` (biblioteca), `bin/botai.test.ts` (CLI do build) e `extensao/src/test/pessoa-dourada.test.ts` (o core que a extensão empacota). As fases 2 e 3 acrescentam o servidor e o Playwright.
+
+## Versão do motor
+
+`MOTOR` vem de `src/versao.ts`, que `scripts/gerar-versao.mjs` grava a partir do `version` do `package.json` no começo do `build`. O `lint` roda `gerar-versao --conferir` e falha se o arquivo versionado ficou para trás. Subiu a versão? `node scripts/gerar-versao.mjs` e commite os dois juntos.
+
+## Visão plana, CSV e SQL (`/plano`)
+
+- `FORMATOS` (`json`, `ndjson`, `csv`, `sql`) e `DIALETOS` moram aqui; a CLI e o servidor da fase 2 leem daqui.
+- 33 colunas em `COLUNAS`, em `snake_case` ASCII (a tabela com a origem de cada uma está no README). `idade` é número; `email_caixa_url` pode ser `null`; o resto é texto, com a máscara que a `Pessoa` já tem (CPF, CNPJ, CEP).
+- CSV: RFC 4180, CRLF e cabeçalho; aspas só quando precisa; `null` vira campo vazio e texto vazio vira `""` (é assim que o `COPY … CSV` do Postgres distingue os dois).
+- SQL: um `INSERT` por pessoa. Postgres e SQLite citam nomes com `"`, o MySQL com crase; aspas simples dobradas em todos; barra invertida dobrada só no MySQL (no Postgres com `standard_conforming_strings` e no SQLite ela é literal); `null` vira `NULL`.
+- `--tabela` passa por `lerTabela` (`[A-Za-z_][A-Za-z0-9_]{0,62}`, com `esquema.` opcional), então o nome citado nunca fecha a aspa.
+- `plano.test.ts` executa o SQL do SQLite num `node:sqlite` em memória (processo filho) e compara com `pessoaPlana`; por isso os testes pedem Node ≥ 22.13.
+
+## CLI (`botai`)
+
+- `src/cli/executar.ts` é puro: `executar(argv, saida)` devolve o código de saída e escreve por `saida.dados` e `saida.mensagem`. Só `src/bin/botai.ts` toca o processo: tipo local de `process` (o pacote compila sem `@types/node`), `process.exitCode` em vez de `process.exit` (a doc do Node avisa que `process.exit` pode perder escrita pendente no stdout) e saída 0 no `EPIPE` (`| head`).
+- Leitor de argumentos próprio (`src/cli/argumentos.ts`), sem dependência: mensagens em português e valor que começa com traço (`--semente -5`).
+- Toda validação roda antes da primeira escrita no stdout: erro de uso nunca deixa CSV ou SQL pela metade.
+- Saídas: 0 ok, 1 inválido no `validar`, 2 erro de uso, 3 erro interno.
+- `ndjson` traz a semente exata de cada pessoa; `csv` sem `--semente` avisa a semente no stderr; `sql` começa com `-- botai: formato 1, motor …, semente …, hoje …`.
+- Testes: `cli/executar.test.ts` (em processo, rápido) e `bin/botai.test.ts` (roda `node dist/bin/botai.js`; por isso o `test` do pacote faz `build` antes).
+- `portabilidade.test.ts`: fora de `src/bin`, nenhum módulo pode citar `process.`, `node:`, `require(`, `Buffer`, `document.` ou `window.`.
