@@ -1,0 +1,22 @@
+{
+  "name": "botai",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "pnpm@11.1.1",
+  "scripts": {
+    "prepare": "husky",
+    "test": "pnpm -r test && node --test scripts/*.test.mjs",
+    "lint": "pnpm -r lint",
+    "prettier:fix": "pnpm -r prettier:fix"
+  },
+  "lint-staged": {
+    "*.{js,mjs,ts,tsx,json,md,css}": "prettier --write"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2"
+  }
+}

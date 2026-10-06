@@ -1,0 +1,25 @@
+# dependências e builds
+node_modules/
+.next/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+.DS_Store
+.pnpm-store/
+
+# testes e Storybook (o Tailwind varreria CSS já compilado, e o gate passaria sem medir nada)
+test-results/
+playwright-report/
+storybook-static/
+*storybook.log
+
+# extensão (WXT): sem isto o Tailwind varre builds antigos e o gate do @source passa sem medir nada
+extensao/.output/
+extensao/.wxt/
+extensao/web-ext.config.ts
+
+# credenciais: só o .env.example entra (o .env.submit do `wxt submit` também cai aqui)
+.env*
+!.env.example
