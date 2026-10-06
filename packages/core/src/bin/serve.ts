@@ -114,7 +114,6 @@ export async function subirServe(
       )
     throw causa
   }
-  escrever(`botai serve: ouvindo em ${noAr.url} (Ctrl+C encerra)`)
   // Na imagem o Node é o PID 1 e não tem tratador padrão de SIGTERM: sem este, o docker stop mata com 137.
   const parar = () => {
     noAr.encerrar().then(
@@ -124,6 +123,7 @@ export async function subirServe(
   }
   process.once('SIGINT', parar)
   process.once('SIGTERM', parar)
+  escrever(`botai serve: ouvindo em ${noAr.url} (Ctrl+C encerra)`)
   return noAr
 }
 
