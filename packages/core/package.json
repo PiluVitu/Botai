@@ -148,9 +148,10 @@
   "scripts": {
     "build": "node scripts/gerar-versao.mjs && rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
     "prepack": "pnpm run build",
-    "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit",
+    "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit && pnpm run lint:sh",
     "test": "pnpm run build && jest && node --test scripts/*.test.mjs",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "lint:sh": "shellcheck scripts/*.sh"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
