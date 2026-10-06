@@ -149,7 +149,7 @@
     "build": "node scripts/gerar-versao.mjs && rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
     "prepack": "pnpm run build",
     "tarball": "pnpm run build && rm -rf pacote && pnpm pack --pack-destination pacote && mv pacote/*.tgz pacote/botai-core.tgz",
-    "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit && pnpm run lint:sh",
+    "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit && pnpm run lint:sh && tsc --noEmit -p tsconfig.sem-dom.json",
     "test": "pnpm run build && jest && node --test scripts/*.test.mjs",
     "test:watch": "jest --watch",
     "lint:sh": "shellcheck scripts/*.sh"
@@ -159,6 +159,7 @@
     "@types/node": "^25.5.0",
     "ajv": "^8.20.0",
     "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
     "ts-jest": "^29.4.9",
     "typescript": "^5.9.3"
   },

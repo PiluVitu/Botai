@@ -8,7 +8,7 @@ TypeScript puro, sem dependência de runtime e sem DOM: a pessoa de teste, os ge
 
 - **Origem:** os módulos do Botaí do `@piluvitu/tools` do monorepo, com o histórico (`git filter-repo`, 2026-10). `prng` é cópia (a roleta do monorepo usa o original). `atalhos` saiu do `pilulabs.ts` de lá.
 - **0.1.0 (fase 0):** os mesmos nomes de módulo e de função do `@piluvitu/tools`, um subpath por módulo, sem barrel na raiz. A 0.2.0 (fase 1) acrescenta a raiz com a API amigável (semente, lote, envelope), o `/plano` e a CLI (ver "API da raiz" abaixo e o contrato `docs/superpowers/plans/2026-10-05-botai-repo-proprio-contrato.md`).
-- **Sem `lib: dom`:** o `tsconfig.json` tem só `es2022` e os tipos do Jest e do Node, e o Jest roda com `testEnvironment: 'node'`. Um uso acidental de DOM quebra o `lint` e os testes. Os tipos do Node servem aos testes (arquivo, processo filho) e, desde a fase 2, ao build (`tsconfig.build.json` com `"types": ["node"]`, por causa do `/servidor`); quem barra API de Node fora de `src/bin` e de `src/servidor/index.ts` é o `portabilidade.test.ts`, não o tsconfig.
+- **Sem `lib: dom`:** o `tsconfig.json` tem só `es2022` e os tipos do Jest e do Node, e o Jest roda com `testEnvironment: 'node'`. Um uso acidental de DOM quebra o `lint` e os testes. Exceção desde a fase 3: `src/navegador/` (motor DOM) traz `/// <reference lib="dom" />`, o que põe o DOM no programa inteiro do `tsconfig.json`; a guarda passa a ser o `tsconfig.sem-dom.json` (exclui `src/navegador`), rodado no fim do `lint`, e os testes de lá pedem `/** @jest-environment jsdom */` no próprio arquivo. Os tipos do Node servem aos testes (arquivo, processo filho) e, desde a fase 2, ao build (`tsconfig.build.json` com `"types": ["node"]`, por causa do `/servidor`); quem barra API de Node fora de `src/bin` e de `src/servidor/index.ts` é o `portabilidade.test.ts`, não o tsconfig.
 
 ## Atalho da extensão (`atalhos`)
 
@@ -76,7 +76,7 @@ Cada módulo é exportado só por subpath, com o nome do arquivo (`@pilutech/bot
 
 ## Testes
 
-Jest + ts-jest (`testEnvironment: 'node'`), `*.test.ts` ao lado do fonte (em `src/` e, desde a fase 2, em `scripts/`, como o `install.test.ts`); `node --test` para `scripts/*.test.mjs`. `make test-core` ou `pnpm --filter @pilutech/botai-core test`; `pnpm --filter @pilutech/botai-core lint` confere o `versao.ts`, os tipos e, desde a fase 2, os `scripts/*.sh` com o ShellCheck. Os testes sorteiam com `src/rng-teste.ts`, que não é exportado nem vai para o `dist`.
+Jest + ts-jest (`testEnvironment: 'node'`), `*.test.ts` ao lado do fonte (em `src/` e, desde a fase 2, em `scripts/`, como o `install.test.ts`); `node --test` para `scripts/*.test.mjs`. `make test-core` ou `pnpm --filter @pilutech/botai-core test`; `pnpm --filter @pilutech/botai-core lint` confere o `versao.ts`, os tipos, desde a fase 2, os `scripts/*.sh` com o ShellCheck e, desde a fase 3, o core sem DOM fora de `src/navegador` (`tsconfig.sem-dom.json`). Os testes sorteiam com `src/rng-teste.ts`, que não é exportado nem vai para o `dist`; ajudante de teste segue o sufixo `-teste.ts` (`src/navegador/layout-teste.ts`), e o `tsconfig.build.json` deixa todo `src/**/*-teste.ts` fora do build.
 
 ## Dependências
 
@@ -140,7 +140,7 @@ Plano: `docs/superpowers/plans/2026-10-05-botai-fase1-core-cli.md`. Os nomes sã
 - Saídas: 0 ok, 1 inválido no `validar`, 2 erro de uso, 3 erro interno.
 - `ndjson` traz a semente exata de cada pessoa; `csv` sem `--semente` avisa a semente no stderr; `sql` começa com `-- botai: formato 1, motor …, semente …, hoje …`.
 - Testes: `cli/executar.test.ts` (em processo, rápido) e `bin/botai.test.ts` (roda `node dist/bin/botai.js`; por isso o `test` do pacote faz `build` antes).
-- `portabilidade.test.ts`: fora de `src/bin` (e de `src/servidor/index.ts`, desde a fase 2), nenhum módulo pode citar `process.`, `node:`, `require(`, `Buffer`, `document.` ou `window.`.
+- `portabilidade.test.ts`: fora de `src/bin` (e de `src/servidor/index.ts`, desde a fase 2), nenhum módulo pode citar `process.`, `node:`, `require(`, `Buffer`, `document.` ou `window.`. Desde a fase 3, `document.` e `window.` podem em `src/navegador/` (o motor DOM); API de Node continua proibida lá.
 
 ## Servidor, imagem e binários (fase 2, 0.3.0)
 

@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join, relative, sep } from 'node:path'
 
 const SRC = __dirname
 const PROIBIDOS = [
@@ -10,6 +10,14 @@ const PROIBIDOS = [
   /\bdocument\./,
   /\bwindow\./,
 ]
+// src/navegador é o motor DOM (fase 3): document e window podem; API de Node continua proibida.
+const SO_DO_NAVEGADOR = [/\bdocument\./, /\bwindow\./].map(String)
+const proibidosPara = (arquivo: string) =>
+  relative(SRC, arquivo).split(sep)[0] === 'navegador'
+    ? PROIBIDOS.filter(
+        (proibido) => !SO_DO_NAVEGADOR.includes(String(proibido)),
+      )
+    : PROIBIDOS
 // src/servidor/index.ts liga o servidor ao node:http (fase 2); consulta.ts e rotas.ts seguem portáveis.
 const SO_NO_NODE = [join('servidor', 'index.ts')]
 
@@ -31,9 +39,9 @@ function modulosDeProducao(pasta: string): string[] {
 test('fora de src/bin, nenhum módulo usa API de Node ou do navegador', () => {
   const violacoes = modulosDeProducao(SRC).flatMap((arquivo) => {
     const texto = readFileSync(arquivo, 'utf8')
-    return PROIBIDOS.filter((proibido) => proibido.test(texto)).map(
-      (proibido) => `${relative(SRC, arquivo)}: ${proibido}`,
-    )
+    return proibidosPara(arquivo)
+      .filter((proibido) => proibido.test(texto))
+      .map((proibido) => `${relative(SRC, arquivo)}: ${proibido}`)
   })
   expect(violacoes).toEqual([])
 })

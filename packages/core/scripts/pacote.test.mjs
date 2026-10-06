@@ -34,6 +34,8 @@ const EXTRAS = [
   'dist/index.js',
   'dist/lote.d.ts',
   'dist/lote.js',
+  'dist/navegador/dom.d.ts',
+  'dist/navegador/dom.js',
   'dist/opcoes.d.ts',
   'dist/opcoes.js',
   'dist/semente.d.ts',
