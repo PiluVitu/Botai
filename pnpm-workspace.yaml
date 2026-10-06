@@ -32,3 +32,15 @@ blockExoticSubdeps: true
 # Até o @piluvitu/ui 0.1.0 estar no npm há 24 h (passo C4 do plano da fase 0).
 overrides:
   '@piluvitu/ui': 'file:vendor/piluvitu-ui-0.1.0.tgz'
+
+auditConfig:
+  ignoreGhsas:
+    # webpack-dev-middleware 6.1.3 (path traversal, high): só no `storybook dev` do site, pelo @storybook/nextjs >
+    # @storybook/builder-webpack5, que exige ^6.1.2 (a correção é da 7.4.5). Não vai no build da landing nem da extensão.
+    - GHSA-g84c-rxfj-3j2c
+    # node-forge 1.4.0 (verificação de assinatura RSA, high; sem versão corrigida no npm em 2026-10-05): só no web-ext
+    # (direto e pelo wxt) > @devicefarmer/adbkit, que fala com Android no `web-ext run`. Não vai no pacote da extensão.
+    - GHSA-86w9-cpqp-85rv
+    # braces 3.0.3 (DoS por padrão aninhado, high; sem versão corrigida no npm em 2026-10-05): só pelo micromatch do
+    # @storybook/nextjs e do eslint-config-next (lint), com padrões nossos. Não vai no build da landing nem da extensão.
+    - GHSA-vfj7-8cjw-p6xm
