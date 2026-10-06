@@ -48,7 +48,8 @@
     "./campos-formatar": "./src/campos-formatar.ts",
     "./atalhos": "./src/atalhos.ts",
     "./plano": "./src/plano.ts",
-    "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json"
+    "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json",
+    "./servidor": "./src/servidor/index.ts"
   },
   "publishConfig": {
     "access": "public",
@@ -137,7 +138,11 @@
         "types": "./dist/plano.d.ts",
         "default": "./dist/plano.js"
       },
-      "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json"
+      "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json",
+      "./servidor": {
+        "types": "./dist/servidor/index.d.ts",
+        "default": "./dist/servidor/index.js"
+      }
     }
   },
   "scripts": {

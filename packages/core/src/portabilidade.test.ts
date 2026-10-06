@@ -10,6 +10,8 @@ const PROIBIDOS = [
   /\bdocument\./,
   /\bwindow\./,
 ]
+// src/servidor/index.ts liga o servidor ao node:http (fase 2); consulta.ts e rotas.ts seguem portáveis.
+const SO_NO_NODE = [join('servidor', 'index.ts')]
 
 function modulosDeProducao(pasta: string): string[] {
   return readdirSync(pasta, { withFileTypes: true }).flatMap((entrada) => {
@@ -17,7 +19,9 @@ function modulosDeProducao(pasta: string): string[] {
     if (entrada.isDirectory())
       return entrada.name === 'bin' ? [] : modulosDeProducao(caminho)
     const ehModulo =
-      entrada.name.endsWith('.ts') && !entrada.name.endsWith('.test.ts')
+      entrada.name.endsWith('.ts') &&
+      !entrada.name.endsWith('.test.ts') &&
+      !SO_NO_NODE.includes(relative(SRC, caminho))
     return ehModulo ? [caminho] : []
   })
 }
