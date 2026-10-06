@@ -87,6 +87,7 @@ test('todo workflow que publica no npm usa o environment npm, com proveniência'
     /npm publish/.test(workflow(arquivo)),
   )
   assert.ok(publicam.includes('publicar-core.yml'))
+  assert.ok(publicam.includes('publicar-playwright.yml'))
   for (const arquivo of publicam) {
     const texto = workflow(arquivo)
     assert.match(texto, /^    environment: npm$/m, arquivo)

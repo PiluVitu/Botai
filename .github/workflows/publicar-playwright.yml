@@ -1,0 +1,133 @@
+name: Publicar @pilutech/botai-playwright
+
+on:
+  push:
+    tags: ['playwright-v*']
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/publicar-playwright.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-playwright-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  actionlint:
+    name: actionlint deste workflow
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: actionlint
+        run: >-
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo" --workdir /repo
+          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+          -color .github/workflows/publicar-playwright.yml
+
+  pacote:
+    name: Testar e empacotar
+    if: startsWith(github.ref, 'refs/tags/playwright-v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24.14.0'
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Tag igual à versão e commit na main
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          versao=$(node -p "require('./packages/playwright/package.json').version")
+          if [ "$TAG" != "playwright-v$versao" ]; then
+            echo "::error::A tag $TAG não bate com packages/playwright/package.json (esperado playwright-v$versao)."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}^{commit}" origin/main; then
+            echo "::error::O commit da tag $TAG não está na main."
+            exit 1
+          fi
+
+      - name: Lint
+        run: pnpm --filter @pilutech/botai-playwright run lint
+
+      - name: Jest
+        run: pnpm --filter @pilutech/botai-playwright run test
+
+      - name: Navegadores do Playwright
+        run: pnpm --filter @pilutech/botai-playwright exec playwright install --with-deps chromium firefox webkit
+
+      - name: E2E
+        run: pnpm --filter @pilutech/botai-playwright run test:e2e
+
+      - name: Build
+        run: pnpm --filter @pilutech/botai-playwright run build
+
+      - name: O core da dependência já está no npm
+        run: |
+          versao_core=$(node -p "require('./packages/core/package.json').version")
+          npm view "@pilutech/botai-core@$versao_core" version
+
+      - name: Empacotar e conferir
+        run: node packages/playwright/scripts/conferir-pacote.mjs --destino "$RUNNER_TEMP/pacote"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pacote-playwright
+          path: ${{ runner.temp }}/pacote/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  publicar:
+    name: Publicar no npm (trusted publishing)
+    needs: pacote
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24.14.0'
+          registry-url: 'https://registry.npmjs.org'
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: pacote-playwright
+          path: ${{ runner.temp }}/pacote
+
+      - name: Publicar (pula a versão que já está no npm)
+        working-directory: ${{ runner.temp }}/pacote
+        run: |
+          versao=$(node -p "require('$GITHUB_WORKSPACE/packages/playwright/package.json').version")
+          if npm view "@pilutech/botai-playwright@$versao" version >/dev/null 2>&1; then
+            echo "::notice::@pilutech/botai-playwright@$versao já está no npm: nada a publicar."
+            exit 0
+          fi
+          tar -xzf ./*.tgz
+          npm publish ./package --access public --provenance --ignore-scripts
