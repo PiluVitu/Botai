@@ -1,0 +1,69 @@
+{
+  "formato": 1,
+  "motor": "0.2.0",
+  "semente": "42",
+  "hoje": "2026-10-05",
+  "pessoa": {
+    "nome": {
+      "sexo": "M",
+      "prenome": "Márcio",
+      "sobrenomes": [
+        "Carvalho",
+        "Rodrigues"
+      ],
+      "completo": "Márcio Carvalho Rodrigues",
+      "noCartao": "MARCIO C RODRIGUES"
+    },
+    "nascimento": {
+      "iso": "1970-02-26",
+      "br": "26/02/1970",
+      "idade": 56
+    },
+    "cpf": "634.132.403-07",
+    "rg": {
+      "numero": "92.957.904-5",
+      "orgaoEmissor": "SSP",
+      "uf": "SP"
+    },
+    "pis": "166.24491.26-5",
+    "tituloEleitor": "5022 4149 1171",
+    "celular": {
+      "ddd": "98",
+      "numero": "97702-9128",
+      "formatado": "(98) 97702-9128",
+      "digitos": "98977029128",
+      "e164": "+5598977029128"
+    },
+    "email": {
+      "usuario": "marcio-rodrigues-0337",
+      "endereco": "marcio-rodrigues-0337@tuamaeaquelaursa.com",
+      "caixaUrl": "https://tuamaeaquelaursa.com/marcio-rodrigues-0337"
+    },
+    "senha": "g4JXwr#&PM8r",
+    "endereco": {
+      "cep": "65071-377",
+      "logradouro": "Avenida Litorânea",
+      "bairro": "Calhau",
+      "cidade": "São Luís",
+      "uf": "MA",
+      "ddd": "98",
+      "numero": "199",
+      "complemento": "Apto 171"
+    },
+    "empresa": {
+      "razaoSocial": "Carvalho & Rodrigues Engenharia Ltda",
+      "nomeFantasia": "Rodrigues Store",
+      "cnpj": "90.849.558/0001-39"
+    },
+    "cartao": {
+      "bandeira": "mastercard",
+      "numero": "5555555555554444",
+      "numeroFormatado": "5555 5555 5555 4444",
+      "titular": "MARCIO C RODRIGUES",
+      "validade": "11/28",
+      "mes": "11",
+      "ano": "28",
+      "cvv": "388"
+    }
+  }
+}

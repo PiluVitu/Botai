@@ -23,7 +23,8 @@
   "files": [
     "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "esquema"
   ],
   "exports": {
     ".": "./src/index.ts",
@@ -46,7 +47,8 @@
     "./campos": "./src/campos.ts",
     "./campos-formatar": "./src/campos-formatar.ts",
     "./atalhos": "./src/atalhos.ts",
-    "./plano": "./src/plano.ts"
+    "./plano": "./src/plano.ts",
+    "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json"
   },
   "publishConfig": {
     "access": "public",
@@ -134,7 +136,8 @@
       "./plano": {
         "types": "./dist/plano.d.ts",
         "default": "./dist/plano.js"
-      }
+      },
+      "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json"
     }
   },
   "scripts": {
@@ -147,6 +150,7 @@
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
+    "ajv": "^8.20.0",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.9",
     "typescript": "^5.9.3"

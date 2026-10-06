@@ -138,6 +138,9 @@ importers:
       '@types/node':
         specifier: ^25.5.0
         version: 25.5.0
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       jest:
         specifier: ^30.4.2
         version: 30.4.2(@types/node@25.5.0)

@@ -1,0 +1,69 @@
+{
+  "formato": 1,
+  "motor": "0.2.0",
+  "semente": "Teresina-PI 🧀 ação",
+  "hoje": "2026-10-05",
+  "pessoa": {
+    "nome": {
+      "sexo": "M",
+      "prenome": "Felipe",
+      "sobrenomes": [
+        "Ribeiro",
+        "Santos"
+      ],
+      "completo": "Felipe Ribeiro Santos",
+      "noCartao": "FELIPE R SANTOS"
+    },
+    "nascimento": {
+      "iso": "1962-04-30",
+      "br": "30/04/1962",
+      "idade": 64
+    },
+    "cpf": "879.753.254-14",
+    "rg": {
+      "numero": "45.962.525-1",
+      "orgaoEmissor": "SSP",
+      "uf": "SP"
+    },
+    "pis": "176.75244.30-1",
+    "tituloEleitor": "4824 2619 0850",
+    "celular": {
+      "ddd": "81",
+      "numero": "97926-5732",
+      "formatado": "(81) 97926-5732",
+      "digitos": "81979265732",
+      "e164": "+5581979265732"
+    },
+    "email": {
+      "usuario": "felipe-santos-4818",
+      "endereco": "felipe-santos-4818@tuamaeaquelaursa.com",
+      "caixaUrl": "https://tuamaeaquelaursa.com/felipe-santos-4818"
+    },
+    "senha": "j2%#22yNd#44",
+    "endereco": {
+      "cep": "51111-000",
+      "logradouro": "Avenida Boa Viagem",
+      "bairro": "Boa Viagem",
+      "cidade": "Recife",
+      "uf": "PE",
+      "ddd": "81",
+      "numero": "1702",
+      "complemento": "Apto 203"
+    },
+    "empresa": {
+      "razaoSocial": "Ribeiro & Santos Soluções Ltda",
+      "nomeFantasia": "Santos Store",
+      "cnpj": "78.411.688/0001-90"
+    },
+    "cartao": {
+      "bandeira": "visa",
+      "numero": "4242424242424242",
+      "numeroFormatado": "4242 4242 4242 4242",
+      "titular": "FELIPE R SANTOS",
+      "validade": "06/30",
+      "mes": "06",
+      "ano": "30",
+      "cvv": "888"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "formato": 1,
+  "motor": "0.2.0",
+  "semente": "bissexto",
+  "hoje": "2028-02-29",
+  "pessoa": {
+    "nome": {
+      "sexo": "F",
+      "prenome": "Bruna",
+      "sobrenomes": [
+        "Lima",
+        "Rocha"
+      ],
+      "completo": "Bruna Lima Rocha",
+      "noCartao": "BRUNA L ROCHA"
+    },
+    "nascimento": {
+      "iso": "1997-04-20",
+      "br": "20/04/1997",
+      "idade": 30
+    },
+    "cpf": "046.800.304-53",
+    "rg": {
+      "numero": "12.760.677-4",
+      "orgaoEmissor": "SSP",
+      "uf": "SP"
+    },
+    "pis": "130.76692.25-8",
+    "tituloEleitor": "6531 5627 1287",
+    "celular": {
+      "ddd": "83",
+      "numero": "98238-1225",
+      "formatado": "(83) 98238-1225",
+      "digitos": "83982381225",
+      "e164": "+5583982381225"
+    },
+    "email": {
+      "usuario": "bruna-rocha-3219",
+      "endereco": "bruna-rocha-3219@tuamaeaquelaursa.com",
+      "caixaUrl": "https://tuamaeaquelaursa.com/bruna-rocha-3219"
+    },
+    "senha": "Vv7@C85Di%8p",
+    "endereco": {
+      "cep": "58045-010",
+      "logradouro": "Avenida Cabo Branco",
+      "bairro": "Cabo Branco",
+      "cidade": "João Pessoa",
+      "uf": "PB",
+      "ddd": "83",
+      "numero": "880",
+      "complemento": "Apto 72"
+    },
+    "empresa": {
+      "razaoSocial": "Lima & Rocha Serviços Digitais Ltda",
+      "nomeFantasia": "Rocha Store",
+      "cnpj": "93.224.385/0001-51"
+    },
+    "cartao": {
+      "bandeira": "visa",
+      "numero": "4242424242424242",
+      "numeroFormatado": "4242 4242 4242 4242",
+      "titular": "BRUNA L ROCHA",
+      "validade": "04/32",
+      "mes": "04",
+      "ano": "32",
+      "cvv": "871"
+    }
+  }
+}

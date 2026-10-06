@@ -26,6 +26,7 @@ const EXTRAS = [
   'dist/semente.js',
   'dist/versao.d.ts',
   'dist/versao.js',
+  'esquema/envelope-v1.schema.json',
 ]
 const alvos = (destino) =>
   typeof destino === 'string' ? [destino] : Object.values(destino)
@@ -59,7 +60,7 @@ before(() => {
 
 after(() => rmSync(pasta, { recursive: true, force: true }))
 
-test('o pnpm pack --dry-run leva só o build, a licença e o README', () => {
+test('o pnpm pack --dry-run leva só o build, o esquema, a licença e o README', () => {
   const { files } = pnpm('pack', '--dry-run', '--json')
   assert.deepEqual(files.map((arquivo) => arquivo.path).sort(), ESPERADOS)
 })

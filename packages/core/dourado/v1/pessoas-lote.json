@@ -1,0 +1,323 @@
+{
+  "formato": 1,
+  "motor": "0.2.0",
+  "semente": "lote",
+  "hoje": "2026-10-05",
+  "pessoas": [
+    {
+      "nome": {
+        "sexo": "M",
+        "prenome": "Gustavo",
+        "sobrenomes": [
+          "Alves",
+          "Ferreira"
+        ],
+        "completo": "Gustavo Alves Ferreira",
+        "noCartao": "GUSTAVO A FERREIRA"
+      },
+      "nascimento": {
+        "iso": "1976-11-12",
+        "br": "12/11/1976",
+        "idade": 49
+      },
+      "cpf": "682.577.495-67",
+      "rg": {
+        "numero": "51.727.616-1",
+        "orgaoEmissor": "SSP",
+        "uf": "SP"
+      },
+      "pis": "114.97854.71-1",
+      "tituloEleitor": "0146 7924 0582",
+      "celular": {
+        "ddd": "71",
+        "numero": "97022-0513",
+        "formatado": "(71) 97022-0513",
+        "digitos": "71970220513",
+        "e164": "+5571970220513"
+      },
+      "email": {
+        "usuario": "gustavo-ferreira-3546",
+        "endereco": "gustavo-ferreira-3546@example.com",
+        "caixaUrl": null
+      },
+      "senha": "Q4V!5#prt3jW",
+      "endereco": {
+        "cep": "40170-010",
+        "logradouro": "Avenida Oceânica",
+        "bairro": "Ondina",
+        "cidade": "Salvador",
+        "uf": "BA",
+        "ddd": "71",
+        "numero": "24",
+        "complemento": "Apto 43"
+      },
+      "empresa": {
+        "razaoSocial": "Alves & Ferreira Tecnologia Ltda",
+        "nomeFantasia": "Ferreira Dev",
+        "cnpj": "28.870.157/0001-97"
+      },
+      "cartao": {
+        "bandeira": "mastercard",
+        "numero": "5555555555554444",
+        "numeroFormatado": "5555 5555 5555 4444",
+        "titular": "GUSTAVO A FERREIRA",
+        "validade": "07/29",
+        "mes": "07",
+        "ano": "29",
+        "cvv": "763"
+      }
+    },
+    {
+      "nome": {
+        "sexo": "F",
+        "prenome": "Luíza",
+        "sobrenomes": [
+          "Santos",
+          "Barbosa"
+        ],
+        "completo": "Luíza Santos Barbosa",
+        "noCartao": "LUIZA S BARBOSA"
+      },
+      "nascimento": {
+        "iso": "1980-07-23",
+        "br": "23/07/1980",
+        "idade": 46
+      },
+      "cpf": "552.970.854-46",
+      "rg": {
+        "numero": "03.100.222-5",
+        "orgaoEmissor": "SSP",
+        "uf": "SP"
+      },
+      "pis": "101.68289.96-0",
+      "tituloEleitor": "0613 0497 1724",
+      "celular": {
+        "ddd": "82",
+        "numero": "99677-3463",
+        "formatado": "(82) 99677-3463",
+        "digitos": "82996773463",
+        "e164": "+5582996773463"
+      },
+      "email": {
+        "usuario": "luiza-barbosa-3916",
+        "endereco": "luiza-barbosa-3916@example.com",
+        "caixaUrl": null
+      },
+      "senha": "eb&L8S7fGPUD",
+      "endereco": {
+        "cep": "57030-170",
+        "logradouro": "Avenida Doutor Antônio Gouveia",
+        "bairro": "Pajuçara",
+        "cidade": "Maceió",
+        "uf": "AL",
+        "ddd": "82",
+        "numero": "58",
+        "complemento": "Apto 101"
+      },
+      "empresa": {
+        "razaoSocial": "Santos & Barbosa Logística Ltda",
+        "nomeFantasia": "Barbosa Hub",
+        "cnpj": "66.634.693/0001-82"
+      },
+      "cartao": {
+        "bandeira": "visa",
+        "numero": "4242424242424242",
+        "numeroFormatado": "4242 4242 4242 4242",
+        "titular": "LUIZA S BARBOSA",
+        "validade": "08/31",
+        "mes": "08",
+        "ano": "31",
+        "cvv": "716"
+      }
+    },
+    {
+      "nome": {
+        "sexo": "M",
+        "prenome": "Rafael",
+        "sobrenomes": [
+          "Correia",
+          "Araújo"
+        ],
+        "completo": "Rafael Correia Araújo",
+        "noCartao": "RAFAEL C ARAUJO"
+      },
+      "nascimento": {
+        "iso": "2006-05-22",
+        "br": "22/05/2006",
+        "idade": 20
+      },
+      "cpf": "216.083.931-00",
+      "rg": {
+        "numero": "55.802.575-4",
+        "orgaoEmissor": "SSP",
+        "uf": "SP"
+      },
+      "pis": "100.67250.01-4",
+      "tituloEleitor": "2830 0571 1082",
+      "celular": {
+        "ddd": "62",
+        "numero": "97056-3882",
+        "formatado": "(62) 97056-3882",
+        "digitos": "62970563882",
+        "e164": "+5562970563882"
+      },
+      "email": {
+        "usuario": "rafael-araujo-2506",
+        "endereco": "rafael-araujo-2506@example.com",
+        "caixaUrl": null
+      },
+      "senha": "X#ETnfZY7@2J",
+      "endereco": {
+        "cep": "74020-200",
+        "logradouro": "Avenida Goiás",
+        "bairro": "Setor Central",
+        "cidade": "Goiânia",
+        "uf": "GO",
+        "ddd": "62",
+        "numero": "820",
+        "complemento": "Apto 161"
+      },
+      "empresa": {
+        "razaoSocial": "Correia & Araújo Tecnologia Ltda",
+        "nomeFantasia": "Araújo Hub",
+        "cnpj": "88.928.595/0001-90"
+      },
+      "cartao": {
+        "bandeira": "visa",
+        "numero": "4242424242424242",
+        "numeroFormatado": "4242 4242 4242 4242",
+        "titular": "RAFAEL C ARAUJO",
+        "validade": "01/29",
+        "mes": "01",
+        "ano": "29",
+        "cvv": "529"
+      }
+    },
+    {
+      "nome": {
+        "sexo": "F",
+        "prenome": "Vitória",
+        "sobrenomes": [
+          "Mendes",
+          "Santos"
+        ],
+        "completo": "Vitória Mendes Santos",
+        "noCartao": "VITORIA M SANTOS"
+      },
+      "nascimento": {
+        "iso": "1980-05-10",
+        "br": "10/05/1980",
+        "idade": 46
+      },
+      "cpf": "632.881.625-12",
+      "rg": {
+        "numero": "12.089.943-7",
+        "orgaoEmissor": "SSP",
+        "uf": "SP"
+      },
+      "pis": "116.93389.19-8",
+      "tituloEleitor": "3081 7743 0566",
+      "celular": {
+        "ddd": "71",
+        "numero": "97621-2505",
+        "formatado": "(71) 97621-2505",
+        "digitos": "71976212505",
+        "e164": "+5571976212505"
+      },
+      "email": {
+        "usuario": "vitoria-santos-7155",
+        "endereco": "vitoria-santos-7155@example.com",
+        "caixaUrl": null
+      },
+      "senha": "dhR8c6XmKg&H",
+      "endereco": {
+        "cep": "40170-010",
+        "logradouro": "Avenida Oceânica",
+        "bairro": "Ondina",
+        "cidade": "Salvador",
+        "uf": "BA",
+        "ddd": "71",
+        "numero": "273",
+        "complemento": "Apto 142"
+      },
+      "empresa": {
+        "razaoSocial": "Mendes & Santos Comércio Ltda",
+        "nomeFantasia": "Santos Dev",
+        "cnpj": "15.614.600/0001-17"
+      },
+      "cartao": {
+        "bandeira": "visa",
+        "numero": "4242424242424242",
+        "numeroFormatado": "4242 4242 4242 4242",
+        "titular": "VITORIA M SANTOS",
+        "validade": "02/31",
+        "mes": "02",
+        "ano": "31",
+        "cvv": "651"
+      }
+    },
+    {
+      "nome": {
+        "sexo": "F",
+        "prenome": "Mariana",
+        "sobrenomes": [
+          "Ferreira",
+          "Oliveira"
+        ],
+        "completo": "Mariana Ferreira Oliveira",
+        "noCartao": "MARIANA F OLIVEIRA"
+      },
+      "nascimento": {
+        "iso": "1994-04-09",
+        "br": "09/04/1994",
+        "idade": 32
+      },
+      "cpf": "046.558.691-00",
+      "rg": {
+        "numero": "01.937.969-9",
+        "orgaoEmissor": "SSP",
+        "uf": "SP"
+      },
+      "pis": "180.65206.71-4",
+      "tituloEleitor": "5491 6137 1864",
+      "celular": {
+        "ddd": "65",
+        "numero": "96837-9508",
+        "formatado": "(65) 96837-9508",
+        "digitos": "65968379508",
+        "e164": "+5565968379508"
+      },
+      "email": {
+        "usuario": "mariana-oliveira-3294",
+        "endereco": "mariana-oliveira-3294@example.com",
+        "caixaUrl": null
+      },
+      "senha": "XF8Bm5RBcW!7",
+      "endereco": {
+        "cep": "78005-370",
+        "logradouro": "Avenida Presidente Getúlio Vargas",
+        "bairro": "Centro-Norte",
+        "cidade": "Cuiabá",
+        "uf": "MT",
+        "ddd": "65",
+        "numero": "826",
+        "complemento": "Apto 82"
+      },
+      "empresa": {
+        "razaoSocial": "Ferreira & Oliveira Comércio Ltda",
+        "nomeFantasia": "Oliveira Dev",
+        "cnpj": "30.981.651/0001-70"
+      },
+      "cartao": {
+        "bandeira": "mastercard",
+        "numero": "5555555555554444",
+        "numeroFormatado": "5555 5555 5555 4444",
+        "titular": "MARIANA F OLIVEIRA",
+        "validade": "11/28",
+        "mes": "11",
+        "ano": "28",
+        "cvv": "353"
+      }
+    }
+  ]
+}

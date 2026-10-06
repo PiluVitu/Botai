@@ -1,0 +1,63 @@
+[
+  {
+    "arquivo": "pessoa-semente-numero.json",
+    "opcoes": { "semente": 42, "hoje": "2026-10-05" }
+  },
+  {
+    "arquivo": "pessoa-semente-texto.json",
+    "opcoes": { "semente": "botai", "hoje": "2026-10-05" }
+  },
+  {
+    "arquivo": "pessoa-semente-unicode.json",
+    "opcoes": { "semente": "Teresina-PI 🧀 ação", "hoje": "2026-10-05" }
+  },
+  {
+    "arquivo": "pessoa-uf.json",
+    "opcoes": { "semente": "botai", "hoje": "2026-10-05", "uf": "PI" }
+  },
+  {
+    "arquivo": "pessoa-dominio-email.json",
+    "opcoes": {
+      "semente": "botai",
+      "hoje": "2026-10-05",
+      "dominioEmail": "example.com"
+    }
+  },
+  {
+    "arquivo": "pessoa-29-de-fevereiro.json",
+    "opcoes": { "semente": "bissexto", "hoje": "2028-02-29" }
+  },
+  {
+    "arquivo": "pessoas-lote.json",
+    "n": 5,
+    "opcoes": {
+      "semente": "lote",
+      "hoje": "2026-10-05",
+      "dominioEmail": "example.com"
+    },
+    "derivados": [
+      { "arquivo": "pessoas-lote.csv", "formato": "csv" },
+      {
+        "arquivo": "pessoas-lote.postgres.sql",
+        "formato": "sql",
+        "dialeto": "postgres"
+      },
+      {
+        "arquivo": "pessoas-lote.mysql.sql",
+        "formato": "sql",
+        "dialeto": "mysql"
+      },
+      {
+        "arquivo": "pessoas-lote.sqlite.sql",
+        "formato": "sql",
+        "dialeto": "sqlite"
+      }
+    ]
+  },
+  {
+    "arquivo": "pessoas-1000.json",
+    "n": 1000,
+    "compacto": true,
+    "opcoes": { "semente": "mil-3", "hoje": "2026-10-05" }
+  }
+]

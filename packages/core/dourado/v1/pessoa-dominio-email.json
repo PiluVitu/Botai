@@ -1,0 +1,69 @@
+{
+  "formato": 1,
+  "motor": "0.2.0",
+  "semente": "botai",
+  "hoje": "2026-10-05",
+  "pessoa": {
+    "nome": {
+      "sexo": "F",
+      "prenome": "Larissa",
+      "sobrenomes": [
+        "Almeida",
+        "Conceição"
+      ],
+      "completo": "Larissa Almeida Conceição",
+      "noCartao": "LARISSA A CONCEICAO"
+    },
+    "nascimento": {
+      "iso": "1984-05-12",
+      "br": "12/05/1984",
+      "idade": 42
+    },
+    "cpf": "610.246.647-08",
+    "rg": {
+      "numero": "06.772.164-3",
+      "orgaoEmissor": "SSP",
+      "uf": "SP"
+    },
+    "pis": "136.23239.29-0",
+    "tituloEleitor": "6372 3010 1481",
+    "celular": {
+      "ddd": "27",
+      "numero": "99249-5917",
+      "formatado": "(27) 99249-5917",
+      "digitos": "27992495917",
+      "e164": "+5527992495917"
+    },
+    "email": {
+      "usuario": "larissa-conceicao-1063",
+      "endereco": "larissa-conceicao-1063@example.com",
+      "caixaUrl": null
+    },
+    "senha": "Zkf6nsT!DvjG",
+    "endereco": {
+      "cep": "29055-130",
+      "logradouro": "Avenida Nossa Senhora da Penha",
+      "bairro": "Praia do Canto",
+      "cidade": "Vitória",
+      "uf": "ES",
+      "ddd": "27",
+      "numero": "1120",
+      "complemento": "Apto 94"
+    },
+    "empresa": {
+      "razaoSocial": "Almeida & Conceição Logística Ltda",
+      "nomeFantasia": "Conceição Labs",
+      "cnpj": "68.069.290/0001-63"
+    },
+    "cartao": {
+      "bandeira": "visa",
+      "numero": "4242424242424242",
+      "numeroFormatado": "4242 4242 4242 4242",
+      "titular": "LARISSA A CONCEICAO",
+      "validade": "07/28",
+      "mes": "07",
+      "ano": "28",
+      "cvv": "624"
+    }
+  }
+}
