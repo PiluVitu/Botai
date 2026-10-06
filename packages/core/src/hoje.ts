@@ -1,0 +1,16 @@
+const DIA_EM_SAO_PAULO = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/Sao_Paulo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
+export function hojeEmSaoPaulo(agora: Date = new Date()): string {
+  const partes = Object.fromEntries(
+    DIA_EM_SAO_PAULO.formatToParts(agora).map((parte) => [
+      parte.type,
+      parte.value,
+    ]),
+  )
+  return `${partes.year}-${partes.month}-${partes.day}`
+}

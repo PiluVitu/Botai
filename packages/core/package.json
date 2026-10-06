@@ -26,6 +26,7 @@
     "README.md"
   ],
   "exports": {
+    ".": "./src/index.ts",
     "./aleatorio": "./src/aleatorio.ts",
     "./prng": "./src/prng.ts",
     "./uf": "./src/uf.ts",
@@ -49,6 +50,10 @@
   "publishConfig": {
     "access": "public",
     "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "./aleatorio": {
         "types": "./dist/aleatorio.d.ts",
         "default": "./dist/aleatorio.js"

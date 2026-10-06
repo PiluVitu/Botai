@@ -11,7 +11,16 @@ const PACOTE = join(dirname(fileURLToPath(import.meta.url)), '..')
 const FONTE = JSON.parse(readFileSync(join(PACOTE, 'package.json'), 'utf8'))
 const PUBLICADOS = FONTE.publishConfig.exports
 // Arquivo do tarball que nenhum subpath aponta (módulo interno, bin): as fases 1 a 3 acrescentam aqui.
-const EXTRAS = []
+const EXTRAS = [
+  'dist/hoje.d.ts',
+  'dist/hoje.js',
+  'dist/index.d.ts',
+  'dist/index.js',
+  'dist/opcoes.d.ts',
+  'dist/opcoes.js',
+  'dist/semente.d.ts',
+  'dist/semente.js',
+]
 const alvos = (destino) =>
   typeof destino === 'string' ? [destino] : Object.values(destino)
 const ESPERADOS = [
