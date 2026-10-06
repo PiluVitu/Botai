@@ -103,6 +103,40 @@ jobs:
         working-directory: packages/core
         run: bash scripts/fumaca-imagem.sh botai:fumaca
 
+  binario:
+    name: Binário Bun linux-x64 (dourados + serve)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm --filter @pilutech/botai-core run build
+
+      - name: Compilar linux-x64
+        working-directory: packages/core
+        run: bash scripts/binarios.sh linux-x64
+
+      - name: Fumaça do binário
+        working-directory: packages/core
+        run: node scripts/fumaca.mjs --binario dist-bin/botai-linux-x64
+
   extensao:
     name: Extensão (lint + test + builds de Chrome, Firefox e Opera + web-ext lint)
     runs-on: ubuntu-24.04
