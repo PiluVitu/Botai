@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" />
+  <title>Endereço</title>
+  <form>
+    <label>CEP <input name="cep" id="cep" /></label>
+    <label>Rua <input name="logradouro" /></label>
+    <label>Número <input name="numero" /></label>
+    <label>Complemento <input name="complemento" /></label>
+    <label>Bairro <input name="bairro" /></label>
+    <label>Cidade <input name="cidade" /></label>
+  </form>
+  <script>
+    window.buscas = 0
+    window.siteSobrescreveu = false
+    document.getElementById('cep').addEventListener('input', (evento) => {
+      if (evento.target.value.replace(/[^0-9]/g, '').length !== 8) return
+      window.buscas += 1
+      setTimeout(() => {
+        document.querySelector('[name="complemento"]').value =
+          'de 612 a 1510 - lado par'
+        window.siteSobrescreveu = true
+      }, 200)
+    })
+  </script>
+</html>
