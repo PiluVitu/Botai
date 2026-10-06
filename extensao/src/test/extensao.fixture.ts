@@ -5,7 +5,7 @@ import {
   type Page,
   type Worker,
 } from '@playwright/test'
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import path from 'node:path'
 import type { browser } from 'wxt/browser'
 import type { Mensagem } from '../lib/mensagens'

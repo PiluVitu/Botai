@@ -1,4 +1,4 @@
-import { calcularIdade, lerDataISO } from '@piluvitu/tools/nascimento'
+import { calcularIdade, lerDataISO } from '@pilutech/botai-core/nascimento'
 
 const DIA_EM_SAO_PAULO = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/Sao_Paulo',

@@ -45,7 +45,7 @@ import {
 declare const chrome: typeof browser
 
 const LOJA = path.resolve(import.meta.dirname, 'imagens')
-const APPS = path.resolve(import.meta.dirname, '../..')
+const RAIZ = path.resolve(import.meta.dirname, '../..')
 const STORYBOOK = path.resolve(import.meta.dirname, '../storybook-static')
 const STORYBOOK_URL = 'http://storybook.local'
 const SVG = readFileSync(path.join(import.meta.dirname, 'icone-1i.svg'), 'utf8')
@@ -307,9 +307,9 @@ for (const tema of TEMAS) {
   })
 }
 
-test('cópias para os sites (apps/web e apps/botai-site)', () => {
+test('cópias para a landing (site/)', () => {
   for (const { origem, destino } of COPIAS) {
-    mkdirSync(path.dirname(path.join(APPS, destino)), { recursive: true })
-    copyFileSync(path.join(LOJA, origem), path.join(APPS, destino))
+    mkdirSync(path.dirname(path.join(RAIZ, destino)), { recursive: true })
+    copyFileSync(path.join(LOJA, origem), path.join(RAIZ, destino))
   }
 })

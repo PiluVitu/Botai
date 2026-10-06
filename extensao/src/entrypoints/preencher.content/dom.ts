@@ -1,4 +1,4 @@
-import type { FieldDescriptor } from '@piluvitu/tools/campos'
+import type { FieldDescriptor } from '@pilutech/botai-core/campos'
 import { browser } from 'wxt/browser'
 
 export type Campo = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement

@@ -1,6 +1,6 @@
-import { cryptoRandomBytes } from '@piluvitu/tools/entropy'
-import { gerarPessoa, type Pessoa } from '@piluvitu/tools/pessoa'
-import { seedFromBytes } from '@piluvitu/tools/prng'
+import { cryptoRandomBytes } from './entropia'
+import { gerarPessoa, type Pessoa } from '@pilutech/botai-core/pessoa'
+import { seedFromBytes } from '@pilutech/botai-core/prng'
 import { storage } from 'wxt/utils/storage'
 import { hojeISO } from './hoje'
 

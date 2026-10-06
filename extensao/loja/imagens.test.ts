@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { COPIAS, ICONE, PECAS_DA_LOJA } from './pecas'
 
 const LOJA = path.resolve(import.meta.dirname, 'imagens')
-const APPS = path.resolve(import.meta.dirname, '../..')
+const RAIZ = path.resolve(import.meta.dirname, '../..')
 
 // Largura, altura e tipo de cor vêm do cabeçalho IHDR, logo depois da assinatura de 8 bytes.
 function cabecalhoPng(arquivo: string) {
@@ -35,12 +35,12 @@ describe('imagens da loja (geradas por make capturas-botai)', () => {
   })
 })
 
-describe('cópias para os sites (apps/web e apps/botai-site)', () => {
+describe('cópias para a landing (site/)', () => {
   it.each(COPIAS.map((c) => [c.destino, c] as const))(
-    'apps/%s é idêntica à da loja',
+    '%s é idêntica à da loja',
     (_, { origem, destino }) => {
       expect(
-        readFileSync(path.join(APPS, destino)).equals(
+        readFileSync(path.join(RAIZ, destino)).equals(
           readFileSync(path.join(LOJA, origem)),
         ),
       ).toBe(true)

@@ -1,6 +1,6 @@
-import type { FieldDescriptor, FieldKind } from '@piluvitu/tools/campos'
-import { valorPara } from '@piluvitu/tools/campos-formatar'
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import type { FieldDescriptor, FieldKind } from '@pilutech/botai-core/campos'
+import { valorPara } from '@pilutech/botai-core/campos-formatar'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { browser } from 'wxt/browser'
 import {
   cabe,

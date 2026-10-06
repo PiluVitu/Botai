@@ -1,4 +1,4 @@
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { useEffect, useState, type ReactNode } from 'react'
 import { browser } from 'wxt/browser'
 import { NenhumCampo } from '../../components/nenhum-campo'

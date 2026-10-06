@@ -1,4 +1,4 @@
-import { validarCPF } from '@piluvitu/tools/cpf'
+import { validarCPF } from '@pilutech/botai-core/cpf'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import { PESSOA_DOURADA } from '../test/pessoa-dourada'

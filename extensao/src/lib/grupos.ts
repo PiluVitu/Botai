@@ -1,4 +1,4 @@
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 
 export type IdGrupo =
   | 'pessoais'

@@ -1,5 +1,5 @@
-import type { FieldKind } from '@piluvitu/tools/campos'
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import type { FieldKind } from '@pilutech/botai-core/campos'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { browser, type Browser } from 'wxt/browser'
 
 export const MENU = {

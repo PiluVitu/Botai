@@ -1,4 +1,4 @@
-import type { FieldKind } from '@piluvitu/tools/campos'
+import type { FieldKind } from '@pilutech/botai-core/campos'
 import { browser, type Browser } from 'wxt/browser'
 import {
   gerarPessoaNova,

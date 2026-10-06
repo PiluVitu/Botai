@@ -1,4 +1,4 @@
-import type { FieldKind } from '@piluvitu/tools/campos'
+import type { FieldKind } from '@pilutech/botai-core/campos'
 import { browser } from 'wxt/browser'
 import type { ResumoPreenchimento } from './resultado'
 

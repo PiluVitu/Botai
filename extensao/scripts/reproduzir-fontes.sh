@@ -19,7 +19,7 @@ test "$(pnpm --version)" = "$pnpm_fixado"
 CI=1 pnpm install --frozen-lockfile
 pnpm --filter @pilutech/botai exec wxt zip -b firefox
 
-versao=$(node -p "require('./apps/botai/package.json').version")
-diff -r "$pasta_esperada" apps/botai/.output/firefox-mv3
-cmp "$esperado" "apps/botai/.output/botai-$versao-firefox.zip"
+versao=$(node -p "require('./extensao/package.json').version")
+diff -r "$pasta_esperada" extensao/.output/firefox-mv3
+cmp "$esperado" "extensao/.output/botai-$versao-firefox.zip"
 echo "IDENTICO: botai-$versao-firefox.zip"

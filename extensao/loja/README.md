@@ -1,10 +1,10 @@
 # Material das lojas do Botaí
 
-O que vai em cada campo das quatro lojas. O passo a passo da publicação (contas, credenciais, primeiro envio e lançamento) está na seção "Publicação" do `apps/botai/README.md`; como o release funciona, na do `apps/botai/CLAUDE.md`.
+O que vai em cada campo das quatro lojas. O passo a passo da publicação (contas, credenciais, primeiro envio e lançamento) está na seção "Publicação" do `extensao/README.md`; como o release funciona, na do `extensao/CLAUDE.md`.
 
 - `textos.md`: os textos da listagem, em pt-BR, uma seção por campo.
 - `notas-revisores.md`: as notas para os revisores da AMO e do Opera, em inglês.
-- `imagens/`: gerado por `make capturas-botai`; não edite à mão. O ícone vai também para `apps/web/public/pilulabs/botai/` (o card) e, com o ícone de 300 px e as capturas de 1280×800, para `apps/botai-site/` (a landing).
+- `imagens/`: gerado por `make capturas-botai`; não edite à mão. O ícone, o de 300 px e as capturas de 1280×800 vão também para `site/` (a landing). O logo do card da PiluLabs, no monorepo, é uma cópia fixa do ícone.
 - `icone-1i.svg`: o desenho 1i em vetor, de onde saem o ícone 128 da loja e o logo do Edge. O ícone do manifesto (`public/icon/`) não muda.
 - `vitrine.pagina.html`, `quadros.ts`, `pecas.ts` e `capturas.captura.ts`: o gerador das imagens.
 

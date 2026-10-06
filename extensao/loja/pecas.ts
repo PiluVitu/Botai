@@ -82,14 +82,13 @@ export interface Copia {
   destino: string
 }
 
-// destino relativo a apps/: o card do portfólio (apps/web) e a landing (apps/botai-site).
+// destino relativo à raiz do repo: a landing (site/).
 export const COPIAS: Copia[] = [
-  { origem: ICONE.arquivo, destino: 'web/public/pilulabs/botai/icone-128.png' },
-  { origem: ICONE.arquivo, destino: 'botai-site/public/icone-128.png' },
-  { origem: LOGO_DO_EDGE.arquivo, destino: 'botai-site/app/icon.png' },
-  { origem: LOGO_DO_EDGE.arquivo, destino: 'botai-site/app/apple-icon.png' },
+  { origem: ICONE.arquivo, destino: 'site/public/icone-128.png' },
+  { origem: LOGO_DO_EDGE.arquivo, destino: 'site/app/icon.png' },
+  { origem: LOGO_DO_EDGE.arquivo, destino: 'site/app/apple-icon.png' },
   ...CAPTURAS.map((captura) => ({
     origem: arquivoDaCaptura(captura, TAMANHOS_DAS_CAPTURAS[0]),
-    destino: `botai-site/public/capturas/${captura.nome}.png`,
+    destino: `site/public/capturas/${captura.nome}.png`,
   })),
 ]

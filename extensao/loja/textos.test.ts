@@ -10,6 +10,11 @@ const textos = lerSecoes(ler('textos.md'))
 const notas = lerSecoes(ler('notas-revisores.md'))
 const caracteres = (texto = '') => [...texto].length
 
+// O repo no GitHub é PiluVitu/Botai (nome técnico, sem acento): a URL dele passa, a grafia errada em prosa, não.
+const REPOSITORIO = 'https://github.com/PiluVitu/Botai'
+const GRAFIA_ERRADA = /BotAi|Bota Aí|BOTAI|Botai/
+const semRepo = (texto: string) => texto.replaceAll(REPOSITORIO, '')
+
 describe('textos da listagem', () => {
   it('nome com acento', () => {
     expect(textos.get('Nome')).toBe('Botaí')
@@ -99,16 +104,23 @@ describe('textos da listagem', () => {
   it.each(['textos.md', 'notas-revisores.md', 'README.md'])(
     '%s nunca escreve a marca com a grafia errada',
     (arquivo) => {
-      expect(ler(arquivo)).not.toMatch(/BotAi|Bota Aí|BOTAI|Botai/)
+      expect(semRepo(ler(arquivo))).not.toMatch(GRAFIA_ERRADA)
     },
   )
+
+  it('aceita a URL do repo, mas não a grafia errada no texto em volta', () => {
+    expect(semRepo(`Código aberto: ${REPOSITORIO}/releases`)).not.toMatch(
+      GRAFIA_ERRADA,
+    )
+    expect(semRepo(`Instale o Botai: ${REPOSITORIO}`)).toMatch(GRAFIA_ERRADA)
+  })
 })
 
 describe('notas para os revisores', () => {
   it.each(['AMO', 'Opera'])(
     '%s aponta para o SOURCE-CODE-REVIEW.md',
     (loja) => {
-      expect(notas.get(loja)).toContain('apps/botai/SOURCE-CODE-REVIEW.md')
+      expect(notas.get(loja)).toContain('extensao/SOURCE-CODE-REVIEW.md')
     },
   )
 })

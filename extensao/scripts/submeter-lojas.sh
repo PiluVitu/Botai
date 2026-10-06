@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Chamado pelo job `lojas` do botai-release.yml; ver "Publicação" no apps/botai/CLAUDE.md.
+# Chamado pelo job `lojas` do botai-release.yml; ver "Publicação" no extensao/CLAUDE.md.
 set -euo pipefail
 
 : "${EVENTO:?EVENTO: o github.event_name}"
-: "${VERSAO:?VERSAO: a versão do apps/botai/package.json}"
+: "${VERSAO:?VERSAO: a versão do extensao/package.json}"
 : "${PASTA_ZIPS:?PASTA_ZIPS: a pasta do artifact botai-zips}"
 
 chrome="$PASTA_ZIPS/botai-$VERSAO-chrome.zip"

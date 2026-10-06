@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Chamado por `make release-botai`, na main, depois do merge do PR de versão; ver "Publicação" no apps/botai/CLAUDE.md.
+# Chamado por `make release-botai`, na main, depois do merge do PR de versão; ver "Publicação" no extensao/CLAUDE.md.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
@@ -13,7 +13,7 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
   exit 1
 fi
 
-versao=$(node -p "require('./apps/botai/package.json').version")
+versao=$(node -p "require('./extensao/package.json').version")
 tag="botai-v$versao"
 if git rev-parse --quiet --verify "refs/tags/$tag" >/dev/null; then
   echo "A tag $tag já existe: suba a versão com make versao-botai V=x.y.z." >&2

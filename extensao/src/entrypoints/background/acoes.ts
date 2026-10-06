@@ -1,5 +1,5 @@
-import type { FieldKind } from '@piluvitu/tools/campos'
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import type { FieldKind } from '@pilutech/botai-core/campos'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { browser } from 'wxt/browser'
 import { obterOuGerarPessoa } from '../../lib/armazenamento'
 import { hojeISO } from '../../lib/hoje'

@@ -22,21 +22,18 @@ describe('peças da loja', () => {
     expect(new Set(arquivos).size).toBe(arquivos.length)
   })
 
-  // O apps/web só usa o ícone (o logo do card); a landing usa o ícone, os ícones do app e as capturas de 1280×800.
-  it('as cópias para os sites: o card do portfólio e a landing', () => {
-    expect(COPIAS.slice(0, 4)).toEqual([
-      {
-        origem: 'icone-128.png',
-        destino: 'web/public/pilulabs/botai/icone-128.png',
-      },
-      { origem: 'icone-128.png', destino: 'botai-site/public/icone-128.png' },
-      { origem: 'edge-logo-300.png', destino: 'botai-site/app/icon.png' },
-      { origem: 'edge-logo-300.png', destino: 'botai-site/app/apple-icon.png' },
+  // A landing (site/) usa o ícone, os ícones do app e as capturas de 1280×800. O logo do card
+  // da PiluLabs, no monorepo, é uma cópia fixa do ícone, fora deste gerador.
+  it('as cópias para a landing', () => {
+    expect(COPIAS.slice(0, 3)).toEqual([
+      { origem: 'icone-128.png', destino: 'site/public/icone-128.png' },
+      { origem: 'edge-logo-300.png', destino: 'site/app/icon.png' },
+      { origem: 'edge-logo-300.png', destino: 'site/app/apple-icon.png' },
     ])
-    expect(COPIAS.slice(4)).toEqual(
+    expect(COPIAS.slice(3)).toEqual(
       CAPTURAS.map((captura) => ({
         origem: `capturas/1280x800/${captura.nome}.png`,
-        destino: `botai-site/public/capturas/${captura.nome}.png`,
+        destino: `site/public/capturas/${captura.nome}.png`,
       })),
     )
   })

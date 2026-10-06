@@ -20,23 +20,23 @@ Uma pessoa de teste falsa e coerente, que fica guardada até você pedir outra:
 - **Edge:** pela mesma página da Chrome Web Store (na primeira vez, o Edge pede para permitir extensões de outras lojas).
 - **Firefox e Opera:** em revisão nas lojas. Até lá, a partir do código.
 
-**A partir do código**, na raiz do monorepo:
+**A partir do código**, na raiz do repositório:
 
 **Chrome e Edge**
 
 1. Rode `make build-botai`.
 2. Em `chrome://extensions` (no Edge, `edge://extensions`), ligue o "Modo do desenvolvedor" e clique em "Carregar sem compactação".
-3. Escolha a pasta `apps/botai/.output/chrome-mv3`.
+3. Escolha a pasta `extensao/.output/chrome-mv3`.
 
 **Opera**
 
 1. Rode `pnpm --filter @pilutech/botai build:opera`.
-2. Em `opera://extensions`, ligue o "Modo de desenvolvedor" e carregue a pasta `apps/botai/.output/opera-mv3`.
+2. Em `opera://extensions`, ligue o "Modo de desenvolvedor" e carregue a pasta `extensao/.output/opera-mv3`.
 
 **Firefox (153 ou mais novo)**
 
 1. Rode `pnpm --filter @pilutech/botai build:firefox`.
-2. Em `about:debugging#/runtime/this-firefox`, clique em "Carregar extensão temporária…" e escolha `apps/botai/.output/firefox-mv3/manifest.json`. A extensão some quando o Firefox fecha.
+2. Em `about:debugging#/runtime/this-firefox`, clique em "Carregar extensão temporária…" e escolha `extensao/.output/firefox-mv3/manifest.json`. A extensão some quando o Firefox fecha.
 
 ## Como usar
 
@@ -56,7 +56,7 @@ O Botaí sai em quatro lojas pela PiluTech. Como o release funciona está no [`C
 
 **Uma vez, antes do primeiro envio:**
 
-1. **Domínios na Vercel:** `pilutech.com.br` e `www.pilutech.com.br` (redirecionando para o apex) no projeto `pilutech-site` (Root Directory `apps/pilutech-site`; ver "Deploy" em `apps/pilutech-site/CLAUDE.md`); `botai.pilutech.com.br` no projeto `botai-site` (Root Directory `apps/botai-site`; ver "Deploy" em `apps/botai-site/CLAUDE.md`).
+1. **Domínios na Vercel:** `botai.pilutech.com.br` no projeto `botai-site` (Root Directory `site`; ver "Deploy" em `site/CLAUDE.md`); `pilutech.com.br` e `www.pilutech.com.br` (redirecionando para o apex) no projeto `pilutech-site`, que mora no monorepo `PiluVitu/PiluVitu-Dev` (Root Directory `apps/pilutech-site`).
 2. **DNS na Cloudflare**, zona `pilutech.com.br`: registros **DNS only** (nuvem cinza) com os valores que a Vercel mostrar (`A @`, `CNAME www`, e o `CNAME botai` com o valor do projeto `botai-site`). Não crie Single Redirect; se houver um de antes, apague. O "Powered by PiluTech" do popup abre `https://pilutech.com.br`, a landing da PiluTech.
 3. **Contas:**
    - Chrome Web Store: taxa única de US$ 5, verificação em duas etapas obrigatória e e-mail de login **imutável** (use um dedicado da PiluTech). Declare-se Trader com os dados da PiluTech, depois de confirmar com o contador.
@@ -82,18 +82,18 @@ O Botaí sai em quatro lojas pela PiluTech. Como o release funciona está no [`C
 9. **Lançamento**, com a Chrome e a AMO aprovadas:
    - publique o item adiado no painel da Chrome Web Store (há 30 dias a partir da aprovação);
    - AMO e Edge ficam públicos assim que aprovam;
-   - no `/admin/pilulabs` (item `botai`, que é o `apps/web/content/pilulabs/botai/index.yaml`), as URLs das lojas aprovadas; o Botaí já está listado, e Firefox e Opera entram quando aprovarem; a landing relê o YAML no build e troca o "Em breve" pelos botões das lojas (o Edge não tem "Em breve": o botão dele só aparece com o link);
+   - em `site/lojas.json` (PR neste repo), as URLs das lojas aprovadas: a landing troca o "Em breve" pelos botões no build seguinte (o Edge não tem "Em breve": o botão dele só aparece com o link); e no `/admin/pilulabs` do PiluVitu (item `botai` do CMS do `apps/web`), as mesmas URLs, para o card da PiluLabs e o selo da landing da PiluTech;
    - neste README, "Como instalar" ganha os links das lojas.
 
 **Versões seguintes:** `make versao-botai V=x.y.z` (abre o PR), merge, `git switch main && git pull`, `make release-botai` e aprove o job `lojas`. Para publicar adiado na Chrome, rejeite a aprovação da tag e rode `gh workflow run botai-release.yml --ref botai-v<versão> -f lojas=submeter -f adiar_chrome=true`. O Opera é sempre à mão, com o `botai-<versão>-opera.zip` do Release e a nota Opera.
 
 ## Privacidade e termos
 
-O Botaí não coleta nem envia dados: ele só lê os formulários da aba em que você o aciona e guarda no navegador a pessoa fictícia que gerou. A [política de privacidade](https://botai.pilutech.com.br/privacidade) e os [termos de uso](https://botai.pilutech.com.br/termos) moram no site do Botaí; o texto deles fica em `apps/botai-site/app/privacidade/page.tsx` e `apps/botai-site/app/termos/page.tsx`.
+O Botaí não coleta nem envia dados: ele só lê os formulários da aba em que você o aciona e guarda no navegador a pessoa fictícia que gerou. A [política de privacidade](https://botai.pilutech.com.br/privacidade) e os [termos de uso](https://botai.pilutech.com.br/termos) moram no site do Botaí; o texto deles fica em `site/app/privacidade/page.tsx` e `site/app/termos/page.tsx`.
 
 ## Licença
 
-MIT, © PiluTech (veja o [`LICENSE`](./LICENSE)). Vale para o Botaí e para os pacotes que ele empacota (`packages/tools` e `packages/ui`), não para o resto deste repositório.
+MIT, © PiluTech (veja o [`LICENSE`](./LICENSE)). Vale para o repositório inteiro, inclusive o `@pilutech/botai-core`.
 
 Detalhes técnicos (arquitetura, testes e o checklist manual) estão no [`CLAUDE.md`](./CLAUDE.md).
 

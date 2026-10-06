@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Chamado por `make versao-botai V=x.y.z`; ver "Publicação" no apps/botai/CLAUDE.md.
+# Chamado por `make versao-botai V=x.y.z`; ver "Publicação" no extensao/CLAUDE.md.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
@@ -14,7 +14,7 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 git fetch --quiet origin main
-atual=$(git show origin/main:apps/botai/package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
+atual=$(git show origin/main:extensao/package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
 if ! node -e '
   const [a, b] = process.argv.slice(1).map((v) => v.split(".").map(Number))
   process.exit((a[0] - b[0] || a[1] - b[1] || a[2] - b[2]) > 0 ? 0 : 1)
@@ -25,8 +25,8 @@ fi
 
 branch="chore/botai-v$nova"
 git switch --quiet -c "$branch" origin/main
-(cd apps/botai && pnpm version "$nova" --no-git-tag-version)
-git add apps/botai/package.json
+(cd extensao && pnpm version "$nova" --no-git-tag-version)
+git add extensao/package.json
 git commit --quiet -m "chore(botai): versão $nova"
 git push --quiet -u origin "$branch"
 gh pr create --base main --head "$branch" \

@@ -3,9 +3,9 @@ import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'wxt'
-import { TECLAS_DO_MANIFESTO } from '@piluvitu/tools/pilulabs'
+import { TECLAS_DO_MANIFESTO } from '@pilutech/botai-core/atalhos'
 
-const raizDoMonorepo = fileURLToPath(new URL('../..', import.meta.url))
+const raizDoRepo = fileURLToPath(new URL('..', import.meta.url))
 
 export default defineConfig({
   srcDir: 'src',
@@ -17,7 +17,7 @@ export default defineConfig({
   dev: { server: { port: 3018 }, reloadCommand: false },
   zip: {
     name: 'botai',
-    sourcesRoot: raizDoMonorepo,
+    sourcesRoot: raizDoRepo,
     // Arquivo oculto só entra citado pelo nome (.npmrc).
     includeSources: [
       'package.json',
@@ -25,14 +25,16 @@ export default defineConfig({
       'pnpm-workspace.yaml',
       '.npmrc',
       'scripts/check-tailwind-source.mjs',
-      'apps/botai/**',
-      'packages/tools/**',
-      'packages/ui/**',
+      'extensao/**',
+      'packages/core/**',
+      // Sai junto com o overrides do pnpm-workspace.yaml (passo C4 do plano da fase 0).
+      'vendor/piluvitu-ui-0.1.0.tgz',
     ],
     // Com sourcesRoot na raiz, a exclusão automática do outDir do WXT não pega estas pastas.
     excludeSources: [
-      'apps/botai/.output/**',
-      'apps/botai/.wxt/**',
+      'extensao/.output/**',
+      'extensao/.wxt/**',
+      'packages/core/dist/**',
       '**/storybook-static/**',
       '**/test-results/**',
       '**/playwright-report/**',

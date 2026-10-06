@@ -1,6 +1,6 @@
-import { classificarFormulario } from '@piluvitu/tools/campos'
-import { valorPara } from '@piluvitu/tools/campos-formatar'
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import { classificarFormulario } from '@pilutech/botai-core/campos'
+import { valorPara } from '@pilutech/botai-core/campos-formatar'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import type { ResultadoFrame } from '../../lib/resultado'
 import type { Contornos } from './contornos'
 import {

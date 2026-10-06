@@ -34,7 +34,7 @@ Privacidade: o Botaí só age na aba em que você o aciona, guarda a pessoa de t
 
 Cuidados: os dados são fictícios, mas um CPF ou um celular gerado pode pertencer a alguém de verdade. Use só em localhost e em ambientes de teste. A caixa de e-mail gerada é pública.
 
-Código aberto (licença MIT): https://github.com/PiluVitu/PiluVitu-Dev/tree/main/apps/botai
+Código aberto (licença MIT): https://github.com/PiluVitu/Botai
 
 Termos de uso: https://botai.pilutech.com.br/termos
 

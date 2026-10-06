@@ -27,7 +27,7 @@ it('recusa a tag que não bate com a versão do package.json', () => {
   ])
   expect(status).toBe(1)
   expect(saida).toContain(
-    '::error::A tag botai-v1.0.1 não bate com a versão de apps/botai/package.json (esperado botai-v1.0.0)',
+    '::error::A tag botai-v1.0.1 não bate com a versão de extensao/package.json (esperado botai-v1.0.0)',
   )
 })
 

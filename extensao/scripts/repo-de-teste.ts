@@ -54,9 +54,9 @@ export function criarRepoDeTeste(versao: string): RepoDeTeste {
   })
   execFileSync('git', ['clone', '--quiet', origem, trabalho], { env })
   const escreverVersao = (v: string) => {
-    mkdirSync(path.join(trabalho, 'apps/botai'), { recursive: true })
+    mkdirSync(path.join(trabalho, 'extensao'), { recursive: true })
     writeFileSync(
-      path.join(trabalho, 'apps/botai/package.json'),
+      path.join(trabalho, 'extensao/package.json'),
       `${JSON.stringify({ name: '@pilutech/botai', version: v, private: true }, null, 2)}\n`,
     )
   }

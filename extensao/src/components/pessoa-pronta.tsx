@@ -6,7 +6,7 @@ import {
   faShuffle,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import type { Pessoa } from '@piluvitu/tools/pessoa'
+import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { Avatar, AvatarFallback } from '@piluvitu/ui/avatar'
 import { Button } from '@piluvitu/ui/button'
 import { cn } from '@piluvitu/ui/cn'

@@ -22,9 +22,9 @@ it('abre o PR de versão: branch da origin/main, só o package.json, sem tag', (
   )
   expect(
     repo.gitDaOrigem('diff', '--name-only', 'main', ramo).split('\n'),
-  ).toEqual(['apps/botai/package.json'])
+  ).toEqual(['extensao/package.json'])
   expect(
-    JSON.parse(repo.gitDaOrigem('show', `${ramo}:apps/botai/package.json`))
+    JSON.parse(repo.gitDaOrigem('show', `${ramo}:extensao/package.json`))
       .version,
   ).toBe('1.1.0')
   expect(repo.gitDaOrigem('tag', '--list')).toBe('')

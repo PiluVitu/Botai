@@ -3,11 +3,10 @@
 @import '@fontsource-variable/jetbrains-mono/wght.css';
 @import '@fortawesome/fontawesome-svg-core/styles.css';
 @import '@piluvitu/ui/styles.css';
-@source '../../../packages/ui/src';
+@source '../node_modules/@piluvitu/ui/dist';
 @source not '../.output';
-/* O zip de fontes do WXT sempre exclui *.test.*: sem estas linhas, o CSS que o revisor da AMO reconstrói sai diferente. */
+/* O zip de fontes do WXT sempre exclui *.test.*: sem esta linha, o CSS que o revisor da AMO reconstrói sai diferente. */
 @source not './**/*.test.*';
-@source not '../../../packages/ui/src/**/*.test.*';
 /* O material das lojas, os scripts e a documentação do app não podem mudar o CSS da extensão. */
 @source not '../loja';
 @source not '../scripts';
