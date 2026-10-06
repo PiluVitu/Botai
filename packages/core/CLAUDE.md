@@ -8,7 +8,7 @@ TypeScript puro, sem dependência de runtime e sem DOM: a pessoa de teste, os ge
 
 - **Origem:** os módulos do Botaí do `@piluvitu/tools` do monorepo, com o histórico (`git filter-repo`, 2026-10). `prng` é cópia (a roleta do monorepo usa o original). `atalhos` saiu do `pilulabs.ts` de lá.
 - **0.1.0 (fase 0):** os mesmos nomes de módulo e de função do `@piluvitu/tools`, um subpath por módulo, sem barrel na raiz. A 0.2.0 (fase 1) acrescenta a raiz com a API amigável (semente, lote, envelope), o `/plano` e a CLI (ver "API da raiz" abaixo e o contrato `docs/superpowers/plans/2026-10-05-botai-repo-proprio-contrato.md`).
-- **Sem `lib: dom`:** o `tsconfig.json` tem só `es2022` e os tipos do Jest e do Node, e o Jest roda com `testEnvironment: 'node'`. Um uso acidental de DOM quebra o `lint` e os testes. Os tipos do Node servem aos testes (arquivo, processo filho); o `tsconfig.build.json` zera o `types`, e o `portabilidade.test.ts` barra API de Node fora de `src/bin`.
+- **Sem `lib: dom`:** o `tsconfig.json` tem só `es2022` e os tipos do Jest e do Node, e o Jest roda com `testEnvironment: 'node'`. Um uso acidental de DOM quebra o `lint` e os testes. Os tipos do Node servem aos testes (arquivo, processo filho) e, desde a fase 2, ao build (`tsconfig.build.json` com `"types": ["node"]`, por causa do `/servidor`); quem barra API de Node fora de `src/bin` e de `src/servidor/index.ts` é o `portabilidade.test.ts`, não o tsconfig.
 
 ## Atalho da extensão (`atalhos`)
 
@@ -76,7 +76,7 @@ Cada módulo é exportado só por subpath, com o nome do arquivo (`@pilutech/bot
 
 ## Testes
 
-Jest + ts-jest (`testEnvironment: 'node'`), `*.test.ts` ao lado do fonte; `node --test` para `scripts/*.test.mjs`. `make test-core` ou `pnpm --filter @pilutech/botai-core test`; tipos com `pnpm --filter @pilutech/botai-core lint`. Os testes sorteiam com `src/rng-teste.ts`, que não é exportado nem vai para o `dist`.
+Jest + ts-jest (`testEnvironment: 'node'`), `*.test.ts` ao lado do fonte (em `src/` e, desde a fase 2, em `scripts/`, como o `install.test.ts`); `node --test` para `scripts/*.test.mjs`. `make test-core` ou `pnpm --filter @pilutech/botai-core test`; `pnpm --filter @pilutech/botai-core lint` confere o `versao.ts`, os tipos e, desde a fase 2, os `scripts/*.sh` com o ShellCheck. Os testes sorteiam com `src/rng-teste.ts`, que não é exportado nem vai para o `dist`.
 
 ## Dependências
 
@@ -117,7 +117,7 @@ Plano: `docs/superpowers/plans/2026-10-05-botai-fase1-core-cli.md`. Os nomes sã
 - `esquema/envelope-v1.schema.json` (JSON Schema 2020-12) vai no pacote. `envelope.esquema.test.ts` o valida com o Ajv (só devDependency) contra todos os dourados e casos extras.
 - `dourado/v1/indice.json` diz que entradas geram cada arquivo; `scripts/gerar-dourados.mjs` regrava tudo a partir do `dist/`. **Regravar um dourado quer dizer que a pessoa de uma semente mudou: versão major.** As comparações ignoram `motor`.
 - `pessoas-1000.json` fica compacto (1,1 MB). A pasta está no `.prettierignore` e fora do `files` (não vai para o npm).
-- Quem confere os dourados: `envelope.dourado.test.ts` (biblioteca), `bin/botai.test.ts` (CLI do build) e `extensao/src/test/pessoa-dourada.test.ts` (o core que a extensão empacota). As fases 2 e 3 acrescentam o servidor e o Playwright.
+- Quem confere os dourados: `envelope.dourado.test.ts` (biblioteca), `bin/botai.test.ts` (CLI do build), `extensao/src/test/pessoa-dourada.test.ts` (o core que a extensão empacota) e, desde a fase 2, os testes do servidor e do `serve` e o `scripts/fumaca.mjs` (binários e imagem). A fase 3 acrescenta o Playwright.
 
 ## Versão do motor
 
@@ -140,4 +140,30 @@ Plano: `docs/superpowers/plans/2026-10-05-botai-fase1-core-cli.md`. Os nomes sã
 - Saídas: 0 ok, 1 inválido no `validar`, 2 erro de uso, 3 erro interno.
 - `ndjson` traz a semente exata de cada pessoa; `csv` sem `--semente` avisa a semente no stderr; `sql` começa com `-- botai: formato 1, motor …, semente …, hoje …`.
 - Testes: `cli/executar.test.ts` (em processo, rápido) e `bin/botai.test.ts` (roda `node dist/bin/botai.js`; por isso o `test` do pacote faz `build` antes).
-- `portabilidade.test.ts`: fora de `src/bin`, nenhum módulo pode citar `process.`, `node:`, `require(`, `Buffer`, `document.` ou `window.`.
+- `portabilidade.test.ts`: fora de `src/bin` (e de `src/servidor/index.ts`, desde a fase 2), nenhum módulo pode citar `process.`, `node:`, `require(`, `Buffer`, `document.` ou `window.`.
+
+## Servidor, imagem e binários (fase 2, 0.3.0)
+
+Plano: `docs/superpowers/plans/2026-10-05-botai-fase2-servidor.md`.
+
+- **`/servidor`** (`src/servidor/`): `node:http`, sem framework. `responder(metodo, alvo)` é puro (`consulta.ts` lê, `rotas.ts` responde); `criarServidor()` (`index.ts`) só o liga ao HTTP. A raiz do pacote não importa `/servidor`: a raiz roda no navegador da extensão. A trava `src/portabilidade.test.ts` aceita API de Node só em `src/bin/` e em `src/servidor/index.ts`; por isso o build compila com `"types": ["node"]` (`tsconfig.build.json`) sem que o motor possa usá-los.
+- **Uma validação só:** a consulta passa pelos leitores da CLI (`resolverOpcoes`, `lerUF`, `lerDominioEmail`, `lerCampos`, `lerDialeto`, `lerTabela`), e `mensagemDeUso` transforma `ErroDeOpcao`, `ErroDoPlano` e `ErroDeConsulta` no texto do 400. Só do HTTP: parâmetro desconhecido, repetido ou vazio é 400 (ignorar daria a pessoa padrão em silêncio para quem errou o nome, `dominio-email` em vez de `dominioEmail`) e `n` vai de 1 a 10 000 (a CLI vai de 0 a 100 000).
+- **Alvo que não vira URL** (`GET http://[`, que o `node:http` entrega sem validar) dá 400 `{ erro }`, como os outros erros: com o `new URL` fora do `try`, um pedido assim derrubava o `botai serve`.
+- **`textoDoLote`** (`src/lote.ts`): o texto de `botai pessoas` em json, ndjson, csv e sql, parte a parte. A CLI escreve as partes no stdout e o servidor as junta no corpo; mudar um formato muda os dois. Ele valida o `n` antes de devolver o gerador, então nada é escrito antes de um erro.
+- **`botai serve`** (`src/bin/serve.ts`): o bin (`src/bin/botai.ts`) despacha `serve` antes do `executar`, que é síncrono e não conhece o comando. As flags passam pelo `lerArgumentos` da CLI (`--porta 9000` e `--porta=9000` valem; erro de uso sai com 2).
+- **Encerramento:** `close()` + `closeIdleConnections()` na hora e `closeAllConnections()` depois de 2 s. O `serve` trata SIGINT e SIGTERM (sai com 0): na imagem o Node é o PID 1 e não tem tratador padrão, e sem isso o `docker stop` esperava 10 s e matava com 137.
+- **A linha `botai serve: ouvindo em <url>`** no stderr é contrato: `serve.test.ts` e `scripts/fumaca.mjs` acham a URL por ela (com `--porta 0`).
+- **Imagem** (`Dockerfile`): instala o tarball do npm (`pnpm run tarball` → `pacote/botai-core.tgz`), o mesmo arquivo do `npm publish`; `--offline` e `docker build --network=none` passam porque o pacote não tem dependência. Base `node:24.21.0-alpine3.24` por digest (o Dependabot `docker` sobe tag e digest), `USER node`, `HEALTHCHECK --start-interval` (Docker ≥ 25), `ENTRYPOINT ["botai"]` e `CMD ["serve", "--host", "0.0.0.0", "--porta", "8790"]`. O `.dockerignore` deixa só o tarball no contexto (sem ele iriam `node_modules` e os ~400 MB do `dist-bin`). Tamanho medido em 2026-10-05 (protótipo e `botai:local`): 240 MB no `docker image ls` do Docker 29 com o containerd (62,7 MB de conteúdo), quase tudo o binário `node` (122 MB).
+- **GHCR:** o primeiro push cria o pacote **privado** (padrão do GitHub); o dono o torna público uma vez. Só o job `imagem` do `core-distribuicao.yml` tem `packages: write`.
+- **Binários:** Bun do `.bun-version` (1.4.2). Local: `scripts/bun-fixo.sh` baixa para o cache e confere SHA256 fixados no script (trocou a versão, troque os SHA256); o `binarios.sh` recusa outro Bun. No CI, `oven-sh/setup-bun` com `bun-version-file`. Medido com o 1.4.2 em 2026-10-05: alvos x64 e x64-baseline geram binários diferentes (usamos o baseline, que roda sem AVX2); o binário macOS de outra arquitetura sai com assinatura inválida, por isso os darwin são compilados no runner `macos-15` e reassinados ad-hoc (`codesign --force --sign -`); tamanhos: darwin-arm64 ~62 MB, darwin-x64 ~69 MB, linux ~81 MB, windows-x64 ~86 MB, windows-arm64 ~74 MB (este medido com um script mínimo, não com o `botai`); compilar alvo cruzado baixa o runtime daquele alvo (precisa de rede).
+- **`install.sh`:** POSIX sh (roda no dash), `BOTAI_VERSAO`, `BOTAI_DESTINO`, `BOTAI_RELEASES` (raiz dos releases, para o teste). Baixa de `releases/latest`, então o release do core tem de ser o "Latest" do repo: todo outro workflow que cria release usa `--latest=false`. Teste: `scripts/install.test.ts` (release falso num `node:http` e `uname`/`sysctl`/`ldd` falsos no PATH); `spawn` assíncrono, porque o `spawnSync` travaria o servidor do release no mesmo processo.
+- **Fumaça** (`scripts/fumaca.mjs`): `.mjs` sem dependência, fora do Jest de propósito: roda nos 6 runners do release (Windows incluso) só com `setup-node`, sem `pnpm install`. Confere SHA256, os dourados pela CLI e pelo HTTP, `/saude` e o SIGTERM (exceto no Windows, onde o kill não entrega sinal).
+- **Workflow `core-distribuicao.yml`:** `pacote` → `binarios` (macOS) → `fumaca-binarios` (ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel, windows-2025, windows-11-arm) → `imagem` (fumaça amd64, push amd64+arm64) → `imagem-publicada` (a imagem do GHCR como `services:`, como um projeto de teste a usaria) → `release` (cria o release da tag, ou anexa a um que já exista, e marca `--latest`). No PR e no dispatch, só até `fumaca-binarios` (no PR, mais o actionlint).
+
+| Comando                                          | O quê                                                                                      |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `make imagem`                                    | tarball + `docker build --network=none -t botai:local`                                     |
+| `make fumaca-imagem`                             | sobe a `botai:local`, espera o `HEALTHCHECK`, confere contra os dourados e o `docker stop` |
+| `make binario-local`                             | build + binário Bun desta máquina + fumaça                                                 |
+| `pnpm --filter @pilutech/botai-core run tarball` | `pacote/botai-core.tgz`                                                                    |
+| `bash packages/core/scripts/binarios.sh <alvo>…` | binários em `dist-bin/` (`BUN` = o do `bun-fixo.sh`)                                       |

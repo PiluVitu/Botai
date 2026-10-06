@@ -5,6 +5,7 @@ Gerador de dados fake para formulários (CPF, CNPJ, CEP), da [PiluTech](https://
 - **Site:** https://botai.pilutech.com.br
 - **Chrome e Edge:** [Chrome Web Store](https://chromewebstore.google.com/detail/bota%C3%AD/mblmjomopainbcdjipkdmioglamdinnc). Firefox e Opera: em revisão nas lojas.
 - **Biblioteca:** [`@pilutech/botai-core`](https://www.npmjs.com/package/@pilutech/botai-core), o mesmo motor da extensão, para Node e navegador.
+- **Servidor, imagem e binários:** `botai serve`, a imagem `ghcr.io/piluvitu/botai` e binários sem Node ([`packages/core/README.md`](./packages/core/README.md)).
 
 ## O que tem aqui
 

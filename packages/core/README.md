@@ -3,7 +3,7 @@
 O motor do [Botaí](https://botai.pilutech.com.br): gera pessoas brasileiras de teste, coerentes e reproduzíveis. O CPF sai da região fiscal da UF do endereço, o DDD do celular é o do CEP, o e-mail vem do nome, a empresa vem dos sobrenomes, e os documentos passam no dígito verificador. A mesma semente e o mesmo `hoje` geram a mesma pessoa na biblioteca, na CLI e na extensão.
 
 - Sem dependência de runtime. ESM com tipos.
-- Roda em Node, Bun, Deno e navegador: fora do `bin`, nenhum módulo usa API de Node ou do DOM.
+- Roda em Node, Bun, Deno e navegador: fora do `bin` e do `/servidor`, nenhum módulo usa API de Node ou do DOM.
 - MIT © PiluTech.
 
 ## Instalar
@@ -42,7 +42,7 @@ const comSemente = gerarEnvelopeDaPessoa() // { formato, motor, semente, hoje, p
 
 Opções: `semente` (número inteiro ou texto de até 256 caracteres), `hoje` (`AAAA-MM-DD`), `uf` (sigla) e `dominioEmail`.
 
-Subpaths: `/pessoa` (`montarPessoa(rng, hoje, opcoes?)`), `/plano` (visão plana, CSV e SQL), `/cpf`, `/cnpj`, `/rg`, `/pis`, `/titulo-eleitor`, `/celular`, `/nascimento`, `/senha`, `/nome`, `/endereco`, `/empresa`, `/cartao`, `/uf`, `/aleatorio`, `/prng`, `/campos`, `/campos-formatar`, `/atalhos` e o esquema `/esquema/envelope-v1.schema.json`.
+Subpaths: `/pessoa` (`montarPessoa(rng, hoje, opcoes?)`), `/plano` (visão plana, CSV e SQL), `/servidor` (o servidor HTTP do `botai serve`, só no Node), `/cpf`, `/cnpj`, `/rg`, `/pis`, `/titulo-eleitor`, `/celular`, `/nascimento`, `/senha`, `/nome`, `/endereco`, `/empresa`, `/cartao`, `/uf`, `/aleatorio`, `/prng`, `/campos`, `/campos-formatar`, `/atalhos` e o esquema `/esquema/envelope-v1.schema.json`.
 
 ### Reproduzir uma pessoa
 
@@ -128,19 +128,100 @@ Python:
 import json, subprocess
 
 saida = subprocess.run(
-    ["npx", "--yes", "@pilutech/botai-core@0.2.0", "pessoas", "-n", "10",
+    ["npx", "--yes", "@pilutech/botai-core@0.3.0", "pessoas", "-n", "10",
      "--semente", "testes", "--hoje", "2026-10-05", "--formato", "ndjson"],
     capture_output=True, text=True, check=True,
 ).stdout
 pessoas = [json.loads(linha)["pessoa"] for linha in saida.splitlines()]
 ```
 
-Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.2.0", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
+Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.3.0", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
+
+## Servidor HTTP (`botai serve`)
+
+Para qualquer linguagem que fale HTTP. Escuta só em `127.0.0.1` por padrão.
+
+```bash
+npx @pilutech/botai-core serve                  # http://127.0.0.1:8790
+npx @pilutech/botai-core serve --porta 9000 --host 0.0.0.0
+```
+
+| Rota           | Parâmetros (query)                                                                                                                                                                                                                      | Resposta                                    |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `GET /pessoa`  | `semente`, `hoje` (`AAAA-MM-DD`), `uf`, `dominioEmail`                                                                                                                                                                                  | `{ formato, motor, semente, hoje, pessoa }` |
+| `GET /pessoas` | os de `/pessoa` + `n` (1 a 10 000, obrigatório), `formato` (`json`, `ndjson`, `csv`, `sql`), `dialeto` (`postgres`, `mysql`, `sqlite`; só no `sql`), `tabela` (só no `sql`; aceita `esquema.tabela`), `campos` (só no `csv` e no `sql`) | o mesmo texto de `botai pessoas`            |
+| `GET /saude`   | nenhum                                                                                                                                                                                                                                  | `{ ok: true, formato, motor }`              |
+
+- Os nomes são os das flags da CLI em camelCase, e os valores valem o mesmo que na CLI (`uf` e `dominioEmail` em qualquer caixa; semente de até 256 caracteres). Parâmetro desconhecido, repetido ou vazio, ou valor inválido, dá **400** com `{ "erro": "…" }`, que diz qual parâmetro (e, no desconhecido, lista os aceitos).
+- Sem `semente`, o servidor sorteia uma e a devolve no envelope; sem `hoje`, usa o dia de São Paulo, então a mesma semente gera outra pessoa no dia seguinte. Para reproduzir, passe os dois.
+- `Content-Type`: `application/json`, `application/x-ndjson`, `text/csv; header=present` ou `application/sql`, todos com `charset=utf-8`.
+- `Ctrl+C` ou `SIGTERM` encerram na hora, com código 0.
+
+```bash
+curl 'http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-10-05'
+curl 'http://127.0.0.1:8790/pessoas?n=100&semente=seed&hoje=2026-10-05&formato=sql&dialeto=postgres' > seed.sql
+```
+
+Em Python, sem pacote nenhum:
+
+```python
+import json, urllib.request
+with urllib.request.urlopen("http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-10-05") as r:
+    pessoa = json.load(r)["pessoa"]
+```
+
+## Docker
+
+```bash
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.3.0          # o servidor
+docker run --rm ghcr.io/piluvitu/botai:0.3.0 pessoa --semente 42    # a CLI
+```
+
+A imagem roda como usuário sem privilégio, escuta em `0.0.0.0:8790` e tem `HEALTHCHECK` em `/saude`. Para outra porta, mapeie com `-p 9000:8790` em vez de mudar a interna (o `HEALTHCHECK` olha a 8790).
+
+No GitHub Actions, como service:
+
+```yaml
+services:
+  botai:
+    image: ghcr.io/piluvitu/botai:0.3.0
+    ports: ['8790:8790']
+```
+
+No docker compose:
+
+```yaml
+services:
+  botai:
+    image: ghcr.io/piluvitu/botai:0.3.0
+    ports: ['8790:8790']
+```
+
+## Binário sem Node
+
+Binários para macOS (arm64 e x64), Linux (x64 e arm64, glibc) e Windows (x64 e arm64) em cada [release `core-v*`](https://github.com/PiluVitu/Botai/releases), com `SHA256SUMS`. Uns 60 a 90 MB cada: levam o runtime do Bun dentro.
+
+```bash
+curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | sh
+```
+
+- Detecta o sistema e a arquitetura (num terminal sob Rosetta, instala o arm64), confere o SHA256 e instala em `~/.local/bin/botai`.
+- `BOTAI_VERSAO=0.3.0` fixa a versão; `BOTAI_DESTINO=/outra/pasta` muda o destino.
+- Alpine e outros Linux com musl não têm binário: use a imagem ou o npm.
+
+Conferir à mão: `shasum -a 256 -c --ignore-missing SHA256SUMS` (macOS) ou `sha256sum -c --ignore-missing SHA256SUMS` (Linux); no Windows, `Get-FileHash .\botai-windows-x64.exe -Algorithm SHA256` (ou o `botai-windows-arm64.exe`) e compare com a linha do `SHA256SUMS`.
+
+### Binário sem assinatura: o aviso do sistema
+
+Os binários não são assinados por um desenvolvedor identificado (só a assinatura ad-hoc no macOS).
+
+- **macOS:** o `curl` (e o `install.sh`) não marca o arquivo com quarentena, e ele roda sem aviso. Baixado pelo navegador, o macOS bloqueia na primeira execução. Libere com `xattr -d com.apple.quarantine ./botai-darwin-arm64` (ou em Ajustes do Sistema › Privacidade e Segurança › "Abrir Mesmo Assim", que fica disponível por cerca de uma hora depois da tentativa: https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac).
+- **Windows:** o SmartScreen mostra "O Windows protegeu o computador" ("Windows protected your PC"): clique em "Mais informações" e em "Executar assim mesmo". Ou, no PowerShell, `Unblock-File .\botai-windows-x64.exe`, que tira a marca de arquivo baixado da internet (https://learn.microsoft.com/powershell/module/microsoft.powershell.utility/unblock-file). Com o Controle Inteligente de Aplicativos ligado, o Windows bloqueia binário sem assinatura de qualquer origem: use o npm ou a imagem.
 
 ## Contrato
 
 - `esquema/envelope-v1.schema.json` (JSON Schema 2020-12) descreve o envelope. `formato` muda quando a forma muda; `motor` é a versão do pacote que gerou os dados.
-- O repositório guarda arquivos dourados (`packages/core/dourado/v1`): as pessoas esperadas para sementes e datas fixas, conferidas pela biblioteca, pela CLI e pela extensão a cada mudança.
+- O repositório guarda arquivos dourados (`packages/core/dourado/v1`): as pessoas esperadas para sementes e datas fixas, conferidas pela biblioteca, pela CLI, pelo servidor, pela imagem, pelos binários e pela extensão a cada mudança.
 
 ## Licença
 
