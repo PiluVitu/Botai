@@ -1,12 +1,12 @@
 import { somenteDigitos } from '../aleatorio'
-import { envelopar, envelopeDoLote, FORMATO } from '../envelope'
+import { envelopar } from '../envelope'
 import {
   type OpcoesDaPessoa,
   type OpcoesResolvidas,
   pessoaResolvida,
-  pessoasDoLote,
   resolverOpcoes,
 } from '../gerar'
+import { textoDoLote } from '../lote'
 import {
   ErroDeOpcao,
   lerDominioEmail,
@@ -14,16 +14,13 @@ import {
   type NomeDaOpcao,
 } from '../opcoes'
 import {
-  cabecalhoCsv,
   COLUNAS,
   ErroDoPlano,
   type Formato,
   FORMATOS,
-  insertSql,
   lerCampos,
   lerDialeto,
   lerTabela,
-  linhaCsv,
 } from '../plano'
 import { rngDeSemente, sementeAleatoria } from '../semente'
 import { MOTOR } from '../versao'
@@ -157,27 +154,10 @@ function comandoPessoas(argv: readonly string[], saida: Saida): number {
   const dialeto = lerDialeto(texto(lidos, 'dialeto') ?? 'postgres')
   const tabela = lerTabela(texto(lidos, 'tabela') ?? 'pessoas')
   const r = opcoesDaPessoa(lidos)
-
-  if (formato === 'json') {
-    saida.dados(json(envelopeDoLote(n, r)))
-    return SAIDA.ok
-  }
-  const lote = pessoasDoLote(n, r)
-  if (formato === 'csv') {
-    if (texto(lidos, 'semente') === undefined)
-      saida.mensagem(`botai: semente ${r.semente}, hoje ${r.hoje}\n`)
-    saida.dados(cabecalhoCsv(colunas))
-  }
-  if (ehSql)
-    saida.dados(
-      `-- botai: formato ${FORMATO}, motor ${MOTOR}, semente ${r.semente}, hoje ${r.hoje}\n`,
-    )
-  for (const { semente, pessoa } of lote) {
-    if (formato === 'ndjson')
-      saida.dados(`${JSON.stringify(envelopar(semente, r.hoje, pessoa))}\n`)
-    else if (formato === 'csv') saida.dados(linhaCsv(pessoa, colunas))
-    else saida.dados(insertSql(pessoa, { dialeto, tabela, colunas }))
-  }
+  const partes = textoDoLote(n, r, { formato, dialeto, tabela, colunas })
+  if (formato === 'csv' && texto(lidos, 'semente') === undefined)
+    saida.mensagem(`botai: semente ${r.semente}, hoje ${r.hoje}\n`)
+  for (const parte of partes) saida.dados(parte)
   return SAIDA.ok
 }
 
