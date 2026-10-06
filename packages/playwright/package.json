@@ -1,0 +1,62 @@
+{
+  "name": "@pilutech/botai-playwright",
+  "version": "0.1.0",
+  "description": "Fixture do Playwright que gera uma pessoa brasileira de teste reproduzível e preenche formulários com o motor do Botaí",
+  "license": "MIT",
+  "author": "PiluTech",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PiluVitu/Botai.git",
+    "directory": "packages/playwright"
+  },
+  "homepage": "https://botai.pilutech.com.br",
+  "bugs": "https://github.com/PiluVitu/Botai/issues",
+  "keywords": [
+    "playwright",
+    "fixture",
+    "dados de teste",
+    "cpf",
+    "formulario",
+    "botai"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "core": "pnpm --filter @pilutech/botai-core run build",
+    "lint": "pnpm run core && tsc --noEmit",
+    "test": "pnpm run core && jest",
+    "test:e2e": "pnpm run core && playwright test",
+    "build": "pnpm run core && tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@pilutech/botai-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1.59.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.59.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.0",
+    "esbuild": "0.28.1",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.9",
+    "typescript": "^5.9.3"
+  }
+}
