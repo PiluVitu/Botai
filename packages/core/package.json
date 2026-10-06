@@ -144,7 +144,7 @@
     "build": "node scripts/gerar-versao.mjs && rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
     "prepack": "pnpm run build",
     "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit",
-    "test": "jest && node --test scripts/*.test.mjs",
+    "test": "pnpm run build && jest && node --test scripts/*.test.mjs",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
@@ -154,5 +154,8 @@
     "jest": "^30.4.2",
     "ts-jest": "^29.4.9",
     "typescript": "^5.9.3"
+  },
+  "bin": {
+    "botai": "dist/bin/botai.js"
   }
 }
