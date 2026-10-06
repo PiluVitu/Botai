@@ -3,9 +3,10 @@ import { type ChildProcessWithoutNullStreams, spawn } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { request } from 'node:http'
 import { join } from 'node:path'
+import * as servidor from '../servidor/index'
 import { HOST_PADRAO, PORTA_PADRAO } from '../servidor/index'
 import { MOTOR } from '../versao'
-import { ErroDoServe, lerOpcoesDoServe } from './serve'
+import { ErroDoServe, lerOpcoesDoServe, subirServe } from './serve'
 
 interface ItemDoIndice {
   arquivo: string
@@ -136,6 +137,77 @@ describe('lerOpcoesDoServe', () => {
   })
 })
 
+// O listen recusado tem de virar ErroDoServe: qualquer outro erro escapa do executarServe como
+// rejeição não tratada, e o processo sai com 1 e o stack trace do Node no lugar da mensagem.
+// O erro é simulado porque cada sistema recusa coisas diferentes (ver o teste por processo abaixo).
+describe('subirServe: listen recusado pelo sistema', () => {
+  afterEach(() => jest.restoreAllMocks())
+
+  test.each([
+    [
+      'EADDRINUSE',
+      ['--porta', '9000'],
+      1,
+      'a porta 9000 já está em uso em 127.0.0.1',
+    ],
+    [
+      'EADDRNOTAVAIL',
+      ['--host', '203.0.113.1'],
+      2,
+      '--host inválido: 203.0.113.1',
+    ],
+    [
+      'ENOTFOUND',
+      ['--host', 'nao-existe.invalid'],
+      2,
+      '--host inválido: nao-existe.invalid',
+    ],
+    // macOS: endereço de multicast ou de broadcast (224.0.0.1, 255.255.255.255).
+    ['EINVAL', ['--host', '224.0.0.1'], 2, '--host inválido: 224.0.0.1'],
+    // Porta abaixo de 1024 sem root.
+    [
+      'EACCES',
+      ['--porta', '80'],
+      2,
+      'sem permissão para a porta 80 em 127.0.0.1',
+    ],
+  ] as const)(
+    '%s com %j → ErroDoServe com código %i',
+    async (code, args, codigo, mensagem) => {
+      jest.spyOn(servidor, 'iniciarServidor').mockRejectedValue(
+        Object.assign(new Error(`listen ${code}`), {
+          code,
+          syscall: 'listen',
+        }),
+      )
+      const subida = subirServe(args, () => {})
+      await expect(subida).rejects.toBeInstanceOf(ErroDoServe)
+      await expect(subida).rejects.toMatchObject({ codigo })
+      await expect(subida).rejects.toThrow(mensagem)
+    },
+  )
+})
+
+// Medido em 2026-10-06: o macOS recusa 127.0.0.1:80 sem root; o Linux recusa a 80 sem root fora de
+// container, mas num container o Docker põe ip_unprivileged_port_start = 0 e ela escuta.
+function sistemaRecusaPorta80(): boolean {
+  if (process.getuid?.() === 0) return false
+  if (process.platform === 'darwin') return true
+  try {
+    const inicio = readFileSync(
+      '/proc/sys/net/ipv4/ip_unprivileged_port_start',
+      'utf8',
+    )
+    return Number(inicio) > 80
+  } catch {
+    return false
+  }
+}
+
+// Medido em 2026-10-06: o macOS dá EINVAL no listen em 224.0.0.1; o Linux escuta nele.
+const soNoMac = process.platform === 'darwin' ? test : test.skip
+const comPorta80Recusada = sistemaRecusaPorta80() ? test : test.skip
+
 describe('botai serve (o bin do build, por processo e HTTP)', () => {
   let servindo: Servindo | undefined
 
@@ -200,6 +272,31 @@ describe('botai serve (o bin do build, por processo e HTTP)', () => {
     expect(codigo).toBe(2)
     expect(erro).toContain('--host inválido: 203.0.113.1')
   })
+
+  // A sonda do revisor: antes, saía com 1 e o stack trace do Node (rejeição não tratada do listen).
+  soNoMac(
+    'host de multicast (EINVAL): sai com 2 e só a mensagem no stderr',
+    async () => {
+      const { codigo, erro } = await saida(
+        botai(['serve', '--porta', '0', '--host', '224.0.0.1']),
+      )
+      expect(erro).toBe(
+        'botai: --host inválido: 224.0.0.1 (use um endereço desta máquina, como 127.0.0.1 ou 0.0.0.0)\n',
+      )
+      expect(codigo).toBe(2)
+    },
+  )
+
+  comPorta80Recusada(
+    'porta 80 sem root (EACCES): sai com 2 e só a mensagem no stderr',
+    async () => {
+      const { codigo, erro } = await saida(botai(['serve', '--porta', '80']))
+      expect(erro).toBe(
+        'botai: sem permissão para a porta 80 em 127.0.0.1 (abaixo de 1024 costuma exigir root); escolha outra com --porta\n',
+      )
+      expect(codigo).toBe(2)
+    },
+  )
 
   test('opção inválida: sai com 2, sem subir', async () => {
     const { codigo, erro } = await saida(botai(['serve', '--porta', 'abc']))

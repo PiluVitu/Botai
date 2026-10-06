@@ -98,9 +98,18 @@ export async function subirServe(
         `a porta ${opcoes.porta} já está em uso em ${opcoes.host}; escolha outra com --porta`,
         1,
       )
-    if (codigo === 'EADDRNOTAVAIL' || codigo === 'ENOTFOUND')
+    if (
+      codigo === 'EADDRNOTAVAIL' ||
+      codigo === 'ENOTFOUND' ||
+      codigo === 'EINVAL'
+    )
       throw new ErroDoServe(
         `--host inválido: ${opcoes.host} (use um endereço desta máquina, como 127.0.0.1 ou 0.0.0.0)`,
+        2,
+      )
+    if (codigo === 'EACCES')
+      throw new ErroDoServe(
+        `sem permissão para a porta ${opcoes.porta} em ${opcoes.host} (abaixo de 1024 costuma exigir root); escolha outra com --porta`,
         2,
       )
     throw causa
