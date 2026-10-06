@@ -122,7 +122,9 @@ describe('iniciarServidor', () => {
     })
   })
 
-  // Sem o fechamento das ociosas, uma conexão keep-alive parada segura o close() para sempre.
+  // Contrato: a conexão ociosa fecha na hora. No Node 22 e 24 e no Bun 1.4.2 (medido em 2026-10-06), o
+  // próprio close() já fecha a keep-alive parada; se não fechasse, ela só cairia no prazo de 2 s do
+  // encerrar() (nunca ficaria presa para sempre), e o limite de 1 s abaixo reprova esse caso.
   test('encerrar não fica preso numa conexão keep-alive parada', async () => {
     noAr = await iniciarServidor({ porta: 0 })
     const { hostname, port } = new URL(noAr.url)
@@ -138,7 +140,7 @@ describe('iniciarServidor', () => {
     const inicio = Date.now()
     await noAr.encerrar()
     noAr = undefined
-    expect(Date.now() - inicio).toBeLessThan(2_500)
+    expect(Date.now() - inicio).toBeLessThan(1_000)
     socket.destroy()
   })
 
