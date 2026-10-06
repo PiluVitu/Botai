@@ -148,6 +148,7 @@
   "scripts": {
     "build": "node scripts/gerar-versao.mjs && rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
     "prepack": "pnpm run build",
+    "tarball": "pnpm run build && rm -rf pacote && pnpm pack --pack-destination pacote && mv pacote/*.tgz pacote/botai-core.tgz",
     "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit && pnpm run lint:sh",
     "test": "pnpm run build && jest && node --test scripts/*.test.mjs",
     "test:watch": "jest --watch",

@@ -20,6 +20,10 @@ extensao/.output/
 extensao/.wxt/
 extensao/web-ext.config.ts
 
+# core: tarball do pnpm pack (a imagem instala dele) e binários Bun
+packages/core/pacote/
+packages/core/dist-bin/
+
 # credenciais: só o .env.example entra (o .env.submit do `wxt submit` também cai aqui)
 .env*
 !.env.example

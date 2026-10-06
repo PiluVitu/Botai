@@ -1,5 +1,5 @@
 .PHONY: test lint stop \
-        test-core build-core \
+        test-core build-core imagem fumaca-imagem \
         dev-botai build-botai test-botai test-e2e-botai storybook-botai zip-botai versao-botai release-botai capturas-botai \
         dev-botai-site build-botai-site test-botai-site test-e2e-botai-site storybook-botai-site
 
@@ -21,6 +21,13 @@ test-core:
 
 build-core:
 	pnpm --filter @pilutech/botai-core build
+
+imagem: ## Imagem botai:local a partir do tarball do npm (build sem rede)
+	pnpm --filter @pilutech/botai-core run tarball
+	docker build --network=none -t botai:local packages/core
+
+fumaca-imagem: imagem ## Sobe a botai:local e confere contra os dourados
+	cd packages/core && bash scripts/fumaca-imagem.sh botai:local
 
 # --- extensão (MV3 para Chrome, Edge, Opera e Firefox, WXT) ---
 # Dev em 3018 e Storybook em 6018. Carregar .output/chrome-mv3-dev sem empacotar; o dev acrescenta `tabs` e
