@@ -1,6 +1,6 @@
 {
   "name": "@pilutech/botai-core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Motor do Botaí: pessoa brasileira de teste coerente (CPF, CNPJ, RG, PIS, título de eleitor, celular, CEP real, cartão de teste) e classificador de campos de formulário. TypeScript puro, sem dependências.",
   "license": "MIT",
   "type": "module",
@@ -49,7 +49,9 @@
     "./atalhos": "./src/atalhos.ts",
     "./plano": "./src/plano.ts",
     "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json",
-    "./servidor": "./src/servidor/index.ts"
+    "./servidor": "./src/servidor/index.ts",
+    "./navegador": "./src/navegador/index.ts",
+    "./navegador.iife.js": "./dist/navegador.iife.js"
   },
   "publishConfig": {
     "access": "public",
@@ -142,11 +144,16 @@
       "./servidor": {
         "types": "./dist/servidor/index.d.ts",
         "default": "./dist/servidor/index.js"
-      }
+      },
+      "./navegador": {
+        "types": "./dist/navegador/index.d.ts",
+        "default": "./dist/navegador/index.js"
+      },
+      "./navegador.iife.js": "./dist/navegador.iife.js"
     }
   },
   "scripts": {
-    "build": "node scripts/gerar-versao.mjs && rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
+    "build": "node scripts/gerar-versao.mjs && rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist && node scripts/construir-iife.mjs",
     "prepack": "pnpm run build",
     "tarball": "pnpm run build && rm -rf pacote && pnpm pack --pack-destination pacote && mv pacote/*.tgz pacote/botai-core.tgz",
     "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit && pnpm run lint:sh && tsc --noEmit -p tsconfig.sem-dom.json",
@@ -158,6 +165,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
     "ajv": "^8.20.0",
+    "esbuild": "0.28.1",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "ts-jest": "^29.4.9",

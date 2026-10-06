@@ -3,7 +3,7 @@
 O motor do [Botaí](https://botai.pilutech.com.br): gera pessoas brasileiras de teste, coerentes e reproduzíveis. O CPF sai da região fiscal da UF do endereço, o DDD do celular é o do CEP, o e-mail vem do nome, a empresa vem dos sobrenomes, e os documentos passam no dígito verificador. A mesma semente e o mesmo `hoje` geram a mesma pessoa na biblioteca, na CLI e na extensão.
 
 - Sem dependência de runtime. ESM com tipos.
-- Roda em Node, Bun, Deno e navegador: fora do `bin` e do `/servidor`, nenhum módulo usa API de Node ou do DOM.
+- Roda em Node, Bun, Deno e navegador: fora do `bin` e do `/servidor` (Node) e do `/navegador` (DOM), nenhum módulo usa API de Node ou do DOM.
 - MIT © PiluTech.
 
 ## Instalar
@@ -128,14 +128,14 @@ Python:
 import json, subprocess
 
 saida = subprocess.run(
-    ["npx", "--yes", "@pilutech/botai-core@0.3.0", "pessoas", "-n", "10",
+    ["npx", "--yes", "@pilutech/botai-core@0.4.0", "pessoas", "-n", "10",
      "--semente", "testes", "--hoje", "2026-10-05", "--formato", "ndjson"],
     capture_output=True, text=True, check=True,
 ).stdout
 pessoas = [json.loads(linha)["pessoa"] for linha in saida.splitlines()]
 ```
 
-Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.3.0", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
+Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.4.0", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
 
 ## Servidor HTTP (`botai serve`)
 
@@ -173,8 +173,8 @@ with urllib.request.urlopen("http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-1
 ## Docker
 
 ```bash
-docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.3.0          # o servidor
-docker run --rm ghcr.io/piluvitu/botai:0.3.0 pessoa --semente 42    # a CLI
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.0          # o servidor
+docker run --rm ghcr.io/piluvitu/botai:0.4.0 pessoa --semente 42    # a CLI
 ```
 
 A imagem roda como usuário sem privilégio, escuta em `0.0.0.0:8790` e tem `HEALTHCHECK` em `/saude`. Para outra porta, mapeie com `-p 9000:8790` em vez de mudar a interna (o `HEALTHCHECK` olha a 8790).
@@ -184,7 +184,7 @@ No GitHub Actions, como service:
 ```yaml
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.3.0
+    image: ghcr.io/piluvitu/botai:0.4.0
     ports: ['8790:8790']
 ```
 
@@ -193,7 +193,7 @@ No docker compose:
 ```yaml
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.3.0
+    image: ghcr.io/piluvitu/botai:0.4.0
     ports: ['8790:8790']
 ```
 
@@ -206,7 +206,7 @@ curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh
 ```
 
 - Detecta o sistema e a arquitetura (num terminal sob Rosetta, instala o arm64), confere o SHA256 e instala em `~/.local/bin/botai`.
-- `BOTAI_VERSAO=0.3.0` fixa a versão; `BOTAI_DESTINO=/outra/pasta` muda o destino.
+- `BOTAI_VERSAO=0.4.0` fixa a versão; `BOTAI_DESTINO=/outra/pasta` muda o destino.
 - Alpine e outros Linux com musl não têm binário: use a imagem ou o npm.
 
 Conferir à mão: `shasum -a 256 -c --ignore-missing SHA256SUMS` (macOS) ou `sha256sum -c --ignore-missing SHA256SUMS` (Linux); no Windows, `Get-FileHash .\botai-windows-x64.exe -Algorithm SHA256` (ou o `botai-windows-arm64.exe`) e compare com a linha do `SHA256SUMS`.
@@ -217,6 +217,27 @@ Os binários não são assinados por um desenvolvedor identificado (só a assina
 
 - **macOS:** o `curl` (e o `install.sh`) não marca o arquivo com quarentena, e ele roda sem aviso. Baixado pelo navegador, o macOS bloqueia na primeira execução. Libere com `xattr -d com.apple.quarantine ./botai-darwin-arm64` (ou em Ajustes do Sistema › Privacidade e Segurança › "Abrir Mesmo Assim", que fica disponível por cerca de uma hora depois da tentativa: https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac).
 - **Windows:** o SmartScreen mostra "O Windows protegeu o computador" ("Windows protected your PC"): clique em "Mais informações" e em "Executar assim mesmo". Ou, no PowerShell, `Unblock-File .\botai-windows-x64.exe`, que tira a marca de arquivo baixado da internet (https://learn.microsoft.com/powershell/module/microsoft.powershell.utility/unblock-file). Com o Controle Inteligente de Aplicativos ligado, o Windows bloqueia binário sem assinatura de qualquer origem: use o npm ou a imagem.
+
+## Motor de preenchimento no navegador (`/navegador`, desde a 0.4.0)
+
+O mesmo motor da extensão Botaí, para rodar dentro de uma página: acha os campos (inclusive em shadow root aberta), reconhece cada um, escreve pelo setter nativo com `focus`/`input`/`change`/`blur` sintéticos (React controlado e máscaras enxergam o valor) e confere o que ficou.
+
+```ts
+import { gerarPessoa, hojeEmSaoPaulo } from '@pilutech/botai-core'
+import { preencherNaPagina } from '@pilutech/botai-core/navegador'
+
+const hoje = hojeEmSaoPaulo()
+const pessoa = gerarPessoa({ semente: 'cadastro', hoje })
+const resultado = await preencherNaPagina(document, pessoa, hoje, {
+  segundaPassada: true,
+})
+// resultado.preenchidos, resultado.naoReconhecidos, resultado.recusados
+```
+
+- O alvo pode ser o `document` ou um `Element` (um `<form>`, uma seção, um campo só).
+- `segundaPassada: true` espera 1 s e regrava o que o site sobrescreveu (busca de CEP); a Promise só resolve depois.
+- Sem bundler, `@pilutech/botai-core/navegador.iife.js` é um script que cria só `globalThis.__botaiNavegador` (`{ preencher }`, a mesma `preencherNaPagina`). Serve para `page.addInitScript({ path })` ou `page.evaluate(<texto do arquivo>)`. No Playwright, use direto o [`@pilutech/botai-playwright`](https://www.npmjs.com/package/@pilutech/botai-playwright).
+- Shadow root fechada só entra com um adaptador (`raizSombra`) que o ambiente forneça, como a extensão faz.
 
 ## Contrato
 

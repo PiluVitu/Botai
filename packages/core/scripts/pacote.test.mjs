@@ -40,8 +40,6 @@ const EXTRAS = [
   'dist/navegador/dom.js',
   'dist/navegador/iife.d.ts',
   'dist/navegador/iife.js',
-  'dist/navegador/index.d.ts',
-  'dist/navegador/index.js',
   'dist/navegador/pagina.d.ts',
   'dist/navegador/pagina.js',
   'dist/navegador/preencher.d.ts',

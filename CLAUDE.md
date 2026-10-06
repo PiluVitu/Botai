@@ -18,7 +18,7 @@ Guia do Claude Code para o repositório do **Botaí** (`github.com/PiluVitu/Bota
 
 ## Stack
 
-pnpm 11.1.1 (workspaces `extensao`, `site`, `packages/*`), Node 22 no CI (24.14.0 na reprodução da AMO e na publicação no npm), TypeScript strict, Tailwind CSS 4 + `@piluvitu/ui`, WXT 0.21.4 (Vite 7), Next 16, Jest 30 (core e site), Vitest 4 (extensão), Storybook 10 (extensão 6018, site 6019), Playwright 1.59.1. Distribuição do core (fase 2): Bun 1.4.2 (`.bun-version`, binários), Docker (imagem `ghcr.io/piluvitu/botai` sobre `node:24.21.0-alpine3.24`) e ShellCheck (`lint` do core).
+pnpm 11.1.1 (workspaces `extensao`, `site`, `packages/*`), Node 22 no CI (24.14.0 na reprodução da AMO e na publicação no npm), TypeScript strict, Tailwind CSS 4 + `@piluvitu/ui`, WXT 0.21.4 (Vite 7), Next 16, Jest 30 (core e site), Vitest 4 (extensão), Storybook 10 (extensão 6018, site 6019), Playwright 1.59.1. Distribuição do core (fase 2): Bun 1.4.2 (`.bun-version`, binários), Docker (imagem `ghcr.io/piluvitu/botai` sobre `node:24.21.0-alpine3.24`) e ShellCheck (`lint` do core). Motor DOM do core (fase 3): esbuild 0.28.1, a versão do Vite no lockfile, gera o `dist/navegador.iife.js`.
 
 ## Segurança de dependências (spec §5.3)
 
@@ -50,7 +50,7 @@ Até o `@piluvitu/ui` 0.1.0 estar no npm há 24 h, o `pnpm-workspace.yaml` tem `
 | `make lint`                                     | `pnpm -r lint`                                                                           |
 | `make stop`                                     | libera as portas 3018, 6018, 3020 e 6019                                                 |
 | `make test-core`                                | Jest + `node --test` do core (o pacote de verdade é montado e conferido)                 |
-| `make build-core`                               | `dist/` do core (`.js` + `.d.ts`)                                                        |
+| `make build-core`                               | `dist/` do core (`.js` + `.d.ts` + `navegador.iife.js`)                                  |
 | `pnpm --filter @pilutech/botai-core build`      | `gerar-versao` + build do core (o `test` do core já roda o build antes)                  |
 | `node packages/core/dist/bin/botai.js --help`   | a CLI do build local (`npx` do pacote publicado faz o mesmo)                             |
 | `node packages/core/scripts/gerar-dourados.mjs` | regrava `packages/core/dourado/v1` a partir do `dist/`. Mudou um dourado? É versão major |
