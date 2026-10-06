@@ -45,7 +45,8 @@
     "./pessoa": "./src/pessoa.ts",
     "./campos": "./src/campos.ts",
     "./campos-formatar": "./src/campos-formatar.ts",
-    "./atalhos": "./src/atalhos.ts"
+    "./atalhos": "./src/atalhos.ts",
+    "./plano": "./src/plano.ts"
   },
   "publishConfig": {
     "access": "public",
@@ -129,6 +130,10 @@
       "./atalhos": {
         "types": "./dist/atalhos.d.ts",
         "default": "./dist/atalhos.js"
+      },
+      "./plano": {
+        "types": "./dist/plano.d.ts",
+        "default": "./dist/plano.js"
       }
     }
   },
