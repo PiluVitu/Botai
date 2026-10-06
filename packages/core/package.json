@@ -1,0 +1,144 @@
+{
+  "name": "@pilutech/botai-core",
+  "version": "0.1.0",
+  "description": "Motor do Botaí: pessoa brasileira de teste coerente (CPF, CNPJ, RG, PIS, título de eleitor, celular, CEP real, cartão de teste) e classificador de campos de formulário. TypeScript puro, sem dependências.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PiluVitu/Botai.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/PiluVitu/Botai/tree/main/packages/core#readme",
+  "keywords": [
+    "cpf",
+    "cnpj",
+    "dados-de-teste",
+    "fake-data",
+    "brasil",
+    "formulario",
+    "botai"
+  ],
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    "./aleatorio": "./src/aleatorio.ts",
+    "./prng": "./src/prng.ts",
+    "./uf": "./src/uf.ts",
+    "./cpf": "./src/cpf.ts",
+    "./cnpj": "./src/cnpj.ts",
+    "./rg": "./src/rg.ts",
+    "./pis": "./src/pis.ts",
+    "./titulo-eleitor": "./src/titulo-eleitor.ts",
+    "./celular": "./src/celular.ts",
+    "./nascimento": "./src/nascimento.ts",
+    "./senha": "./src/senha.ts",
+    "./nome": "./src/nome.ts",
+    "./endereco": "./src/endereco.ts",
+    "./empresa": "./src/empresa.ts",
+    "./cartao": "./src/cartao.ts",
+    "./pessoa": "./src/pessoa.ts",
+    "./campos": "./src/campos.ts",
+    "./campos-formatar": "./src/campos-formatar.ts",
+    "./atalhos": "./src/atalhos.ts"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      "./aleatorio": {
+        "types": "./dist/aleatorio.d.ts",
+        "default": "./dist/aleatorio.js"
+      },
+      "./prng": {
+        "types": "./dist/prng.d.ts",
+        "default": "./dist/prng.js"
+      },
+      "./uf": {
+        "types": "./dist/uf.d.ts",
+        "default": "./dist/uf.js"
+      },
+      "./cpf": {
+        "types": "./dist/cpf.d.ts",
+        "default": "./dist/cpf.js"
+      },
+      "./cnpj": {
+        "types": "./dist/cnpj.d.ts",
+        "default": "./dist/cnpj.js"
+      },
+      "./rg": {
+        "types": "./dist/rg.d.ts",
+        "default": "./dist/rg.js"
+      },
+      "./pis": {
+        "types": "./dist/pis.d.ts",
+        "default": "./dist/pis.js"
+      },
+      "./titulo-eleitor": {
+        "types": "./dist/titulo-eleitor.d.ts",
+        "default": "./dist/titulo-eleitor.js"
+      },
+      "./celular": {
+        "types": "./dist/celular.d.ts",
+        "default": "./dist/celular.js"
+      },
+      "./nascimento": {
+        "types": "./dist/nascimento.d.ts",
+        "default": "./dist/nascimento.js"
+      },
+      "./senha": {
+        "types": "./dist/senha.d.ts",
+        "default": "./dist/senha.js"
+      },
+      "./nome": {
+        "types": "./dist/nome.d.ts",
+        "default": "./dist/nome.js"
+      },
+      "./endereco": {
+        "types": "./dist/endereco.d.ts",
+        "default": "./dist/endereco.js"
+      },
+      "./empresa": {
+        "types": "./dist/empresa.d.ts",
+        "default": "./dist/empresa.js"
+      },
+      "./cartao": {
+        "types": "./dist/cartao.d.ts",
+        "default": "./dist/cartao.js"
+      },
+      "./pessoa": {
+        "types": "./dist/pessoa.d.ts",
+        "default": "./dist/pessoa.js"
+      },
+      "./campos": {
+        "types": "./dist/campos.d.ts",
+        "default": "./dist/campos.js"
+      },
+      "./campos-formatar": {
+        "types": "./dist/campos-formatar.d.ts",
+        "default": "./dist/campos-formatar.js"
+      },
+      "./atalhos": {
+        "types": "./dist/atalhos.d.ts",
+        "default": "./dist/atalhos.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
+    "prepack": "pnpm run build",
+    "lint": "tsc --noEmit",
+    "test": "jest && node --test scripts/*.test.mjs",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.9",
+    "typescript": "^5.9.3"
+  }
+}
