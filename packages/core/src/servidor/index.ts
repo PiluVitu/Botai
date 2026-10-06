@@ -1,5 +1,5 @@
 import { createServer, type Server } from 'node:http'
-import type { AddressInfo } from 'node:net'
+import type { AddressInfo, Socket } from 'node:net'
 import { responder } from './rotas'
 
 export { LIMITE_DE_PESSOAS } from './consulta'
@@ -21,22 +21,31 @@ export interface ServidorNoAr {
 }
 
 export function criarServidor(): Server {
-  return createServer((req, res) => {
+  const servidor = createServer((req, res) => {
     const resposta = responder(req.method ?? 'GET', req.url ?? '/')
     res.writeHead(resposta.status, {
       ...resposta.cabecalhos,
       'Content-Length': Buffer.byteLength(resposta.corpo),
     })
-    res.end(resposta.corpo)
+    // O close() do Node fecha como ociosa a conexão de resposta já terminada, mesmo com o corpo no buffer:
+    // por isso o end só vem com o corpo fora do processo, e a que fica ociosa depois do close() fecha no finish.
+    res.write(resposta.corpo, () => res.end())
+    res.once('finish', () => {
+      if (!servidor.listening) servidor.closeIdleConnections()
+    })
   })
+  return servidor
 }
 
-function encerrar(servidor: Server): Promise<void> {
+function encerrar(
+  servidor: Server,
+  conexoes: ReadonlySet<Socket>,
+): Promise<void> {
   return new Promise((resolve, reject) => {
-    const prazo = setTimeout(
-      () => servidor.closeAllConnections(),
-      PRAZO_PARA_ENCERRAR_MS,
-    )
+    // O closeAllConnections() do Bun 1.4.2 não derruba conexão com resposta em curso; o destroy derruba.
+    const prazo = setTimeout(() => {
+      for (const conexao of conexoes) conexao.destroy()
+    }, PRAZO_PARA_ENCERRAR_MS)
     servidor.close((erro) => {
       clearTimeout(prazo)
       if (erro) reject(erro)
@@ -51,6 +60,11 @@ export function iniciarServidor({
   host = HOST_PADRAO,
 }: OpcoesDoServidor = {}): Promise<ServidorNoAr> {
   const servidor = criarServidor()
+  const conexoes = new Set<Socket>()
+  servidor.on('connection', (conexao: Socket) => {
+    conexoes.add(conexao)
+    conexao.once('close', () => conexoes.delete(conexao))
+  })
   return new Promise((resolve, reject) => {
     servidor.once('error', reject)
     servidor.listen(porta, host, () => {
@@ -60,7 +74,7 @@ export function iniciarServidor({
       resolve({
         servidor,
         url: `http://${hostDaUrl}:${port}`,
-        encerrar: () => encerrar(servidor),
+        encerrar: () => encerrar(servidor, conexoes),
       })
     })
   })

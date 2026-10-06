@@ -155,7 +155,7 @@ npx @pilutech/botai-core serve --porta 9000 --host 0.0.0.0
 - Os nomes são os das flags da CLI em camelCase, e os valores valem o mesmo que na CLI (`uf` e `dominioEmail` em qualquer caixa; semente de até 256 caracteres). Parâmetro desconhecido, repetido ou vazio, ou valor inválido, dá **400** com `{ "erro": "…" }`, que diz qual parâmetro (e, no desconhecido, lista os aceitos).
 - Sem `semente`, o servidor sorteia uma e a devolve no envelope; sem `hoje`, usa o dia de São Paulo, então a mesma semente gera outra pessoa no dia seguinte. Para reproduzir, passe os dois.
 - `Content-Type`: `application/json`, `application/x-ndjson`, `text/csv; header=present` ou `application/sql`, todos com `charset=utf-8`.
-- `Ctrl+C` ou `SIGTERM` encerram na hora, com código 0.
+- `Ctrl+C` ou `SIGTERM` encerram com código 0: o servidor para de aceitar conexões na hora, e uma resposta ainda em entrega (cliente lento) ganha até 2 s para chegar inteira.
 
 ```bash
 curl 'http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-10-05'

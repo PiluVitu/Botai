@@ -1,6 +1,7 @@
 /** @jest-environment node */
+import { once } from 'node:events'
 import { request } from 'node:http'
-import { connect } from 'node:net'
+import { connect, type Socket } from 'node:net'
 import {
   HOST_PADRAO,
   iniciarServidor,
@@ -32,6 +33,43 @@ function pedir(url: string): Promise<RespostaHttp> {
       .end()
   })
 }
+
+interface ClienteParado {
+  socket: Socket
+  // A resposta crua (cabeçalho e corpo), quando o servidor fechar a conexão.
+  resposta: Promise<Buffer>
+}
+
+// Pede e para de ler logo no primeiro pedaço: o resto da resposta fica no buffer do servidor.
+async function pedirEParar(url: string, alvo: string): Promise<ClienteParado> {
+  const { hostname, port } = new URL(url)
+  const socket = connect(Number(port), hostname)
+  await once(socket, 'connect')
+  const partes: Buffer[] = []
+  socket.on('data', (parte: Buffer) => partes.push(parte))
+  const resposta = new Promise<Buffer>((resolve) =>
+    socket.once('close', () => resolve(Buffer.concat(partes))),
+  )
+  socket.write(`GET ${alvo} HTTP/1.1\r\nHost: botai\r\n\r\n`)
+  await once(socket, 'data')
+  socket.pause()
+  return { socket, resposta }
+}
+
+function bytesDoCorpo(resposta: Buffer): {
+  recebidos: number
+  contentLength: number
+} {
+  const fim = resposta.indexOf('\r\n\r\n')
+  const cabecalho = resposta.subarray(0, fim).toString('latin1')
+  return {
+    recebidos: resposta.length - fim - 4,
+    contentLength: Number(/^content-length: (\d+)$/im.exec(cabecalho)?.[1]),
+  }
+}
+
+// ~17 MB de corpo: bem mais do que cabe nos buffers do sistema, então quase tudo fica no processo.
+const ALVO_GRANDE = '/pessoas?n=10000&semente=lento&hoje=2026-10-05'
 
 let noAr: ServidorNoAr | undefined
 
@@ -103,4 +141,36 @@ describe('iniciarServidor', () => {
     expect(Date.now() - inicio).toBeLessThan(2_500)
     socket.destroy()
   })
+
+  // A sonda do revisor: antes, o encerrar() resolvia em 2 ms e o cliente recebia ~1,7 MB dos 17 MB.
+  // O Node marca a resposta do res.end(corpo) como terminada mesmo com o corpo ainda no buffer, e o
+  // close() a fecha como ociosa; o contrato dá 2 s a quem ainda está recebendo.
+  test('encerrar espera a resposta ainda não entregue: o cliente que volta a ler dentro do prazo recebe o corpo inteiro', async () => {
+    noAr = await iniciarServidor({ porta: 0 })
+    const cliente = await pedirEParar(noAr.url, ALVO_GRANDE)
+
+    const inicio = Date.now()
+    const encerrado = noAr.encerrar().then(() => Date.now() - inicio)
+    noAr = undefined
+    setTimeout(() => cliente.socket.resume(), 300)
+
+    const { recebidos, contentLength } = bytesDoCorpo(await cliente.resposta)
+    expect(contentLength).toBeGreaterThan(10_000_000)
+    expect(recebidos).toBe(contentLength)
+    // Entregue a resposta, a conexão fica ociosa e fecha na hora, sem esperar o prazo.
+    expect(await encerrado).toBeLessThan(1_900)
+  }, 10_000)
+
+  test('encerrar não fica preso num cliente que parou de ler: derruba a conexão no prazo de 2 s', async () => {
+    noAr = await iniciarServidor({ porta: 0 })
+    const cliente = await pedirEParar(noAr.url, ALVO_GRANDE)
+
+    const inicio = Date.now()
+    await noAr.encerrar()
+    noAr = undefined
+    const duracao = Date.now() - inicio
+    cliente.socket.destroy()
+    expect(duracao).toBeGreaterThanOrEqual(1_900)
+    expect(duracao).toBeLessThan(3_000)
+  }, 10_000)
 })
