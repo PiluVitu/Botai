@@ -12,6 +12,8 @@ const FONTE = JSON.parse(readFileSync(join(PACOTE, 'package.json'), 'utf8'))
 const PUBLICADOS = FONTE.publishConfig.exports
 // Arquivo do tarball que nenhum subpath aponta (módulo interno, bin): as fases 1 a 3 acrescentam aqui.
 const EXTRAS = [
+  'dist/gerar.d.ts',
+  'dist/gerar.js',
   'dist/hoje.d.ts',
   'dist/hoje.js',
   'dist/index.d.ts',
