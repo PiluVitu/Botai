@@ -1,25 +1,17 @@
 #!/usr/bin/env node
 import { executar } from '../cli/executar'
-
-// Tipo mínimo local: só este arquivo fala com o processo, e o resto do pacote compila sem @types/node.
-declare const process: {
-  argv: string[]
-  exitCode: number | undefined
-  exit(codigo: number): never
-  stdout: {
-    write(texto: string): boolean
-    on(evento: 'error', ouvinte: (erro: { code?: string }) => void): void
-  }
-  stderr: { write(texto: string): boolean }
-}
+import { executarServe } from './serve'
 
 // Leitor que foi embora (| head): EPIPE num pipe; ENOTCONN quando o stdout é o socketpair que o Node usa no macOS.
-process.stdout.on('error', (erro) => {
+process.stdout.on('error', (erro: NodeJS.ErrnoException) => {
   if (erro.code === 'EPIPE' || erro.code === 'ENOTCONN') process.exit(0)
   throw erro
 })
 
-process.exitCode = executar(process.argv.slice(2), {
-  dados: (texto) => void process.stdout.write(texto),
-  mensagem: (texto) => void process.stderr.write(texto),
-})
+const [comando, ...resto] = process.argv.slice(2)
+if (comando === 'serve') void executarServe(resto)
+else
+  process.exitCode = executar(process.argv.slice(2), {
+    dados: (texto) => void process.stdout.write(texto),
+    mensagem: (texto) => void process.stderr.write(texto),
+  })

@@ -14,6 +14,8 @@ const PUBLICADOS = FONTE.publishConfig.exports
 const EXTRAS = [
   'dist/bin/botai.d.ts',
   'dist/bin/botai.js',
+  'dist/bin/serve.d.ts',
+  'dist/bin/serve.js',
   'dist/cli/ajuda.d.ts',
   'dist/cli/ajuda.js',
   'dist/cli/argumentos.d.ts',

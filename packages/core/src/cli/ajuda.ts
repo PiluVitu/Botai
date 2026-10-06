@@ -9,6 +9,7 @@ Uso:
                 [--tabela T] [--campos a,b,c]
   botai cpf|cnpj|rg|pis|titulo|celular|cep [--formatado] [--uf UF] [--semente S]
   botai validar cpf|cnpj|rg|pis|titulo|cartao <valor>
+  botai serve [--porta 8790] [--host 127.0.0.1]
   botai --versao
 
 A mesma semente e o mesmo --hoje geram a mesma pessoa em qualquer máquina.
