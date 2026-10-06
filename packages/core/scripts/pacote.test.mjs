@@ -12,6 +12,8 @@ const FONTE = JSON.parse(readFileSync(join(PACOTE, 'package.json'), 'utf8'))
 const PUBLICADOS = FONTE.publishConfig.exports
 // Arquivo do tarball que nenhum subpath aponta (módulo interno, bin): as fases 1 a 3 acrescentam aqui.
 const EXTRAS = [
+  'dist/envelope.d.ts',
+  'dist/envelope.js',
   'dist/gerar.d.ts',
   'dist/gerar.js',
   'dist/hoje.d.ts',
@@ -22,6 +24,8 @@ const EXTRAS = [
   'dist/opcoes.js',
   'dist/semente.d.ts',
   'dist/semente.js',
+  'dist/versao.d.ts',
+  'dist/versao.js',
 ]
 const alvos = (destino) =>
   typeof destino === 'string' ? [destino] : Object.values(destino)

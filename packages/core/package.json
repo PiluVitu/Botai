@@ -1,6 +1,6 @@
 {
   "name": "@pilutech/botai-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Motor do Botaí: pessoa brasileira de teste coerente (CPF, CNPJ, RG, PIS, título de eleitor, celular, CEP real, cartão de teste) e classificador de campos de formulário. TypeScript puro, sem dependências.",
   "license": "MIT",
   "type": "module",
@@ -133,9 +133,9 @@
     }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
+    "build": "node scripts/gerar-versao.mjs && rm -rf dist && tsc -p tsconfig.build.json && node scripts/extensoes.mjs dist",
     "prepack": "pnpm run build",
-    "lint": "tsc --noEmit",
+    "lint": "node scripts/gerar-versao.mjs --conferir && tsc --noEmit",
     "test": "jest && node --test scripts/*.test.mjs",
     "test:watch": "jest --watch"
   },
