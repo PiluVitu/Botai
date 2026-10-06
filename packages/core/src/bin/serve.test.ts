@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { type ChildProcessWithoutNullStreams, spawn } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { request } from 'node:http'
+import { request, type Server } from 'node:http'
 import { join } from 'node:path'
 import * as servidor from '../servidor/index'
 import { HOST_PADRAO, PORTA_PADRAO } from '../servidor/index'
@@ -188,6 +188,45 @@ describe('subirServe: listen recusado pelo sistema', () => {
   )
 })
 
+// Quem lê o "ouvindo em" (este teste, um supervisor, o docker stop) pode mandar o sinal na hora.
+// Medido em 2026-10-06, com o tratador instalado depois da linha e o SIGINT mandado assim que ela
+// chega: o processo morria pela ação padrão do sinal em 98 de 100 subidas no macOS e em 11 de 100
+// no Linux (node:22-slim), e o CI do repo quebrou no "SIGINT encerra com código 0".
+describe('subirServe: sinais', () => {
+  const instalados = () => ({
+    SIGINT: process.listenerCount('SIGINT'),
+    SIGTERM: process.listenerCount('SIGTERM'),
+  })
+  let antes: ReturnType<typeof instalados>
+
+  beforeEach(() => {
+    antes = instalados()
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+    for (const sinal of ['SIGINT', 'SIGTERM'] as const)
+      for (const tratador of process.listeners(sinal).slice(antes[sinal]))
+        process.off(sinal, tratador)
+  })
+
+  test('SIGINT e SIGTERM já têm tratador quando a linha "ouvindo em" sai', async () => {
+    jest.spyOn(servidor, 'iniciarServidor').mockResolvedValue({
+      servidor: {} as Server,
+      url: 'http://127.0.0.1:1',
+      encerrar: async () => {},
+    })
+    let naHoraDaLinha: ReturnType<typeof instalados> | undefined
+    await subirServe(['--porta', '0'], () => {
+      naHoraDaLinha = instalados()
+    })
+    expect(naHoraDaLinha).toEqual({
+      SIGINT: antes.SIGINT + 1,
+      SIGTERM: antes.SIGTERM + 1,
+    })
+  })
+})
+
 // Medido em 2026-10-06: o macOS recusa 127.0.0.1:80 sem root; o Linux recusa a 80 sem root fora de
 // container, mas num container o Docker põe ip_unprivileged_port_start = 0 e ela escuta.
 function sistemaRecusaPorta80(): boolean {
@@ -216,8 +255,13 @@ describe('botai serve (o bin do build, por processo e HTTP)', () => {
       throw new Error(`${BIN} não existe: rode pnpm run build antes`)
   })
 
+  // Morto por sinal, o filho fica com exitCode null e o 'exit' já passou: esperar por ele travaria.
   afterEach(async () => {
-    if (servindo && servindo.filho.exitCode === null) {
+    if (
+      servindo &&
+      servindo.filho.exitCode === null &&
+      servindo.filho.signalCode === null
+    ) {
       const fim = saida(servindo.filho)
       servindo.filho.kill('SIGKILL')
       await fim
