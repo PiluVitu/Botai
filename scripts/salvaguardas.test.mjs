@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -35,4 +35,62 @@ test('credencial não entra no repo: .env* ignorado, só o .env.example passa', 
   const linhas = ler('.gitignore').split('\n')
   assert.ok(linhas.includes('.env*'))
   assert.ok(linhas.includes('!.env.example'))
+})
+
+const WORKFLOWS = join(RAIZ, '.github', 'workflows')
+const workflows = () =>
+  readdirSync(WORKFLOWS).filter((arquivo) => arquivo.endsWith('.yml'))
+const workflow = (arquivo) => ler(join('.github', 'workflows', arquivo))
+
+test('os workflows da fase 0 existem, e toda action de todo workflow está fixada por SHA', () => {
+  for (const base of [
+    'botai-e2e.yml',
+    'botai-release.yml',
+    'ci.yml',
+    'publicar-core.yml',
+    'trivy.yml',
+  ])
+    assert.ok(workflows().includes(base), base)
+  for (const arquivo of workflows())
+    for (const linha of workflow(arquivo)
+      .split('\n')
+      .filter((l) => /^\s*(-\s*)?uses:/.test(l)))
+      assert.match(
+        linha,
+        /uses: \S+@[0-9a-f]{40} # \S+$/,
+        `${arquivo}: ${linha.trim()}`,
+      )
+})
+
+test('o CI barra lockfile solto, cópia duplicada e advisory high', () => {
+  const ci = workflow('ci.yml')
+  for (const comando of [
+    'pnpm install --frozen-lockfile',
+    'pnpm dedupe --check',
+    'pnpm audit --audit-level high',
+  ])
+    assert.ok(ci.includes(comando), comando)
+})
+
+test('Dependabot com cooldown em todo ecossistema e sem merge automático', () => {
+  const dependabot = ler('.github/dependabot.yml')
+  const ecossistemas =
+    dependabot.match(/^  - package-ecosystem:/gm)?.length ?? 0
+  assert.ok(ecossistemas >= 2, 'npm e github-actions')
+  assert.equal(dependabot.match(/^    cooldown:$/gm)?.length, ecossistemas)
+  assert.doesNotMatch(dependabot, /auto-?merge/i)
+})
+
+// Spec §5.4: publicação só por tag, atrás de aprovação, com proveniência; id-token só onde publica.
+test('todo workflow que publica no npm usa o environment npm, com proveniência', () => {
+  const publicam = workflows().filter((arquivo) =>
+    /npm publish/.test(workflow(arquivo)),
+  )
+  assert.ok(publicam.includes('publicar-core.yml'))
+  for (const arquivo of publicam) {
+    const texto = workflow(arquivo)
+    assert.match(texto, /^    environment: npm$/m, arquivo)
+    assert.equal(texto.match(/id-token: write/g)?.length, 1, arquivo)
+    assert.match(texto, /npm publish \S+ --access public --provenance/, arquivo)
+  }
 })

@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dependencias:
+    name: Dependências e salvaguardas (lockfile, dedupe, audit, node --test, actionlint)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      # Versão lida de package.json > packageManager (pnpm@11.1.1).
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Dedupe check
+        run: pnpm dedupe --check
+
+      - name: Audit (high ou pior)
+        run: pnpm audit --audit-level high
+
+      - name: Salvaguardas e gate (node --test)
+        run: node --test scripts/*.test.mjs
+
+      - name: actionlint
+        run: >-
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo" --workdir /repo
+          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+          -color
+
+  core:
+    name: Core (tsc sem DOM + Jest + build + pacote)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (tsc sem lib dom)
+        run: pnpm --filter @pilutech/botai-core run lint
+
+      - name: Test (jest + build + conferência do pacote)
+        run: pnpm --filter @pilutech/botai-core run test
+
+  extensao:
+    name: Extensão (lint + test + builds de Chrome, Firefox e Opera + web-ext lint)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # `wxt prepare` vem dentro dos scripts, nunca como postinstall: um postinstall quebrado derrubaria o install de todos os jobs.
+      - name: Lint (wxt prepare + tsc + eslint)
+        run: pnpm --filter @pilutech/botai run lint
+
+      - name: Test (vitest)
+        run: pnpm --filter @pilutech/botai run test
+
+      - name: Build (+ gate do @source em .output/chrome-mv3)
+        run: pnpm --filter @pilutech/botai run build
+
+      - name: Build do Firefox (+ gate do @source em .output/firefox-mv3)
+        run: pnpm --filter @pilutech/botai run build:firefox
+
+      - name: Build do Opera, sem minificar (+ gate do @source em .output/opera-mv3)
+        run: pnpm --filter @pilutech/botai run build:opera
+
+      # O addons-linter é o validador da AMO; falha só em erro (os avisos vêm do react-dom e do Font Awesome).
+      - name: web-ext lint no build do Firefox
+        run: pnpm --filter @pilutech/botai run lint:firefox
+
+  site:
+    name: Site (lint + tsc + test + build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter @pilutech/botai-site run lint
+
+      - name: Typecheck
+        run: pnpm --filter @pilutech/botai-site run typecheck
+
+      - name: Test (jest + node --test)
+        run: pnpm --filter @pilutech/botai-site run test
+
+      - name: Build (+ gate do @source + rotas estáticas)
+        run: pnpm --filter @pilutech/botai-site run build
