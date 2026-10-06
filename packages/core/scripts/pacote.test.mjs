@@ -34,6 +34,8 @@ const EXTRAS = [
   'dist/opcoes.js',
   'dist/semente.d.ts',
   'dist/semente.js',
+  'dist/servidor/consulta.d.ts',
+  'dist/servidor/consulta.js',
   'dist/versao.d.ts',
   'dist/versao.js',
   'esquema/envelope-v1.schema.json',
