@@ -14,8 +14,7 @@ import {
 } from './dom'
 
 export type ResultadoInsercao =
-  | { ok: true }
-  | { ok: false; motivo: 'sem-foco' | 'recusado' }
+  { ok: true } | { ok: false; motivo: 'sem-foco' | 'recusado' }
 
 const TEXTO_LIVRE: FieldDescriptor = {
   tag: 'textarea',

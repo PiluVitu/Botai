@@ -45,8 +45,7 @@ describe('arquivos dourados v1 (biblioteca)', () => {
     '%s',
     (_, item) => {
       const dourado = JSON.parse(ler(item.arquivo)) as
-        | EnvelopeDaPessoa
-        | EnvelopeDasPessoas
+        EnvelopeDaPessoa | EnvelopeDasPessoas
       const gerado =
         item.n === undefined
           ? gerarEnvelopeDaPessoa(item.opcoes)

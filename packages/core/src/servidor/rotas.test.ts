@@ -73,8 +73,7 @@ describe('responder: dourados', () => {
       expect(status).toBe(200)
       expect(corpo.motor).toBe(MOTOR)
       const dourado = JSON.parse(ler(item.arquivo)) as
-        | EnvelopeDaPessoa
-        | EnvelopeDasPessoas
+        EnvelopeDaPessoa | EnvelopeDasPessoas
       expect(semMotor(corpo)).toEqual(semMotor(dourado))
     },
   )

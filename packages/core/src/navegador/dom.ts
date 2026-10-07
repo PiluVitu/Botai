@@ -40,7 +40,7 @@ export function preenchivel(el: Campo): boolean {
 }
 
 function sobAriaHidden(el: Element): boolean {
-  for (let atual: Element | null = el; atual; ) {
+  for (let atual: Element | null = el; atual;) {
     if (atual.closest('[aria-hidden="true"]')) return true
     const raiz = atual.getRootNode()
     atual = raiz instanceof ShadowRoot ? raiz.host : null
