@@ -87,6 +87,7 @@ jobs:
         with:
           node-version: '24.14.0'
           registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
 
       - name: npm ≥ 11.5.1 (antes disso não há trusted publishing)
         run: |
