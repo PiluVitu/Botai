@@ -276,6 +276,15 @@ describe('seletor', () => {
     expect(seletor(q<HTMLSelectElement>('select'))).toBe('select#origem')
   })
 
+  it('id que começa com algarismo sai escapado como no navegador', () => {
+    // O CSS.escape é o do jsdom (≥ 30), igual ao do navegador. O polyfill ingênuo que o setup tinha deixava
+    // "#1origem" sem escapar, e o querySelectorAll lançava SyntaxError.
+    montar('<select id="1origem"></select>')
+    const el = q<HTMLSelectElement>('select')
+    expect(seletor(el)).toBe('select#\\31 origem')
+    expect(document.querySelector(seletor(el))).toBe(el)
+  })
+
   it('senão tag[name] quando o name é único', () => {
     montar('<input name="ref_code" placeholder="opcional">')
     expect(seletor(q('input'))).toBe('input[name="ref_code"]')
