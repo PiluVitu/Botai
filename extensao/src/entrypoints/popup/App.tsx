@@ -113,8 +113,7 @@ function TelaDoPopup({
   async function preencher() {
     if (!aba) return
     const resposta = (await enviar({ tipo: 'preencher', tabId: aba.id })) as
-      | RespostaPreencher
-      | undefined
+      RespostaPreencher | undefined
     if (resposta) setEstado(aposPreencher(resposta))
   }
 

@@ -9,10 +9,16 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+  # Negado: o script só compila com npm_config_build_from_source=true; o binário vem do pacote opcional da plataforma.
+  '@parcel/watcher': false
 
 # O eslint-config-next (site/) resolve o next por require: ele precisa estar na raiz do node_modules.
 publicHoistPattern:
   - next
+
+# Sufixo de peer só com nome@versão (pnpm ≥ 10.33.0): com o sufixo aninhado, o ciclo eslint-plugin-import <->
+# eslint-import-resolver-typescript mudava de notação conforme a ordem da rede, e o dedupe --check falhava às vezes.
+dedupePeers: true
 
 # Versão publicada há menos de 24 h não instala, inclusive @pilutech/* e @piluvitu/* (spec §5.3).
 minimumReleaseAge: 1440

@@ -1,12 +1,7 @@
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
 
 export type IdGrupo =
-  | 'pessoais'
-  | 'email'
-  | 'endereco'
-  | 'empresa'
-  | 'cartao'
-  | 'docs'
+  'pessoais' | 'email' | 'endereco' | 'empresa' | 'cartao' | 'docs'
 
 export interface LinhaDado {
   rotulo: string

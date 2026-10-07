@@ -90,8 +90,7 @@ describe('bin botai do build', () => {
       expect(r.stderr).toBe('')
       expect(r.codigo).toBe(0)
       const dourado = JSON.parse(ler(item.arquivo)) as
-        | EnvelopeDaPessoa
-        | EnvelopeDasPessoas
+        EnvelopeDaPessoa | EnvelopeDasPessoas
       expect(semMotor(JSON.parse(r.stdout))).toEqual(semMotor(dourado))
     },
   )
