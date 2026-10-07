@@ -18,7 +18,7 @@ Fixture do Playwright publicado no npm (MIT). Gera a pessoa com `@pilutech/botai
 - **Mundo MAIN:** o motor escreve pelo setter do protótipo, o que mantém o React funcionando; o site enxerga `__botaiNavegador`.
 - **Sem contornos:** `SEM_CONTORNOS`, para não sujar screenshot nem `toHaveScreenshot`.
 - **Semente legível** (o texto da semente é o próprio identificador do teste): a anotação já serve de argumento para `botai pessoa --semente`.
-- **Peer `@playwright/test` `^1.59.1`:** a única versão testada; uma cópia só do `@playwright/test` no projeto do usuário (o `mergeTests` existe desde a 1.39).
+- **Peer `@playwright/test` `^1.59.1`:** a versão com que a 0.1.0 foi testada e publicada; desde 2026-10-06 o CI testa a da devDependency (1.63.0). Subir o piso do peer é decisão de versão do pacote. Uma cópia só do `@playwright/test` no projeto do usuário (o `mergeTests` existe desde a 1.39).
 - **Módulos testados no Jest sem import de pacote:** o ts-jest em CommonJS não resolve `exports`; por isso `semente.ts` e `resultado.ts` só dependem de tipos locais (o `ResultadoFrame` do core é compatível por estrutura).
 
 ## Testes
