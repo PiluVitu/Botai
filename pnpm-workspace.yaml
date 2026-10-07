@@ -9,6 +9,8 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+  # Negado: o script só compila com npm_config_build_from_source=true; o binário vem do pacote opcional da plataforma.
+  '@parcel/watcher': false
 
 # O eslint-config-next (site/) resolve o next por require: ele precisa estar na raiz do node_modules.
 publicHoistPattern:
