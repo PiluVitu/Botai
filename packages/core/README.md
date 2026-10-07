@@ -128,14 +128,14 @@ Python:
 import json, subprocess
 
 saida = subprocess.run(
-    ["npx", "--yes", "@pilutech/botai-core@0.4.0", "pessoas", "-n", "10",
+    ["npx", "--yes", "@pilutech/botai-core@0.4.1", "pessoas", "-n", "10",
      "--semente", "testes", "--hoje", "2026-10-05", "--formato", "ndjson"],
     capture_output=True, text=True, check=True,
 ).stdout
 pessoas = [json.loads(linha)["pessoa"] for linha in saida.splitlines()]
 ```
 
-Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.4.0", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
+Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.4.1", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
 
 ## Servidor HTTP (`botai serve`)
 
@@ -173,8 +173,8 @@ with urllib.request.urlopen("http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-1
 ## Docker
 
 ```bash
-docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.0          # o servidor
-docker run --rm ghcr.io/piluvitu/botai:0.4.0 pessoa --semente 42    # a CLI
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1          # o servidor
+docker run --rm ghcr.io/piluvitu/botai:0.4.1 pessoa --semente 42    # a CLI
 ```
 
 A imagem roda como usuário sem privilégio, escuta em `0.0.0.0:8790` e tem `HEALTHCHECK` em `/saude`. Para outra porta, mapeie com `-p 9000:8790` em vez de mudar a interna (o `HEALTHCHECK` olha a 8790).
@@ -184,7 +184,7 @@ No GitHub Actions, como service:
 ```yaml
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.4.0
+    image: ghcr.io/piluvitu/botai:0.4.1
     ports: ['8790:8790']
 ```
 
@@ -193,7 +193,7 @@ No docker compose:
 ```yaml
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.4.0
+    image: ghcr.io/piluvitu/botai:0.4.1
     ports: ['8790:8790']
 ```
 
@@ -206,7 +206,7 @@ curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh
 ```
 
 - Detecta o sistema e a arquitetura (num terminal sob Rosetta, instala o arm64), confere o SHA256 e instala em `~/.local/bin/botai`.
-- `BOTAI_VERSAO=0.4.0` fixa a versão; `BOTAI_DESTINO=/outra/pasta` muda o destino.
+- `BOTAI_VERSAO=0.4.1` fixa a versão; `BOTAI_DESTINO=/outra/pasta` muda o destino.
 - Alpine e outros Linux com musl não têm binário: use a imagem ou o npm.
 
 Conferir à mão: `shasum -a 256 -c --ignore-missing SHA256SUMS` (macOS) ou `sha256sum -c --ignore-missing SHA256SUMS` (Linux); no Windows, `Get-FileHash .\botai-windows-x64.exe -Algorithm SHA256` (ou o `botai-windows-arm64.exe`) e compare com a linha do `SHA256SUMS`.

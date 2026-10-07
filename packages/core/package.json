@@ -1,6 +1,6 @@
 {
   "name": "@pilutech/botai-core",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Motor do Botaí: pessoa brasileira de teste coerente (CPF, CNPJ, RG, PIS, título de eleitor, celular, CEP real, cartão de teste) e classificador de campos de formulário. TypeScript puro, sem dependências.",
   "license": "MIT",
   "type": "module",
