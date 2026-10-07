@@ -169,7 +169,7 @@
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "ts-jest": "^29.4.14",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "bin": {
     "botai": "dist/bin/botai.js"
