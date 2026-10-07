@@ -1,6 +1,6 @@
 # Botaí: build instructions for add-on reviewers
 
-Botaí is a browser extension built with WXT 0.21.4 and Vite 7 from TypeScript sources in a pnpm workspace (https://github.com/PiluVitu/Botai). This archive contains only the parts of the repository that the extension needs:
+Botaí is a browser extension built with WXT 0.21.4 and Vite 8 from TypeScript sources in a pnpm workspace (https://github.com/PiluVitu/Botai). This archive contains only the parts of the repository that the extension needs:
 
 - `extensao`: the extension itself;
 - `packages/core`: the workspace package with the test data generators and the form field classifier, which the extension imports as TypeScript source (it has no prebuilt output here);
