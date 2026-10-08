@@ -1,0 +1,9 @@
+{
+  "label": "Referência",
+  "position": 13,
+  "link": {
+    "type": "generated-index",
+    "slug": "/referencia",
+    "description": "As 33 colunas, os 38 tipos de campo, as mensagens de erro e os números medidos."
+  }
+}

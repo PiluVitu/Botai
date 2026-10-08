@@ -1,0 +1,33 @@
+{
+  "name": "@pilutech/botai-docs",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "docusaurus start --port 3022 --no-open",
+    "build": "docusaurus build",
+    "serve": "docusaurus serve --port 3022 --no-open",
+    "clear": "docusaurus clear",
+    "test": "node --test \"scripts/*.test.mjs\" \"*.test.mjs\" \"src/**/*.test.mjs\"",
+    "lint": "prettier --check . && node --test scripts/versoes.test.mjs",
+    "prettier:fix": "prettier --write ."
+  },
+  "lint-staged": {
+    "*.{js,mjs,json,md,mdx,css}": "prettier --write"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@mdx-js/react": "^3.1.1",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@pilutech/botai-core": "workspace:*",
+    "@piluvitu/ui": "0.1.0",
+    "prettier": "^3.9.9"
+  }
+}

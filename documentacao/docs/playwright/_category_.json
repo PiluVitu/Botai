@@ -1,0 +1,9 @@
+{
+  "label": "Playwright",
+  "position": 10,
+  "link": {
+    "type": "generated-index",
+    "slug": "/playwright",
+    "description": "O fixture botai do @pilutech/botai-playwright: uma pessoa reprodutível por teste e o preenchimento em todos os frames."
+  }
+}

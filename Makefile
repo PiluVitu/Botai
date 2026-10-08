@@ -2,7 +2,8 @@
         test-core build-core imagem fumaca-imagem binario-local \
         test-playwright test-e2e-playwright \
         dev-botai build-botai test-botai test-e2e-botai storybook-botai zip-botai versao-botai release-botai capturas-botai \
-        dev-botai-site build-botai-site test-botai-site test-e2e-botai-site storybook-botai-site
+        dev-botai-site build-botai-site test-botai-site test-e2e-botai-site storybook-botai-site \
+        dev-botai-docs build-botai-docs test-botai-docs
 
 test:
 	pnpm -r test && node --test scripts/*.test.mjs
@@ -11,7 +12,7 @@ lint:
 	pnpm -r lint
 
 stop:
-	@for p in 3018 6018 3020 6019; do \
+	@for p in 3018 6018 3020 6019 3022; do \
 		pids=$$(lsof -ti tcp:$$p -sTCP:LISTEN 2>/dev/null); \
 		if [ -n "$$pids" ]; then kill $$pids 2>/dev/null && echo "killed :$$p ($$pids)"; else echo ":$$p free"; fi; \
 	done
@@ -93,3 +94,15 @@ test-e2e-botai-site:
 
 storybook-botai-site:
 	pnpm --filter @pilutech/botai-site storybook
+
+# --- documentação (Docusaurus, docs.botai.pilutech.com.br) ---
+# Dev em 3022. Os blocos "testar" rodam contra packages/core/dist: o test-botai-docs builda o core antes.
+dev-botai-docs:
+	pnpm --filter @pilutech/botai-docs start
+
+build-botai-docs:
+	pnpm --filter @pilutech/botai-docs build
+
+test-botai-docs:
+	pnpm --filter @pilutech/botai-core build
+	pnpm --filter @pilutech/botai-docs test

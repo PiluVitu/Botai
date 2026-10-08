@@ -1,0 +1,9 @@
+{
+  "label": "Biblioteca",
+  "position": 9,
+  "link": {
+    "type": "generated-index",
+    "slug": "/biblioteca",
+    "description": "O pacote @pilutech/botai-core no código JS e TS: Node, Bun, Deno e navegador."
+  }
+}

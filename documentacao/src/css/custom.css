@@ -1,0 +1,85 @@
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+
+:root {
+  --botai-fundo: 220 50% 98%;
+  --botai-cartao: 0 0% 100%;
+  --botai-borda: 216 30% 88%;
+  --botai-texto: 222 36% 9%;
+  --botai-texto-suave: 215 18% 35%;
+  --botai-primaria: 198 93% 26%;
+
+  --ifm-color-primary: hsl(var(--botai-primaria));
+  --ifm-color-primary-dark: color-mix(
+    in srgb,
+    var(--ifm-color-primary) 90%,
+    black
+  );
+  --ifm-color-primary-darker: color-mix(
+    in srgb,
+    var(--ifm-color-primary) 85%,
+    black
+  );
+  --ifm-color-primary-darkest: color-mix(
+    in srgb,
+    var(--ifm-color-primary) 70%,
+    black
+  );
+  --ifm-color-primary-light: color-mix(
+    in srgb,
+    var(--ifm-color-primary) 90%,
+    white
+  );
+  --ifm-color-primary-lighter: color-mix(
+    in srgb,
+    var(--ifm-color-primary) 85%,
+    white
+  );
+  --ifm-color-primary-lightest: color-mix(
+    in srgb,
+    var(--ifm-color-primary) 70%,
+    white
+  );
+
+  --ifm-background-color: hsl(var(--botai-fundo));
+  --ifm-background-surface-color: hsl(var(--botai-cartao));
+  --ifm-card-background-color: hsl(var(--botai-cartao));
+  --ifm-navbar-background-color: hsl(var(--botai-fundo));
+  --ifm-navbar-shadow: 0 1px 0 hsl(var(--botai-borda));
+  --ifm-footer-background-color: hsl(var(--botai-cartao));
+
+  --ifm-color-content: hsl(var(--botai-texto));
+  --ifm-color-content-secondary: hsl(var(--botai-texto-suave));
+  --ifm-font-color-base: hsl(var(--botai-texto));
+  --ifm-font-color-secondary: hsl(var(--botai-texto-suave));
+
+  --ifm-toc-border-color: hsl(var(--botai-borda));
+  --ifm-table-border-color: hsl(var(--botai-borda));
+  --ifm-hr-background-color: hsl(var(--botai-borda));
+
+  --ifm-font-family-base:
+    'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --ifm-font-family-monospace:
+    'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ifm-heading-font-weight: 700;
+  --ifm-code-font-size: 92%;
+
+  --docusaurus-highlighted-code-line-bg: rgb(0 0 0 / 10%);
+}
+
+[data-theme='dark'] {
+  --botai-fundo: 220 33% 5%;
+  --botai-cartao: 222 36% 9%;
+  --botai-borda: 205 40% 18%;
+  --botai-texto: 215 33% 93%;
+  --botai-texto-suave: 216 17% 64%;
+  --botai-primaria: 198 93% 60%;
+
+  --docusaurus-highlighted-code-line-bg: rgb(0 0 0 / 30%);
+}
+
+.footer {
+  border-top: 1px solid hsl(var(--botai-borda));
+  text-align: center;
+}

@@ -1,0 +1,9 @@
+{
+  "label": "Binários",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "slug": "/binarios",
+    "description": "Binários sem Node para macOS, Linux e Windows: o install.sh, o download e a verificação."
+  }
+}
