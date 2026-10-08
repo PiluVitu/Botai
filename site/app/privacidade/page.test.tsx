@@ -144,7 +144,7 @@ describe('/privacidade', () => {
     )
   })
 
-  // Review Focus 1: o Botaí ainda está "Em breve", e ele lê a URL da aba ativa.
+  // Review Focus 1: o texto vale antes e depois das lojas, e ele lê a URL da aba ativa.
   it('não afirma o que o código não sustenta', () => {
     expect(document.body).not.toHaveTextContent(
       /dispon[ií]vel|publicad[oa] nas lojas|Na Firefox Add-ons/i,

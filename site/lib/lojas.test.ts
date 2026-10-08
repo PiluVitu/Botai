@@ -1,10 +1,14 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { ehHttps } from './pilulabs'
+import { ehHttps, lojasPublicadas } from './pilulabs'
 import { ARQUIVO_DAS_LOJAS, lerUrlsDasLojas } from './lojas'
 
 const URL_CHROME = 'https://chromewebstore.google.com/detail/botai/abc'
+const CHROME_WEB_STORE =
+  'https://chromewebstore.google.com/detail/bota%C3%AD/mblmjomopainbcdjipkdmioglamdinnc'
+const FIREFOX_ADD_ONS =
+  'https://addons.mozilla.org/pt-BR/firefox/addon/bota%C3%AD/'
 const SEM_LOJA = { chromeUrl: '', firefoxUrl: '', edgeUrl: '', operaUrl: '' }
 
 describe('lerUrlsDasLojas', () => {
@@ -38,6 +42,18 @@ describe('lerUrlsDasLojas', () => {
     ])
     for (const url of Object.values(urls))
       expect(url === '' || ehHttps(url)).toBe(true)
+  })
+
+  // O estado conferido nas lojas: Chrome Web Store desde 2026-10-05 e AMO desde 2026-10-08.
+  // Edge e Opera seguem sem link; publicar uma delas é mudar este teste no mesmo PR.
+  it('o arquivo real publica o Chrome e o Firefox, nessa ordem, e ainda não o Edge nem o Opera', () => {
+    const urls = lerUrlsDasLojas()
+    expect(lojasPublicadas(urls)).toEqual([
+      { loja: 'chrome', url: CHROME_WEB_STORE },
+      { loja: 'firefox', url: FIREFOX_ADD_ONS },
+    ])
+    expect(urls.edgeUrl).toBe('')
+    expect(urls.operaUrl).toBe('')
   })
 
   it('apara espaços e ignora o resto do objeto', () => {

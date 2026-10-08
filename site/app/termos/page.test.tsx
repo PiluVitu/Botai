@@ -155,7 +155,7 @@ describe('/termos', () => {
     )
   })
 
-  // O Botaí ainda está "Em breve": o texto vale antes e depois das lojas.
+  // O texto vale antes e depois das lojas: não diz que o Botaí já está nelas.
   it('não diz que já está nas lojas', () => {
     expect(document.body).not.toHaveTextContent(
       /dispon[ií]vel|publicad[oa] nas lojas/i,
