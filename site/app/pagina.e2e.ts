@@ -98,6 +98,25 @@ test.describe('/', () => {
     ).toBe('[Botaí] Suporte')
   })
 
+  // Só o href: clicar sairia para outro host (e o docs.botai é outro projeto da Vercel).
+  test('o Docs do topo e o do rodapé levam à documentação, na mesma aba', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    for (const regiao of [
+      page.getByRole('navigation', { name: 'Topo' }),
+      page.getByRole('contentinfo'),
+    ]) {
+      const docs = regiao.getByRole('link', { name: 'Docs', exact: true })
+      await expect(docs).toBeVisible()
+      await expect(docs).toHaveAttribute(
+        'href',
+        'https://docs.botai.pilutech.com.br',
+      )
+      await expect(docs).not.toHaveAttribute('target')
+    }
+  })
+
   test('abas das capturas pelo teclado (WAI-ARIA)', async ({ page }) => {
     await page.goto('/')
     const abas = page.getByRole('tab')
@@ -273,19 +292,24 @@ test.describe('/', () => {
       expect(vazados).toEqual([])
     })
 
-    // O topo ganhou a terceira âncora, e os comandos da seção para devs têm até 85 caracteres:
-    // os dois quebram linha. Como nos botões de loja, o vazamento para o gutter não aparece no scrollWidth.
-    test('o topo e a seção para devs não passam da coluna', async ({
+    // O topo ganhou a terceira âncora e o Docs, os comandos da seção para devs têm até 85 caracteres,
+    // e o rodapé ganhou o Docs ao lado do Suporte: os três quebram linha. Como nos botões de loja,
+    // o vazamento para o gutter não aparece no scrollWidth.
+    test('o topo, a seção para devs e o rodapé não passam da coluna', async ({
       page,
     }) => {
       await page.goto('/')
       await expect(page.locator('#para-devs pre').first()).toBeAttached()
+      await expect(
+        page.getByRole('contentinfo').getByRole('link', { name: 'Docs' }),
+      ).toBeAttached()
       const vazados = await page.evaluate(() => {
         const coluna = (
           document.querySelector('main') as HTMLElement
         ).getBoundingClientRect()
         return [
           ...document.querySelectorAll('nav[aria-label="Topo"] *'),
+          ...document.querySelectorAll('footer *'),
           ...document.querySelectorAll('#para-devs *'),
         ]
           .filter((elemento) => {

@@ -9,6 +9,7 @@ import {
   PROPOSTA,
   RECURSOS,
   REQUISITOS,
+  URL_DA_DOCUMENTACAO,
   URL_DA_PILULABS,
 } from '@/lib/conteudo'
 import type { ModeloDaLanding } from '@/lib/modelo'
@@ -39,6 +40,7 @@ export function Landing({ fase, lojas, notaDasLojas }: ModeloDaLanding) {
             { href: '#capturas', rotulo: 'capturas' },
             { href: '#para-devs', rotulo: 'para devs' },
           ]}
+          docs={URL_DA_DOCUMENTACAO}
         />
 
         <header className="mt-[72px] flex flex-col gap-6">

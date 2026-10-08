@@ -14,6 +14,16 @@ describe('Rodape', () => {
     )
   })
 
+  it('leva à documentação, ao lado do suporte', () => {
+    render(<Rodape />)
+    const docs = screen.getByRole('link', { name: 'Docs' })
+    expect(docs).toHaveAttribute('href', 'https://docs.botai.pilutech.com.br')
+    expect(docs).not.toHaveAttribute('target')
+    expect(docs.parentElement).toBe(
+      screen.getByRole('link', { name: 'Suporte' }).parentElement,
+    )
+  })
+
   it('leva à política de privacidade e aos termos de uso', () => {
     render(<Rodape />)
     const documentos = within(
