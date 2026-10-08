@@ -29,6 +29,7 @@ test.describe('/', () => {
       'O que ele bota',
       'Capturas',
       'Como usar',
+      'Para devs',
       'Privacidade',
       'Cuidados',
       'Bota aí no seu navegador',
@@ -66,11 +67,16 @@ test.describe('/', () => {
 
   test('as âncoras do topo levam às seções', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: 'como usar' }).click()
-    await expect(page).toHaveURL(/#como-usar$/)
-    await expect(
-      page.getByRole('heading', { level: 2, name: 'Como usar' }),
-    ).toBeInViewport()
+    for (const [ancora, alvo, titulo] of [
+      ['como usar', 'como-usar', 'Como usar'],
+      ['para devs', 'para-devs', 'Para devs'],
+    ]) {
+      await page.getByRole('link', { name: ancora }).click()
+      await expect(page).toHaveURL(new RegExp(`#${alvo}$`))
+      await expect(
+        page.getByRole('heading', { level: 2, name: titulo }),
+      ).toBeInViewport()
+    }
   })
 
   test('o topo volta para a PiluLabs no piluvitu.com.br, e o suporte leva [Botaí] no assunto', async ({
@@ -264,6 +270,37 @@ test.describe('/', () => {
             .map((botao) => botao.textContent ?? '')
         }),
       )
+      expect(vazados).toEqual([])
+    })
+
+    // O topo ganhou a terceira âncora, e os comandos da seção para devs têm até 85 caracteres:
+    // os dois quebram linha. Como nos botões de loja, o vazamento para o gutter não aparece no scrollWidth.
+    test('o topo e a seção para devs não passam da coluna', async ({
+      page,
+    }) => {
+      await page.goto('/')
+      await expect(page.locator('#para-devs pre').first()).toBeAttached()
+      const vazados = await page.evaluate(() => {
+        const coluna = (
+          document.querySelector('main') as HTMLElement
+        ).getBoundingClientRect()
+        return [
+          ...document.querySelectorAll('nav[aria-label="Topo"] *'),
+          ...document.querySelectorAll('#para-devs *'),
+        ]
+          .filter((elemento) => {
+            const caixa = elemento.getBoundingClientRect()
+            return (
+              caixa.width > 0 &&
+              (caixa.right > coluna.right + 0.5 ||
+                caixa.left < coluna.left - 0.5)
+            )
+          })
+          .map(
+            (elemento) =>
+              `${elemento.tagName} ${(elemento.textContent ?? '').slice(0, 40)}`,
+          )
+      })
       expect(vazados).toEqual([])
     })
   })

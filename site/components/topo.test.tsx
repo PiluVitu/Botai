@@ -38,4 +38,17 @@ describe('Topo', () => {
     render(<Topo voltar={{ href: '/', rotulo: 'Botaí' }} />)
     expect(screen.getByRole('navigation')).toHaveClass('flex-wrap')
   })
+
+  // Com três âncoras e o botão (~322 px), a linha delas passa dos 272 px úteis a 320 px.
+  it('as âncoras e o botão também quebram linha entre si', () => {
+    render(
+      <Topo
+        voltar={{ href: '/', rotulo: 'Botaí' }}
+        ancoras={[{ href: '#para-devs', rotulo: 'para devs' }]}
+      />,
+    )
+    expect(
+      screen.getByRole('link', { name: 'para devs' }).parentElement,
+    ).toHaveClass('flex-wrap')
+  })
 })
