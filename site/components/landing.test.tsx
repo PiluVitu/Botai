@@ -29,6 +29,7 @@ describe('Landing', () => {
       'O que ele bota',
       'Capturas',
       'Como usar',
+      'Para devs',
       'Privacidade',
       'Cuidados',
       'Bota aí no seu navegador',
@@ -37,8 +38,24 @@ describe('Landing', () => {
 
   it('as âncoras do topo levam a seções que existem', () => {
     renderizar()
-    for (const alvo of ['como-usar', 'capturas'])
-      expect(document.getElementById(alvo)).not.toBeNull()
+    const ancoras = within(screen.getByRole('navigation', { name: 'Topo' }))
+      .getAllByRole('link')
+      .map((a) => a.getAttribute('href') as string)
+      .filter((href) => href.startsWith('#'))
+    expect(ancoras).toEqual(['#como-usar', '#capturas', '#para-devs'])
+    for (const alvo of ancoras)
+      expect(document.getElementById(alvo.slice(1))).not.toBeNull()
+  })
+
+  // A seção "Para devs" fala do servidor HTTP que roda na máquina de quem usa: quem não tem
+  // servidor é a extensão, como na política.
+  it('a privacidade fala da extensão, não do Botaí inteiro', () => {
+    renderizar()
+    const privacidade = screen.getByRole('region', { name: 'Privacidade' })
+    expect(privacidade).toHaveTextContent(
+      'Nada sai do seu navegador: a extensão não tem servidor',
+    )
+    expect(privacidade).not.toHaveTextContent(/o Botaí não tem servidor/)
   })
 
   it('em breve: selo, nota e as 3 lojas desabilitadas nos dois blocos, sem o Edge', () => {

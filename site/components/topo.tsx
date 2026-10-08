@@ -23,7 +23,7 @@ export function Topo({ voltar, ancoras = [] }: TopoProps) {
         />
         {voltar.rotulo}
       </Link>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {ancoras.map((ancora) => (
           <a
             key={ancora.href}

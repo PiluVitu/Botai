@@ -16,14 +16,13 @@ import { AtalhoLocal } from './atalho-local'
 import { BotoesLoja } from './botoes-loja'
 import { CabecalhoSecao } from './cabecalho-secao'
 import { CapturasAbas } from './capturas-abas'
+import { CARTAO, TEXTO_DE_CARTAO } from './cartao'
 import { ImagemPorTema } from './imagem-por-tema'
+import { ParaDevs } from './para-devs'
 import { Rodape } from './rodape'
 import { SeloFase } from './selo-fase'
 import { TabelaAtalhos } from './tabela-atalhos'
 import { Topo } from './topo'
-
-const CARTAO = 'bg-card border-border rounded-lg border'
-const TEXTO_DE_CARTAO = 'text-muted-foreground text-pretty'
 
 export function Landing({ fase, lojas, notaDasLojas }: ModeloDaLanding) {
   return (
@@ -38,6 +37,7 @@ export function Landing({ fase, lojas, notaDasLojas }: ModeloDaLanding) {
           ancoras={[
             { href: '#como-usar', rotulo: 'como usar' },
             { href: '#capturas', rotulo: 'capturas' },
+            { href: '#para-devs', rotulo: 'para devs' },
           ]}
         />
 
@@ -215,6 +215,8 @@ export function Landing({ fase, lojas, notaDasLojas }: ModeloDaLanding) {
             </p>
           </section>
 
+          <ParaDevs />
+
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-12">
             <section
               aria-labelledby="privacidade-heading"
@@ -222,9 +224,9 @@ export function Landing({ fase, lojas, notaDasLojas }: ModeloDaLanding) {
             >
               <CabecalhoSecao id="privacidade-heading" rotulo="Privacidade" />
               <p className="text-base leading-[1.6] text-pretty">
-                Nada sai do seu navegador: o Botaí não tem servidor, não usa
-                analytics e só guarda a pessoa fictícia que gerou. Ele só age na
-                aba em que você o aciona.
+                Nada sai do seu navegador: a extensão não tem servidor, não usa
+                analytics e só guarda a pessoa fictícia que gerou. Ela só age na
+                aba em que você a aciona.
               </p>
               <Link
                 href="/privacidade"

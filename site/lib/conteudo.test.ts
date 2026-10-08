@@ -1,10 +1,17 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import * as core from '@pilutech/botai-core'
+import { executar } from '../../packages/core/src/cli/executar'
 import {
   DOCUMENTOS,
   EMAIL_DE_SUPORTE,
   historicoDe,
+  IMAGEM_DO_SERVIDOR,
   MAILTO,
+  npmDe,
+  PACOTE_DO_CORE,
+  PACOTE_DO_PLAYWRIGHT,
+  PORTAS,
   RECURSOS,
   REPOSITORIO,
   REQUISITOS,
@@ -14,10 +21,11 @@ import {
   URL_DA_PILUTECH,
 } from './conteudo'
 
-const WXT_CONFIG = readFileSync(
-  join(__dirname, '..', '..', 'extensao', 'wxt.config.ts'),
-  'utf8',
-)
+const RAIZ = join(__dirname, '..', '..')
+const ler = (...caminho: string[]) =>
+  readFileSync(join(RAIZ, ...caminho), 'utf8')
+
+const WXT_CONFIG = ler('extensao', 'wxt.config.ts')
 
 describe('conteúdo da landing', () => {
   it('os 5 recursos do design, na ordem', () => {
@@ -86,5 +94,93 @@ describe('contato e links da PiluTech', () => {
   it('a vitrine PiluLabs mora no piluvitu.com.br, e a PiluTech no pilutech.com.br', () => {
     expect(URL_DA_PILULABS).toBe('https://piluvitu.com.br/pilulabs')
     expect(URL_DA_PILUTECH).toBe('https://pilutech.com.br')
+  })
+})
+
+// A seção "Para devs" mostra comandos de verdade: cada um é conferido contra o código que ele chama.
+describe('para devs', () => {
+  function linhasDe(titulo: string): string[] {
+    const porta = PORTAS.find((p) => p.titulo === titulo)
+    if (!porta || porta.codigo.tipo === 'atalho')
+      throw new Error(`porta sem código: ${titulo}`)
+    return porta.codigo.linhas
+  }
+
+  it('as cinco portas do motor, na ordem do anúncio', () => {
+    expect(PORTAS.map((p) => p.titulo)).toEqual([
+      'Extensão',
+      'Biblioteca',
+      'CLI',
+      'Servidor, Docker e binários',
+      'Plugin do Playwright',
+    ])
+    expect(PORTAS[0].codigo).toEqual({ tipo: 'atalho' })
+  })
+
+  it('os pacotes têm o nome do package.json e a página do npm', () => {
+    const nome = (pasta: string) =>
+      (JSON.parse(ler('packages', pasta, 'package.json')) as { name: string })
+        .name
+    expect([PACOTE_DO_CORE, PACOTE_DO_PLAYWRIGHT]).toEqual([
+      nome('core'),
+      nome('playwright'),
+    ])
+    expect(npmDe(PACOTE_DO_CORE)).toBe(
+      'https://www.npmjs.com/package/@pilutech/botai-core',
+    )
+  })
+
+  it('a biblioteca importa da raiz do core uma função que existe', () => {
+    const [importacao, chamada] = linhasDe('Biblioteca')
+    const lido = /^import \{ (\w+) \} from '(.+)'$/.exec(importacao)
+    expect(lido?.[2]).toBe(PACOTE_DO_CORE)
+    const funcao = lido?.[1] as keyof typeof core
+    expect(typeof core[funcao]).toBe('function')
+    expect(chamada.startsWith(`${funcao}(`)).toBe(true)
+  })
+
+  // Roda na CLI do core o argv que o terminal passaria, sem o `npx` e sem o `>`.
+  it('o comando da CLI roda e sai com o SQL de 1000 pessoas', () => {
+    const [linha] = linhasDe('CLI')
+    const [npx, pacote, ...resto] = linha.split(' ')
+    expect([npx, pacote]).toEqual(['npx', PACOTE_DO_CORE])
+    const argv = resto.slice(0, resto.indexOf('>'))
+    let dados = ''
+    const codigo = executar(argv, {
+      dados: (texto) => {
+        dados += texto
+      },
+      mensagem: () => {},
+    })
+    expect(codigo).toBe(0)
+    expect(dados).toMatch(/^-- botai: formato 1, /)
+    expect(dados.match(/^INSERT /gm)).toHaveLength(1000)
+  })
+
+  // Subiu a versão do core? A imagem da landing sobe no mesmo PR.
+  it('a imagem do servidor é a da versão do core, na porta em que a imagem escuta', () => {
+    const { version } = JSON.parse(ler('packages', 'core', 'package.json')) as {
+      version: string
+    }
+    expect(IMAGEM_DO_SERVIDOR).toBe(`ghcr.io/piluvitu/botai:${version}`)
+    expect(linhasDe('Servidor, Docker e binários')).toEqual([
+      `docker run --rm -p 8790:8790 ${IMAGEM_DO_SERVIDOR}`,
+    ])
+    expect(ler('packages', 'core', 'Dockerfile')).toContain(
+      'CMD ["serve", "--host", "0.0.0.0", "--porta", "8790"]',
+    )
+  })
+
+  it('o plugin exporta o test com a fixture botai, que tem o preencher', () => {
+    expect(linhasDe('Plugin do Playwright')).toEqual([
+      `import { test } from '${PACOTE_DO_PLAYWRIGHT}'`,
+      'await botai.preencher(page)',
+    ])
+    expect(ler('packages', 'playwright', 'src', 'index.ts')).toMatch(
+      /export \{[^}]*\btest,[^}]*\} from '\.\/fixture\.js'/,
+    )
+    const fixture = ler('packages', 'playwright', 'src', 'fixture.ts')
+    expect(fixture).toMatch(/^\s+botai: async \(/m)
+    expect(fixture).toMatch(/^\s+preencher\(\n\s+alvo: Page \| Locator,/m)
   })
 })

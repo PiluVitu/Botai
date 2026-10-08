@@ -16,6 +16,7 @@ export const DaLanding: Story = {
     ancoras: [
       { href: '#como-usar', rotulo: 'como usar' },
       { href: '#capturas', rotulo: 'capturas' },
+      { href: '#para-devs', rotulo: 'para devs' },
     ],
   },
 }
