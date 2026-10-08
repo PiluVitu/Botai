@@ -4,6 +4,90 @@ description: As mensagens reais da CLI e do servidor HTTP do Botaí, com o códi
 sidebar_position: 3
 ---
 
+## CLI {#cli}
+
+Toda mensagem da CLI vai para o stderr e começa com `botai:`. Num erro de uso, a saída é 2 e o stdout fica vazio. As mensagens abaixo foram copiadas de execuções reais; o que muda de um caso para outro é o valor entre aspas. Os códigos estão em [Códigos de saída](../cli/codigos-de-saida.md).
+
+### Comando e argumentos {#cli-comando}
+
+| Mensagem no stderr                                       | Quando                                                                       |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `botai: comando desconhecido "nada" (veja botai --help)` | o comando não existe                                                         |
+| `botai: opção desconhecida: --foo`                       | a opção não existe ou não vale para o comando (como `--hoje` no `botai cpf`) |
+| `botai: opção repetida: --semente`                       | a mesma opção apareceu duas vezes                                            |
+| `botai: --semente precisa de um valor`                   | a opção ficou sem valor no fim do comando                                    |
+| `botai: argumento inesperado: extra`                     | sobrou um argumento                                                          |
+
+### O lote {#cli-lote}
+
+| Mensagem no stderr                                                   | Quando                                        |
+| -------------------------------------------------------------------- | --------------------------------------------- |
+| `botai: -n é obrigatório`                                            | `botai pessoas` sem `-n`                      |
+| `botai: -n precisa ser um inteiro, recebido "abc"`                   | o `-n` não é um inteiro (também `-1` e `1.5`) |
+| `botai: -n: n precisa ser um inteiro de 0 a 100000, recebido 100001` | o `-n` passou de 100 000                      |
+
+```bash testar=2
+botai pessoas -n 100001
+```
+
+### Semente, hoje, UF e domínio {#cli-opcoes}
+
+| Mensagem no stderr                                                                      | Quando                                                           |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `botai: --semente: semente vazia`                                                       | `--semente ''`                                                   |
+| `botai: --semente: semente com mais de 256 caracteres`                                  | a semente de texto passou de 256 caracteres                      |
+| `botai: --semente: semente com caractere de controle`                                   | a semente tem um caractere de controle, como uma tabulação       |
+| `botai: --hoje: hoje precisa ser uma data AAAA-MM-DD que existe, recebido "05/10/2026"` | outro formato de data, ou uma data que não existe (`2026-02-30`) |
+| `botai: --uf: uf desconhecida "XX" (use uma das 27 siglas, ex.: SP)`                    | a UF não é uma das 27 siglas                                     |
+| `botai: --uf não vale para cnpj`                                                        | `--uf` no `cnpj`, no `rg` ou no `pis`                            |
+| `botai: --dominio-email: domínio de e-mail inválido "nao valido" (ex.: example.com)`    | o domínio não tem forma de domínio                               |
+
+```bash testar=2
+botai pessoa --hoje 05/10/2026
+```
+
+### Formatos {#cli-formatos}
+
+| Mensagem no stderr                                                                                       | Quando                                                                 |
+| -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `botai: --formato desconhecido "xml" (use json, ndjson, csv, sql)`                                       | o formato não é um dos quatro                                          |
+| `botai: --dialeto só vale com --formato sql`                                                             | `--dialeto` sem `--formato sql`                                        |
+| `botai: dialeto desconhecido "MySQL" (use postgres, mysql, sqlite)`                                      | o dialeto não é um dos três (diferencia maiúsculas)                    |
+| `botai: --tabela só vale com --formato sql`                                                              | `--tabela` sem `--formato sql`                                         |
+| `botai: tabela inválida "x;drop" (letras, dígitos e _, até 63 caracteres; opcionalmente esquema.tabela)` | a tabela tem outro caractere, mais de um ponto (`a.b.c`) ou está vazia |
+| `botai: --campos só vale com --formato csv ou sql`                                                       | `--campos` em json ou ndjson                                           |
+| `botai: campos: lista vazia ou com vírgula sobrando`                                                     | `--campos ''` ou uma vírgula a mais                                    |
+| `botai: campos: coluna repetida "nome"`                                                                  | a mesma coluna duas vezes                                              |
+
+Coluna que não existe também sai com 2. A mensagem começa com `botai: campos: coluna desconhecida "xyz"` e lista as 33 colunas aceitas (estão em [Colunas](./colunas.md)).
+
+```bash testar=2
+botai pessoas -n 10 --formato sql --tabela 'x;drop'
+```
+
+### validar {#cli-validar}
+
+| Mensagem no stderr                                                            | Quando                                                                  |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `botai: uso: botai validar <tipo> <valor>`                                    | faltou o tipo ou o valor, ou sobrou argumento                           |
+| `botai: tipo desconhecido "celular" (use cpf, cnpj, rg, pis, titulo, cartao)` | o tipo não é um dos seis (diferencia maiúsculas: `CPF` também cai aqui) |
+
+Um valor inválido não é erro de uso: o `validar` escreve `inválido` no stdout e sai com 1.
+
+```bash testar=2
+botai validar celular 11999999999
+```
+
+### Aviso que não é erro {#cli-aviso}
+
+Sem `--semente`, o `botai pessoas --formato csv` escreve a semente sorteada no stderr e sai com 0, porque o CSV não tem onde guardá-la:
+
+```text
+botai: semente 75bf48f551f1dd10, hoje 2026-10-08
+```
+
+As mensagens do `botai serve` estão em [Erros de partida](#servidor-partida).
+
 ## Servidor {#servidor}
 
 O `botai serve` erra de dois jeitos. Na partida, ele escreve uma linha no stderr e o processo termina. Depois de no ar, um pedido errado recebe um status HTTP e um JSON `{"erro": "..."}`, e o servidor continua atendendo.
