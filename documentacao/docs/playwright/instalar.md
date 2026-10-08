@@ -12,7 +12,7 @@ O `@pilutech/botai-playwright` é um fixture do Playwright. Cada teste recebe um
 npm i -D @pilutech/botai-playwright
 ```
 
-A pessoa de uma semente pode mudar entre versões. Para que ela não mude sem você saber, fixe a versão exata:
+Mudar a pessoa de uma semente é versão major; na série 0.x, é a minor. Para que ela não mude sem você saber, fixe a versão exata:
 
 ```bash
 npm i -D --save-exact @pilutech/botai-playwright@0.1.0

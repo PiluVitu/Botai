@@ -30,6 +30,7 @@ Com a CLI `botai` instalada:
 botai pessoa --semente "chromium › cadastro.spec.ts › cadastro" --hoje 2026-10-08
 ```
 
+<!-- prettier-ignore -->
 ```json
 {
   "formato": 1,
@@ -40,7 +41,10 @@ botai pessoa --semente "chromium › cadastro.spec.ts › cadastro" --hoje 2026-
     "nome": {
       "sexo": "F",
       "prenome": "Larissa",
-      "sobrenomes": ["Barbosa", "Conceição"],
+      "sobrenomes": [
+        "Barbosa",
+        "Conceição"
+      ],
       "completo": "Larissa Barbosa Conceição",
       "noCartao": "LARISSA B CONCEICAO"
     },

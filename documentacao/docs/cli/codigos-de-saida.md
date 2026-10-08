@@ -31,7 +31,7 @@ botai validar cpf 634.132.403-08
 inválido
 ```
 
-O `botai serve` também sai com 1 quando a porta já está em uso. Veja [botai serve](../servidor/botai-serve.md).
+O `botai serve` também sai com 1 quando a porta já está em uso. Veja [`botai serve`](../servidor/botai-serve.md).
 
 ## 2: erro de uso
 

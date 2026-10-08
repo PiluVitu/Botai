@@ -20,8 +20,10 @@ Os nomes são os do Playwright, onde o comportamento foi provado. O fixture `@pi
 O `addScriptTag({ path })` lê o arquivo e o põe na página como script inline. A CSP bloqueia, e o Playwright lança:
 
 ```text
-page.addScriptTag: Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-L7FbwKW/iwV9rKZ6X+Rp7nIHpiNGKfRodZLsKaflgw0='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.
+page.addScriptTag: Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-…'), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.
 ```
+
+O hash muda com o texto injetado; o resto da mensagem é o mesmo.
 
 ## O que funciona
 

@@ -125,7 +125,7 @@ O motor roda no mundo MAIN da página: um site que troca protótipos nativos pod
 ## Fixture do Playwright {#playwright}
 
 - **Locator com mais de um elemento** quebra com `strict mode violation`: aponte para o contêiner ou passe a Page. Um Locator sem elemento fica esperando até o timeout do teste, sem erro próprio do Botaí.
-- **Relógio parado**: com `page.clock.install({ time })` seguido de `page.clock.pauseAt(…)`, a Promise do `botai.preencher` não resolve: a 2ª passada, de cerca de 1 s, fica esperando o relógio. Só `page.clock.install()` não atrapalha. Use `{ segundaPassada: false }` ou avance o relógio com `page.clock.runFor(1500)` ([Relógio e 2ª passada](./playwright/relogio-e-segunda-passada.md)).
+- **Relógio parado**: com `page.clock.install({ time })` seguido de `page.clock.pauseAt(…)`, a Promise do `botai.preencher` não resolve: a 2ª passada, de cerca de 1 s, fica esperando o relógio. Só `page.clock.install()` não atrapalha. Use `{ segundaPassada: false }` ou, depois que a 1ª passada escrever, avance o relógio com `page.clock.runFor(1500)` ([Relógio e 2ª passada](./playwright/relogio-e-segunda-passada.md)).
 - **Anotações e anexo** só aparecem em testes que pedem o fixture `botai`.
 - **Uma cópia só** do `@playwright/test` no projeto. O E2E exige os navegadores da versão exata do Playwright (`playwright install`).
 - **O 0.1.0 depende do core 0.4.0** exato: a pessoa é a mesma da 0.4.1, e o anexo diz `motor 0.4.0`.

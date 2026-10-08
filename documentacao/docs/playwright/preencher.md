@@ -76,7 +76,7 @@ Ligada por padrão: o Botaí espera cerca de 1 s e regrava o que a página sobre
 await botai.preencher(page, { segundaPassada: false })
 ```
 
-Medido em 2026-10-08, macOS arm64, Node 22.22.3, numa máquina compartilhada: de 4 a 11 ms sem a 2ª passada e cerca de 1 s com ela. O relógio falso do Playwright pode segurar a 2ª passada: veja [relógio e 2ª passada](./relogio-e-segunda-passada.md).
+Medido em 2026-10-08, macOS arm64, Node 22.22.3, numa máquina compartilhada: de 4 a 11 ms sem a 2ª passada e cerca de 1 s com ela. Com o relógio do Playwright parado (`page.clock.pauseAt`), a 2ª passada não termina: veja [relógio e 2ª passada](./relogio-e-segunda-passada.md).
 
 ## O que fica de fora {#o-que-fica-de-fora}
 

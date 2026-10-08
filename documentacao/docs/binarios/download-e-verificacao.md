@@ -72,7 +72,7 @@ botai pessoa --semente 42 --hoje 2026-10-05
 
 O `botai-darwin-arm64` conferiu os 12 arquivos dourados, e a pessoa que ele gera, pela CLI e pelo `serve`, é a mesma das outras portas. Para usar o nome `botai`, mova o arquivo para uma pasta do `PATH` com esse nome, como o `install.sh` faz em `~/.local/bin`.
 
-O servidor HTTP é o mesmo comando `serve` da CLI. Veja [botai serve](../servidor/botai-serve.md).
+O servidor HTTP é o mesmo comando `serve` da CLI. Veja [`botai serve`](../servidor/botai-serve.md).
 
 ### Windows
 

@@ -63,9 +63,12 @@ await botai.preencher(page, { segundaPassada: false })
 
 ```ts
 const preenchimento = botai.preencher(page)
+await expect(page.getByLabel('CEP')).not.toHaveValue('')
 await page.clock.runFor(1500)
 await preenchimento
 ```
+
+Na segunda, espere a 1ª passada escrever antes do `runFor`: o timer da 2ª passada só existe depois dela.
 
 Mais em [Relógio e 2ª passada](./playwright/relogio-e-segunda-passada.md).
 

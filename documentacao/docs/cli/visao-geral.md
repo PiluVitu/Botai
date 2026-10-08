@@ -77,7 +77,7 @@ Também funcionam `--version` (igual a `--versao`), `-h` e `ajuda` (iguais a `--
 | `pessoas`                                              | um lote em json, ndjson, csv ou sql          | [Um lote de pessoas](./pessoas.md)          |
 | `cpf`, `cnpj`, `rg`, `pis`, `titulo`, `celular`, `cep` | um valor avulso                              | [Geradores avulsos](./geradores-avulsos.md) |
 | `validar`                                              | confere o dígito verificador de um documento | [Validar documentos](./validar.md)          |
-| `serve`                                                | o servidor HTTP local                        | [botai serve](../servidor/botai-serve.md)   |
+| `serve`                                                | o servidor HTTP local                        | [`botai serve`](../servidor/botai-serve.md) |
 
 `botai --versao` imprime a versão do pacote:
 

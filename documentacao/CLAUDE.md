@@ -43,7 +43,7 @@ CONVENCOES.md          árvore, frontmatter, tom, status, exemplos testáveis e 
 | `vercel.test.mjs`            | o `ignoreCommand` e que todo caminho vigiado existe                                                                                                                                 |
 
 - **Como os blocos rodam:** o teste copia `packages/core/dist` para uma pasta temporária (no `make test`, o plugin do Playwright reconstrói o core em paralelo com `rm -rf dist`), confere a cópia com `botai --versao` e põe no `PATH` um `botai` que roda `node <cópia>/bin/botai.js`. Cada bloco roda em `bash -c 'set -eo pipefail; …'`, numa pasta vazia, sem stdin, com 60 s de limite. Bloco que cita `127.0.0.1:8790` fala com um `botai serve --porta 0` que o teste sobe uma vez e troca na URL.
-- **Proibido em bloco testado** (o teste reprova antes de rodar): URL que não seja `http://127.0.0.1:8790`, `docker`, `docker-compose`, `npx`, `npm`, `pnpm`, `sudo`, `gh`, `psql`, `mysql`, `sqlite3` e `botai serve`.
+- **Proibido em bloco testado** (o teste reprova antes de rodar): URL que não seja `http://127.0.0.1:8790`, `docker`, `docker-compose`, `npx`, `npm`, `pnpm`, `sudo`, `gh`, `psql`, `mysql`, `sqlite3` e `botai serve`. A proibição olha a palavra solta, não a posição de comando: `--dialeto mysql` também cai, e as páginas escrevem `--dialeto=mysql` nos blocos testados.
 - O teste não builda o core: sem `packages/core/dist` (ou com outra versão), espera até 30 s e falha pedindo `make build-core`. O `make test-botai-docs` e o job do CI buildam antes; no `make test`, a dependência `workspace:*` do core põe este pacote depois do teste do core, que builda.
 - Subiu a versão do core ou do plugin? O `versoes.test.mjs` lista cada página a atualizar; saída colada que mudou se copia de novo de uma execução real.
 
@@ -59,6 +59,8 @@ CONVENCOES.md          árvore, frontmatter, tom, status, exemplos testáveis e 
 | `pnpm --filter @pilutech/botai-docs exec prettier --write docs` | formata as páginas                                                                |
 
 O lint-staged deste pacote roda o Prettier em `*.{js,mjs,json,md,mdx,css}`.
+
+O cache persistente do webpack fica em `documentacao/node_modules/.cache/webpack`, com nome fixo e sem a pasta do site na chave: uma cópia do site que use o mesmo `node_modules` o reaproveita, e o build cai com `TypeError: Cannot read properties of undefined (reading 'id')` no `DocItem` (visto em 2026-10-08). Saída: `pnpm --filter @pilutech/botai-docs run clear`, ou o build com `DOCUSAURUS_NO_PERSISTENT_CACHE=1`.
 
 ## Deploy (Vercel, projeto próprio)
 

@@ -27,7 +27,7 @@ Não há versão para o Safari nem para o Firefox para Android.
 
 ## O que foi testado
 
-Na auditoria de 2026-10-08, os 26 testes E2E e os 465 testes do Vitest da extensão passaram. O E2E funcional roda só no Chromium: o Playwright não carrega a extensão nos outros navegadores.
+Na auditoria de 2026-10-08, os 26 testes E2E e os 465 testes do Vitest da extensão passaram. O E2E funcional roda só no Chromium.
 
 :::note[Documentado]
 

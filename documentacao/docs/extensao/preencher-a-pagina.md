@@ -25,7 +25,7 @@ O atalho sugerido só vale na primeira instalação. Se outro app já usa a tecl
 
 :::info
 
-O E2E aciona o preenchimento pelo popup. O gesto nativo do atalho e o do menu têm teste só do handler, porque o Playwright não aciona os dois.
+O gesto nativo do atalho e o do menu têm teste só do handler, porque o Playwright não aciona os dois.
 
 :::
 

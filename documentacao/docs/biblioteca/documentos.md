@@ -75,7 +75,7 @@ console.log(exterior)
 - **Validadores:** aceitam o valor com ou sem máscara (`validarCPF('63413240307')` também dá `true`) e devolvem `true` ou `false`.
 - **CNPJ:** só numérico. O CNPJ alfanumérico (vigente desde julho de 2026) não é gerado, e `validarCNPJ` o recusa.
 - **RG:** não há padrão nacional; o Botaí usa o modelo SSP-SP em qualquer UF. Por padrão o dígito verificador nunca é `X`; `{ permitirX: true }` libera.
-- **Título de eleitor:** `uf` é uma das 27 siglas ou `'ZZ'` (exterior, código 28); sem ela, SP. O número gerado vale nas duas leituras da regra de SP e MG, que validadores populares tratam de jeitos diferentes: `validarTituloEleitor(v)` usa `'com-excecao-sp-mg'`, e `'sem-excecao'` é a outra. Nas 27 UFs, 13 500 títulos em 13 500 saíram válidos nas duas regras e com o código certo.
+- **Título de eleitor:** `uf` é uma das 27 siglas ou `'ZZ'` (exterior, código 28); sem ela, SP. O número gerado vale nas duas leituras da regra de SP e MG: `validarTituloEleitor(v)` usa `'com-excecao-sp-mg'`, e `'sem-excecao'` é a outra. Nas 27 UFs, 13 500 títulos em 13 500 saíram válidos nas duas regras e com o código certo.
 
 :::tip
 

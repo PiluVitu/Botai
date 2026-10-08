@@ -55,7 +55,7 @@ Sem opção nenhuma, a semente é o nome do projeto, o arquivo, os `describe` e 
 projeto › arquivo › describe › título
 ```
 
-O teste `cadastro` do arquivo `cadastro.spec.ts`, no projeto `chromium`, recebe a semente `chromium › cadastro.spec.ts › cadastro`. A semente é legível de propósito: ela serve direto de argumento para a CLI, como mostra [reproduzir uma falha](./reproduzir-uma-falha.md).
+O teste `cadastro` do arquivo `cadastro.spec.ts`, no projeto `chromium`, recebe a semente `chromium › cadastro.spec.ts › cadastro`. A semente é legível: ela serve direto de argumento para a CLI, como mostra [reproduzir uma falha](./reproduzir-uma-falha.md).
 
 O que isso quer dizer na prática:
 

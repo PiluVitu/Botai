@@ -29,7 +29,7 @@ A pessoa é Rafael Rocha Araújo, CPF 481.343.522-00 (região 2 = RR), de Boa Vi
 A semente é um **inteiro seguro** (negativo vale) ou um **texto de 1 a 256 caracteres** sem caractere de controle.
 
 - `42` (número) e `'42'` (texto) são a mesma semente. A CLI, que recebe sempre texto, gera a mesma pessoa que `gerarPessoa({ semente: 42 })`.
-- O texto é normalizado em NFC antes do hash: o mesmo nome em NFC ou em NFD (como o macOS grava nomes de arquivo) é a mesma semente.
+- O texto é normalizado em NFC antes do hash: o mesmo nome em NFC ou em NFD é a mesma semente.
 
 ```bash testar
 nfc=$(printf 'S\303\243o Lu\303\255s')
@@ -150,7 +150,7 @@ Para ter sozinha uma pessoa do lote, use a semente dela: `demo/0`, `demo/1`… O
 | CLI e binário     | `--semente S`                                                         | `--hoje AAAA-MM-DD`         |
 | Servidor e imagem | `?semente=S` (sem ela, sorteia uma de 16 hex e a devolve no envelope) | `?hoje=AAAA-MM-DD`          |
 | Biblioteca        | `gerarPessoa({ semente })`                                            | `gerarPessoa({ hoje })`     |
-| Fixture           | `botaiSemente` (padrão: o título completo do teste)                   | `botaiHoje`                 |
+| Fixture           | `botaiSemente` (padrão: `projeto › arquivo › describe › título`)      | `botaiHoje`                 |
 | Extensão          | não tem: cada pessoa nova é sorteada com crypto                       | a data de hoje em São Paulo |
 
 No fixture do Playwright, a semente padrão é `projeto › arquivo › describe › título`. Ela é estável entre retries e workers, mas renomear o teste troca a pessoa, e cada navegador recebe uma pessoa diferente. Para ter a mesma em todos, fixe `botaiSemente` ([Opções do fixture](../playwright/opcoes.md)).

@@ -145,7 +145,7 @@ A tabela e a regra dos prefixos logo abaixo dela foram lidas no código do class
 | `cc-exp`, `cc-exp-month`, `cc-exp-year`              | `cartaoValidade`, `cartaoValidadeMes`, `cartaoValidadeAno`      |
 | `one-time-code`                                      | fica de fora                                                    |
 
-Os prefixos de seção (`section-*`, `shipping`, `billing`, `home`, `work`, `mobile`) não mudam o tipo: `shipping postal-code` é `cep`.
+Os prefixos de seção (`section-*`, `shipping`, `billing`, `home`, `work`, `mobile`, `fax`, `pager`) não mudam o tipo: `shipping postal-code` é `cep`.
 
 ## Na extensão: o modo B
 
