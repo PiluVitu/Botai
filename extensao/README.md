@@ -18,7 +18,8 @@ Uma pessoa de teste falsa e coerente, que fica guardada até você pedir outra:
 
 - **Chrome:** [Chrome Web Store](https://chromewebstore.google.com/detail/bota%C3%AD/mblmjomopainbcdjipkdmioglamdinnc).
 - **Edge:** pela mesma página da Chrome Web Store (na primeira vez, o Edge pede para permitir extensões de outras lojas).
-- **Firefox e Opera:** em revisão nas lojas. Até lá, a partir do código.
+- **Firefox (153 ou mais novo):** [Firefox Add-ons](https://addons.mozilla.org/pt-BR/firefox/addon/bota%C3%AD/).
+- **Opera:** em revisão na loja. Até lá, a partir do código.
 
 **A partir do código**, na raiz do repositório:
 

@@ -3,7 +3,8 @@
 Gerador de dados fake para formulários (CPF, CNPJ, CEP), da [PiluTech](https://pilutech.com.br). Gera uma pessoa brasileira de teste coerente (documentos com dígito verificador certo, CEP real com rua e cidade, celular com o DDD do CEP, cartão de teste da Stripe) e preenche o formulário da página.
 
 - **Site:** https://botai.pilutech.com.br
-- **Chrome e Edge:** [Chrome Web Store](https://chromewebstore.google.com/detail/bota%C3%AD/mblmjomopainbcdjipkdmioglamdinnc). Firefox e Opera: em revisão nas lojas.
+- **Chrome e Edge:** [Chrome Web Store](https://chromewebstore.google.com/detail/bota%C3%AD/mblmjomopainbcdjipkdmioglamdinnc).
+- **Firefox:** [Firefox Add-ons](https://addons.mozilla.org/pt-BR/firefox/addon/bota%C3%AD/). Opera: em revisão na loja.
 - **Biblioteca:** [`@pilutech/botai-core`](https://www.npmjs.com/package/@pilutech/botai-core), o mesmo motor da extensão, para Node e navegador.
 - **Servidor, imagem e binários:** `botai serve`, a imagem `ghcr.io/piluvitu/botai` e binários sem Node ([`packages/core/README.md`](./packages/core/README.md)).
 - `@pilutech/botai-playwright`: fixture do Playwright ([README](packages/playwright/README.md)).
