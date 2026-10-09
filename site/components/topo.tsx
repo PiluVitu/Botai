@@ -1,13 +1,14 @@
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faBookOpen } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Button } from '@piluvitu/ui/button'
 import Link from 'next/link'
 import { BotaoTema } from './botao-tema'
 
 export type LinkDoTopo = { href: string; rotulo: string }
 
-type TopoProps = { voltar: LinkDoTopo; ancoras?: LinkDoTopo[] }
+type TopoProps = { voltar: LinkDoTopo; ancoras?: LinkDoTopo[]; docs?: string }
 
-export function Topo({ voltar, ancoras = [] }: TopoProps) {
+export function Topo({ voltar, ancoras = [], docs }: TopoProps) {
   return (
     <nav
       aria-label="Topo"
@@ -33,6 +34,21 @@ export function Topo({ voltar, ancoras = [] }: TopoProps) {
             {ancora.rotulo}
           </a>
         ))}
+        {docs && (
+          <Button
+            asChild
+            variant="outline"
+            className="gap-2 px-3 font-mono text-[13px]"
+          >
+            <a href={docs}>
+              <FontAwesomeIcon
+                icon={faBookOpen}
+                className="text-primary size-[13px]"
+              />
+              Docs
+            </a>
+          </Button>
+        )}
         <BotaoTema />
       </div>
     </nav>

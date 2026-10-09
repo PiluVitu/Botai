@@ -47,6 +47,17 @@ describe('Landing', () => {
       expect(document.getElementById(alvo.slice(1))).not.toBeNull()
   })
 
+  it('o topo e o rodapé levam à documentação', () => {
+    renderizar()
+    for (const regiao of [
+      screen.getByRole('navigation', { name: 'Topo' }),
+      screen.getByRole('contentinfo'),
+    ])
+      expect(
+        within(regiao).getByRole('link', { name: 'Docs' }),
+      ).toHaveAttribute('href', 'https://docs.botai.pilutech.com.br')
+  })
+
   // A seção "Para devs" fala do servidor HTTP que roda na máquina de quem usa: quem não tem
   // servidor é a extensão, como na política.
   it('a privacidade fala da extensão, não do Botaí inteiro', () => {

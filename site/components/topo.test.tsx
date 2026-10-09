@@ -33,6 +33,32 @@ describe('Topo', () => {
     ).toBeInTheDocument()
   })
 
+  it('com a documentação, o botão Docs leva a ela, na linha das âncoras e antes do tema', () => {
+    render(
+      <Topo
+        voltar={{ href: '/', rotulo: 'Botaí' }}
+        ancoras={[{ href: '#para-devs', rotulo: 'para devs' }]}
+        docs="https://docs.botai.pilutech.com.br"
+      />,
+    )
+    const docs = screen.getByRole('link', { name: 'Docs' })
+    expect(docs).toHaveAttribute('href', 'https://docs.botai.pilutech.com.br')
+    expect(docs).not.toHaveAttribute('target')
+    const linha = screen.getByRole('link', { name: 'para devs' }).parentElement
+    expect(docs.parentElement).toBe(linha)
+    expect(
+      [...(linha as HTMLElement).children].map(
+        (filho) => filho.textContent || filho.getAttribute('aria-label'),
+      ),
+    ).toEqual(['para devs', 'Docs', 'Alternar tema'])
+  })
+
+  // As páginas de texto (/privacidade e /termos) têm só o voltar e o tema.
+  it('sem a documentação, o topo não tem Docs', () => {
+    render(<Topo voltar={{ href: '/', rotulo: 'Botaí' }} />)
+    expect(screen.queryByRole('link', { name: 'Docs' })).toBeNull()
+  })
+
   // A 320 px o voltar, as âncoras e o botão não cabem numa linha.
   it('quebra linha em tela estreita', () => {
     render(<Topo voltar={{ href: '/', rotulo: 'Botaí' }} />)

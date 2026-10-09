@@ -16,6 +16,7 @@ import {
   REPOSITORIO,
   REQUISITOS,
   REQUISITOS_DO_SOFTWARE,
+  URL_DA_DOCUMENTACAO,
   URL_DA_LICENCA,
   URL_DA_PILULABS,
   URL_DA_PILUTECH,
@@ -94,6 +95,11 @@ describe('contato e links da PiluTech', () => {
   it('a vitrine PiluLabs mora no piluvitu.com.br, e a PiluTech no pilutech.com.br', () => {
     expect(URL_DA_PILULABS).toBe('https://piluvitu.com.br/pilulabs')
     expect(URL_DA_PILUTECH).toBe('https://pilutech.com.br')
+  })
+
+  // A documentação é outro projeto da Vercel (documentacao/), num subdomínio da landing.
+  it('a documentação mora no docs.botai.pilutech.com.br', () => {
+    expect(URL_DA_DOCUMENTACAO).toBe('https://docs.botai.pilutech.com.br')
   })
 })
 
