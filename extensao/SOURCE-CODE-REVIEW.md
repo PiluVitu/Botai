@@ -4,8 +4,7 @@ Botaí is a browser extension built with WXT 0.21.4 and Vite 8 from TypeScript s
 
 - `extensao`: the extension itself;
 - `packages/core`: the workspace package with the test data generators and the form field classifier, which the extension imports as TypeScript source (it has no prebuilt output here);
-- at the root, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc` and `scripts/check-tailwind-source.mjs`. They are here only to reproduce the build: the workspace layout, the lockfile, the install settings and a CSS check that the build scripts run;
-- `vendor/piluvitu-ui-0.1.0.tgz`: the npm package of `@piluvitu/ui`, which `pnpm-workspace.yaml` > `overrides` installs from this file until it is fetched from the npm registry.
+- at the root, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc` and `scripts/check-tailwind-source.mjs`. They are here only to reproduce the build: the workspace layout, the lockfile, the install settings and a CSS check that the build scripts run.
 
 The popup's UI components come from `@piluvitu/ui`, our design system, installed at the version locked in `pnpm-lock.yaml` (MIT; source at https://github.com/PiluVitu/PiluVitu-Dev/tree/main/packages/ui).
 

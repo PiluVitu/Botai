@@ -47,10 +47,6 @@ pnpm 11.1.1 (workspaces `extensao`, `site`, `documentacao`, `packages/*`), Node 
 - **Actions** fixadas por SHA com a versão em comentário (`uses: actions/checkout@<sha> # v7.0.1`), `permissions` mínimas por job, `persist-credentials: false`. Action nova entra fixada: `git ls-remote --tags https://github.com/<dono>/<action> '<tag>^{}'`. O `upload-artifact` (v7) e o `download-artifact` (v8) sobem juntos: o v8 falha quando o digest do artifact não bate. Job com `id-token: write` (os `publicar` do npm) leva `package-manager-cache: false` no `setup-node`: desde a v5 ele liga o cache sozinho quando o `packageManager` é npm, e a doc da v7 pede isso no trusted publishing (um cache envenenado alcançaria o token OIDC). A v7 do `setup-node` não exporta mais o `NODE_AUTH_TOKEN` falso; o `npm publish` ≥ 11.5.1 troca o token pelo do OIDC de qualquer jeito.
 - ⚠️ `pnpm update -r <pkg>` não mexe nas cópias transitivas quando `<pkg>` também é dependência direta de algum workspace (medido no monorepo): confira o resultado no `pnpm-lock.yaml`, não na saída do pnpm. E rode `pnpm dedupe --check` depois de qualquer bump.
 
-## Fase 0: o `@piluvitu/ui` vem de um tarball local (temporário)
-
-Até o `@piluvitu/ui` 0.1.0 estar no npm há 24 h, o `pnpm-workspace.yaml` tem `overrides: { '@piluvitu/ui': 'file:vendor/piluvitu-ui-0.1.0.tgz' }`, o tarball é versionado em `vendor/` e o zip de fontes da AMO o leva. Versionado de propósito: as tags `core-v0.1.0` a `core-v0.4.0` nascem em commits de antes do C4, e o `publicar-core.yml` instala no commit da tag. O passo C4 do plano da fase 0 tira esse override (só ele: o do `shell-quote` fica), o `vendor/` e esta seção num commit só.
-
 ## Comandos
 
 | Comando                                         | O quê                                                                                    |
