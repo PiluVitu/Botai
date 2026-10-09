@@ -1,12 +1,21 @@
 import { validarCPF } from '@pilutech/botai-core/cpf'
+import { montarPessoa } from '@pilutech/botai-core/pessoa'
+import { sfc32 } from '@pilutech/botai-core/prng'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import { PESSOA_DOURADA } from '../test/pessoa-dourada'
 import {
+  devolverFavorito,
+  favoritosItem,
   gerarPessoaNova,
+  guardarFavorito,
   obterOuGerarPessoa,
   pessoaItem,
+  renomearFavorito,
+  tirarFavorito,
+  usarFavorito,
 } from './armazenamento'
+import { primeiroNome, type Favorito } from './favoritos'
 import { idadeEm } from './hoje'
 
 describe('armazenamento da pessoa', () => {
@@ -67,6 +76,138 @@ describe('armazenamento da pessoa', () => {
     const pararDeOuvir = pessoaItem.watch(ouvinte)
     await pessoaItem.setValue(PESSOA_DOURADA)
     expect(ouvinte).toHaveBeenCalledWith(PESSOA_DOURADA, null)
+    pararDeOuvir()
+  })
+})
+
+describe('armazenamento dos favoritos', () => {
+  const outra = (n: number) =>
+    montarPessoa(sfc32(n, n + 1, n + 2, n + 3), '2026-10-01')
+  const P = PESSOA_DOURADA
+
+  beforeEach(() =>
+    vi.useFakeTimers({
+      toFake: ['Date'],
+      now: new Date('2026-10-09T13:00:00Z'),
+    }),
+  )
+  afterEach(() => vi.useRealTimers())
+
+  const lista = () => favoritosItem.getValue()
+
+  it('começa com a lista vazia', async () => {
+    expect(await lista()).toEqual([])
+  })
+
+  it('guarda a lista inteira em local:botai_favoritos', async () => {
+    const favorito = await guardarFavorito(P)
+    expect(await fakeBrowser.storage.local.get('botai_favoritos')).toEqual({
+      botai_favoritos: [favorito],
+    })
+  })
+
+  it('guardar cria o favorito com id único, o primeiro nome de apelido e a data de agora', async () => {
+    const um = await guardarFavorito(P)
+    const dois = await guardarFavorito(outra(10))
+    expect(um).toEqual({
+      id: expect.any(String),
+      apelido: primeiroNome(P),
+      pessoa: P,
+      guardadoEm: '2026-10-09T13:00:00.000Z',
+    })
+    expect(dois?.id).not.toBe(um?.id)
+    expect(await lista()).toEqual([um, dois])
+  })
+
+  it('guardar a mesma pessoa de novo, ou uma quarta, não grava nada', async () => {
+    await guardarFavorito(P)
+    expect(await guardarFavorito(structuredClone(P))).toBeNull()
+    await guardarFavorito(outra(10))
+    await guardarFavorito(outra(20))
+    expect(await guardarFavorito(outra(30))).toBeNull()
+    expect(await lista()).toHaveLength(3)
+  })
+
+  it('guardar não mexe na pessoa ativa', async () => {
+    await pessoaItem.setValue(P)
+    await guardarFavorito(outra(10))
+    expect(await pessoaItem.getValue()).toEqual(P)
+  })
+
+  it('tirar e desfazer devolvem o favorito na mesma posição, com o apelido', async () => {
+    const [a, b, c] = [outra(10), outra(20), outra(30)]
+    await guardarFavorito(a)
+    const meio = await guardarFavorito(b)
+    await guardarFavorito(c)
+    if (!meio) throw new Error('não guardou')
+    await renomearFavorito(meio.id, 'comprador PJ')
+
+    const removido = await tirarFavorito(meio.id)
+    expect(removido?.posicao).toBe(1)
+    expect(removido?.favorito.apelido).toBe('comprador PJ')
+    expect((await lista()).map((f) => f.pessoa.cpf)).toEqual([a.cpf, c.cpf])
+
+    if (!removido) throw new Error('não tirou')
+    expect(await devolverFavorito(removido)).toBe(true)
+    expect((await lista()).map((f) => f.apelido)).toEqual([
+      primeiroNome(a),
+      'comprador PJ',
+      primeiroNome(c),
+    ])
+  })
+
+  it('tirar um id que não existe devolve null; desfazer duas vezes não duplica', async () => {
+    const favorito = await guardarFavorito(P)
+    expect(await tirarFavorito('nao-existe')).toBeNull()
+    const removido = await tirarFavorito(favorito?.id ?? '')
+    if (!removido) throw new Error('não tirou')
+    expect(await devolverFavorito(removido)).toBe(true)
+    expect(await devolverFavorito(removido)).toBe(false)
+    expect(await lista()).toHaveLength(1)
+  })
+
+  it('renomear normaliza o apelido e não toca nos outros', async () => {
+    const um = await guardarFavorito(P)
+    const dois = await guardarFavorito(outra(10))
+    if (!um || !dois) throw new Error('não guardou')
+    expect(await renomearFavorito(um.id, '  admin do staging  ')).toBe(true)
+    expect(await renomearFavorito(dois.id, '   ')).toBe(true)
+    expect(await renomearFavorito('nao-existe', 'x')).toBe(false)
+    expect((await lista()).map((f) => f.apelido)).toEqual([
+      'admin do staging',
+      primeiroNome(dois.pessoa),
+    ])
+  })
+
+  it('usar um favorito grava a pessoa dele como a ativa, e a lista fica igual', async () => {
+    const a = outra(10)
+    await pessoaItem.setValue(P)
+    const favorito = await guardarFavorito(a)
+    const antes: Favorito[] = await lista()
+    expect(await usarFavorito(favorito?.id ?? '')).toEqual(a)
+    expect(await pessoaItem.getValue()).toEqual(a)
+    expect(await lista()).toEqual(antes)
+  })
+
+  it('usar um favorito que já saiu não troca a ativa', async () => {
+    await pessoaItem.setValue(P)
+    expect(await usarFavorito('nao-existe')).toBeNull()
+    expect(await pessoaItem.getValue()).toEqual(P)
+  })
+
+  it('"Nova pessoa" troca só a ativa: os favoritos ficam', async () => {
+    await pessoaItem.setValue(P)
+    await guardarFavorito(P)
+    const antes = await lista()
+    await gerarPessoaNova()
+    expect(await lista()).toEqual(antes)
+  })
+
+  it('watch avisa quem escuta quando os favoritos mudam', async () => {
+    const ouvinte = vi.fn()
+    const pararDeOuvir = favoritosItem.watch(ouvinte)
+    const favorito = await guardarFavorito(P)
+    await vi.waitFor(() => expect(ouvinte).toHaveBeenCalledWith([favorito], []))
     pararDeOuvir()
   })
 })

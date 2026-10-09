@@ -10,7 +10,7 @@ Source code: the attached sources zip is a subset of our public repository (http
 
 How to test: open any page with a sign-up form, click the Botaí toolbar button, then "Gerar pessoa" and "Preencher esta página". A notice in the corner shows how many fields were filled. Right-click a text field › Botaí › Inserir › CPF fills a single field.
 
-Permissions: activeTab and scripting inject the filler only into the tab the user acted on; contextMenus and menus add the right-click items (menus.getTargetElement finds the clicked field); storage keeps the generated fake person in storage.local.
+Permissions: activeTab and scripting inject the filler only into the tab the user acted on; contextMenus and menus add the right-click items (menus.getTargetElement finds the clicked field); storage keeps the active fake person and up to 3 favorite fake people the user saves in storage.local.
 
 ## Opera
 
