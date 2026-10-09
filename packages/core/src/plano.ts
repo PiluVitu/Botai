@@ -34,6 +34,8 @@ export const COLUNAS = [
   'cartao_titular',
   'cartao_validade',
   'cartao_cvv',
+  'cartao_provedor',
+  'cartao_cenario',
 ] as const
 
 export type Coluna = (typeof COLUNAS)[number]
@@ -74,6 +76,8 @@ const VALOR_DA_COLUNA: Record<Coluna, (p: Pessoa) => ValorPlano> = {
   cartao_titular: (p) => p.cartao.titular,
   cartao_validade: (p) => p.cartao.validade,
   cartao_cvv: (p) => p.cartao.cvv,
+  cartao_provedor: (p) => p.cartao.provedor,
+  cartao_cenario: (p) => p.cartao.cenario,
 }
 
 export class ErroDoPlano extends Error {

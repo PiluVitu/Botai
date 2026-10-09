@@ -63,7 +63,30 @@ describe('pessoaPlana', () => {
       cartao_titular: 'VINICIUS O COSTA',
       cartao_validade: '08/28',
       cartao_cvv: '430',
+      cartao_provedor: 'stripe',
+      cartao_cenario: 'aprovado',
     })
+  })
+
+  test('cartao_provedor e cartao_cenario seguem o cartão da pessoa', () => {
+    const p = montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {
+      cartao: { provedor: 'pagarme', cenario: 'pendente-cancelado' },
+    })
+    expect(pessoaPlana(p)).toMatchObject({
+      cartao_bandeira: 'visa',
+      cartao_numero: '4000000000000051',
+      cartao_provedor: 'pagarme',
+      cartao_cenario: 'pendente-cancelado',
+    })
+  })
+
+  test('35 colunas, as duas do cartão novas no fim', () => {
+    expect(COLUNAS).toHaveLength(35)
+    expect(COLUNAS.slice(-3)).toEqual([
+      'cartao_cvv',
+      'cartao_provedor',
+      'cartao_cenario',
+    ])
   })
 
   test('as chaves saem na ordem de COLUNAS', () => {
@@ -100,7 +123,7 @@ describe('CSV (RFC 4180)', () => {
 
   test('linha da pessoa dourada, todas as colunas', () => {
     expect(linhaCsv(DOURADA)).toBe(
-      'Vinícius Oliveira Costa,Vinícius,Oliveira Costa,M,1993-05-29,33,647.692.234-39,25.547.934-7,SSP,SP,161.51127.87-1,6080 6730 1600,vinicius-costa-6607@tuamaeaquelaursa.com,vinicius-costa-6607,https://tuamaeaquelaursa.com/vinicius-costa-6607,s7YZgw&$iLak,(84) 99114-8037,+5584991148037,59090-000,Avenida Engenheiro Roberto Freire,3360,Apto 74,Ponta Negra,Natal,RN,Oliveira & Costa Logística Ltda,Costa Digital,35.728.569/0001-52,mastercard,5555555555554444,VINICIUS O COSTA,08/28,430\r\n',
+      'Vinícius Oliveira Costa,Vinícius,Oliveira Costa,M,1993-05-29,33,647.692.234-39,25.547.934-7,SSP,SP,161.51127.87-1,6080 6730 1600,vinicius-costa-6607@tuamaeaquelaursa.com,vinicius-costa-6607,https://tuamaeaquelaursa.com/vinicius-costa-6607,s7YZgw&$iLak,(84) 99114-8037,+5584991148037,59090-000,Avenida Engenheiro Roberto Freire,3360,Apto 74,Ponta Negra,Natal,RN,Oliveira & Costa Logística Ltda,Costa Digital,35.728.569/0001-52,mastercard,5555555555554444,VINICIUS O COSTA,08/28,430,stripe,aprovado\r\n',
     )
   })
 
