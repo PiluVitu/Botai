@@ -1,8 +1,10 @@
 import { cryptoRandomBytes } from './entropia'
 import { hojeEmSaoPaulo } from '@pilutech/botai-core'
+import type { CartaoEscolhido } from '@pilutech/botai-core/cartao'
 import { montarPessoa, type Pessoa } from '@pilutech/botai-core/pessoa'
 import { seedFromBytes } from '@pilutech/botai-core/prng'
 import { storage } from 'wxt/utils/storage'
+import { ESCOLHA_PADRAO, normalizarEscolha } from './cartao'
 import {
   devolverNaLista,
   guardarNaLista,
@@ -28,10 +30,27 @@ export const favoritosItem = storage.defineItem<Favorito[]>(
   },
 )
 
+export const cartaoItem = storage.defineItem<CartaoEscolhido>(
+  'local:botai_cartao',
+  {
+    fallback: ESCOLHA_PADRAO,
+    version: 1,
+  },
+)
+
+export async function lerEscolhaDoCartao(): Promise<CartaoEscolhido> {
+  return normalizarEscolha(await cartaoItem.getValue())
+}
+
+export async function escolherCartao(escolha: CartaoEscolhido): Promise<void> {
+  await cartaoItem.setValue(normalizarEscolha(escolha))
+}
+
 export async function gerarPessoaNova(): Promise<Pessoa> {
   const pessoa = montarPessoa(
     seedFromBytes(cryptoRandomBytes(16)),
     hojeEmSaoPaulo(),
+    { cartao: await lerEscolhaDoCartao() },
   )
   await pessoaItem.setValue(pessoa)
   return pessoa

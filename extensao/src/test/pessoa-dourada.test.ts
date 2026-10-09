@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { type EnvelopeDaPessoa, gerarPessoa } from '@pilutech/botai-core'
 import { describe, expect, it } from 'vitest'
-import { PESSOA_DOURADA } from './pessoa-dourada'
+import { PESSOA_ANTIGA, PESSOA_DOURADA } from './pessoa-dourada'
 
 const DOURADO = path.resolve(
   import.meta.dirname,
@@ -15,6 +15,23 @@ describe('o motor que a extensão empacota', () => {
     expect(PESSOA_DOURADA.email.endereco).toBe(
       'vinicius-costa-6607@tuamaeaquelaursa.com',
     )
+  })
+
+  it('a pessoa antiga é a dourada com o cartão de antes da 1.2.0, sem provedor nem cenário', () => {
+    expect(PESSOA_DOURADA.cartao).toMatchObject({
+      provedor: 'stripe',
+      cenario: 'aprovado',
+    })
+    expect(PESSOA_ANTIGA.cartao).not.toHaveProperty('provedor')
+    expect(PESSOA_ANTIGA.cartao).not.toHaveProperty('cenario')
+    expect({
+      ...PESSOA_ANTIGA,
+      cartao: {
+        ...PESSOA_ANTIGA.cartao,
+        provedor: 'stripe',
+        cenario: 'aprovado',
+      },
+    }).toEqual(PESSOA_DOURADA)
   })
 
   it.each([

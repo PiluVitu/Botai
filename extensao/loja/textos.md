@@ -20,7 +20,7 @@ Feito para quem desenvolve e testa formulários brasileiros. O Botaí gera uma p
 • CEP real, com rua, bairro, cidade e UF que batem com ele
 • nome, data de nascimento, celular, e-mail e senha
 • empresa (razão social, nome fantasia e CNPJ)
-• cartão de teste documentado da Stripe (número, nome, validade e CVV)
+• cartão de teste documentado da Stripe ou da Pagar.me, no cenário que você escolher (aprovado, recusado, pendente…): número, nome, validade e CVV
 • até 3 pessoas favoritas, com apelido, para voltar a elas depois
 
 Como usar
@@ -59,7 +59,7 @@ Itens no menu do botão direito: "Preencher esta página" e "Inserir › CPF / E
 
 ## Justificativa: storage
 
-Guardar no próprio navegador (storage.local) a pessoa de teste ativa e até 3 pessoas favoritas que a pessoa guardar, para reutilizá-las. Nada é sincronizado nem enviado.
+Guardar no próprio navegador (storage.local) a pessoa de teste ativa, até 3 pessoas favoritas que a pessoa guardar, para reutilizá-las, e a preferência do cartão de teste (provedor e cenário) das próximas pessoas. Nada é sincronizado nem enviado.
 
 ## Justificativa: menus
 
