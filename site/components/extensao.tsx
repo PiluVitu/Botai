@@ -35,7 +35,7 @@ export function Extensao({ lojas }: { lojas: BotaoDeLoja[] }) {
           <div className={cn(CARTAO, 'overflow-hidden')}>
             <ImagemPorTema
               variantes={CAPTURAS[0].variantes}
-              sizes="(min-width: 1264px) 572px, calc(100vw - 32px)"
+              sizes="(min-width: 1264px) 572px, (min-width: 900px) calc(48vw - 32px), calc(100vw - 32px)"
             />
           </div>
           <figcaption className="text-muted-foreground font-mono text-xs">

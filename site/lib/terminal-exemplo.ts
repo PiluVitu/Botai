@@ -31,7 +31,6 @@ const RECORTE_DO_TERMINAL: Recorte = {
   hoje: true,
   pessoa: {
     nome: ['completo'],
-    nascimento: ['br'],
     cpf: true,
     celular: ['formatado'],
     email: ['endereco'],
@@ -72,30 +71,39 @@ function emUmaLinha(objeto: Objeto, escolhidas: readonly string[]): Trecho[] {
   return trechos
 }
 
-function corpo(objeto: Objeto, recorte: Recorte, recuo: number) {
+function corpo(
+  objeto: Objeto,
+  recorte: Recorte,
+  recuo: number,
+): LinhaDaSaida[] {
   const lista = membros(objeto, Object.keys(recorte))
-  return lista.flatMap((nome, indice): LinhaDaSaida[] => {
+  const linhas: LinhaDaSaida[] = []
+  lista.forEach((nome, indice) => {
     const virgula = indice < lista.length - 1 ? ',' : ''
-    if (nome === RETICENCIAS)
-      return [{ recuo, trechos: [sinal(RETICENCIAS + virgula)] }]
+    const anterior = linhas.at(-1)
+    if (nome === RETICENCIAS) {
+      if (anterior) anterior.trechos.push(sinal(` ${RETICENCIAS}${virgula}`))
+      else linhas.push({ recuo, trechos: [sinal(RETICENCIAS + virgula)] })
+      return
+    }
     const regra = recorte[nome]
     const dado = objeto[nome]
     const fim = virgula ? [sinal(virgula)] : []
     if (regra === true)
-      return [{ recuo, trechos: [chave(nome), valor(dado), ...fim] }]
-    if (Array.isArray(regra))
-      return [
-        {
-          recuo,
-          trechos: [chave(nome), ...emUmaLinha(dado as Objeto, regra), ...fim],
-        },
-      ]
-    return [
-      { recuo, trechos: [chave(nome), sinal('{')] },
-      ...corpo(dado as Objeto, regra as Recorte, recuo + 1),
-      { recuo, trechos: [sinal(`}${virgula}`)] },
-    ]
+      linhas.push({ recuo, trechos: [chave(nome), valor(dado), ...fim] })
+    else if (Array.isArray(regra))
+      linhas.push({
+        recuo,
+        trechos: [chave(nome), ...emUmaLinha(dado as Objeto, regra), ...fim],
+      })
+    else
+      linhas.push(
+        { recuo, trechos: [chave(nome), sinal('{')] },
+        ...corpo(dado as Objeto, regra as Recorte, recuo + 1),
+        { recuo, trechos: [sinal(`}${virgula}`)] },
+      )
   })
+  return linhas
 }
 
 export function abreviar(objeto: object, recorte: Recorte): LinhaDaSaida[] {

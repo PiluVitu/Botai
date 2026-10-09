@@ -212,15 +212,22 @@ test.describe('/', () => {
     }
   })
 
-  // O selo «Sem teste · via HTTP» numa coluna de 190 px quebrava em duas linhas dentro da pílula.
-  test('a 1440 px, cada selo das integrações cabe numa linha', async ({
+  // Numa coluna de 190 px, selo de mais de 16 caracteres («Sem teste · via HTTP») quebrava em duas linhas dentro da pílula.
+  test('a 1440 px, seis integrações por linha, como no design, e cada selo cabe numa linha', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/')
-    const selos = page
-      .getByRole('region', { name: 'O que foi testado, e o que ainda não.' })
-      .locator('li > span')
+    const secao = page.getByRole('region', {
+      name: 'O que foi testado, e o que ainda não.',
+    })
+    const topos = await secao
+      .locator('li')
+      .evaluateAll((itens) =>
+        itens.map((li) => Math.round(li.getBoundingClientRect().top)),
+      )
+    expect(topos.filter((topo) => topo === topos[0])).toHaveLength(6)
+    const selos = secao.locator('li > span')
     await expect(selos).toHaveCount(13)
     const alturas = await selos.evaluateAll((spans) =>
       spans.map((s) => ({

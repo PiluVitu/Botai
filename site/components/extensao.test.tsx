@@ -85,7 +85,7 @@ describe('Extensao', () => {
       expect(img).not.toHaveAttribute('fetchpriority')
       expect(img).toHaveAttribute(
         'sizes',
-        '(min-width: 1264px) 572px, calc(100vw - 32px)',
+        '(min-width: 1264px) 572px, (min-width: 900px) calc(48vw - 32px), calc(100vw - 32px)',
       )
     }
   })

@@ -30,7 +30,11 @@ export function LinhaDeComando({
             {linha.split(' ').map((palavra, indice) => (
               <Fragment key={indice}>
                 {indice > 0 ? ' ' : null}
-                <span className="inline-block indent-0">{palavra}</span>
+                {palavra.startsWith('-') ? (
+                  <span className="inline-block indent-0">{palavra}</span>
+                ) : (
+                  palavra
+                )}
               </Fragment>
             ))}
           </span>

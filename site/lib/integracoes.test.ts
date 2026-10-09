@@ -38,12 +38,17 @@ describe('integrações', () => {
     expect(
       INTEGRACOES.filter((i) => !i.testado).map((i) => [i.nome, i.selo]),
     ).toEqual([
-      ['Cypress', 'Sem teste · via JS'],
-      ['Selenium', 'Sem teste · via JS'],
-      ['Puppeteer', 'Sem teste · via JS'],
-      ['WebdriverIO', 'Sem teste · via JS'],
-      ['Go', 'Sem teste · via HTTP'],
-      ['Java', 'Sem teste · via HTTP'],
+      ['Cypress', 'Sem teste · JS'],
+      ['Selenium', 'Sem teste · JS'],
+      ['Puppeteer', 'Sem teste · JS'],
+      ['WebdriverIO', 'Sem teste · JS'],
+      ['Go', 'Sem teste · HTTP'],
+      ['Java', 'Sem teste · HTTP'],
     ])
+  })
+
+  // A 190 px por coluna (6 a 1440, como no design), "Testado via HTTP" é o maior que cabe numa linha.
+  it('nenhum selo passa de 16 caracteres', () => {
+    expect(INTEGRACOES.filter((i) => i.selo.length > 16)).toEqual([])
   })
 })

@@ -19,11 +19,15 @@ describe('LinhaDeComando', () => {
   })
 
   // Sem o inline-block, o Chromium quebra depois do hífen (`--` numa linha, `formato` na outra).
-  it('cada palavra é um bloco inteiro, sem herdar o recuo negativo', () => {
+  // Só a flag: palavra maior que a caixa (o pacote, a URL) num inline-block descia inteira e deixava o `npx` sozinho.
+  it('cada flag é um bloco inteiro, sem herdar o recuo negativo; o resto é texto corrido', () => {
     const { container } = render(<LinhaDeComando linhas={[CLI]} />)
-    const palavras = [...container.querySelectorAll('span.inline-block')]
-    expect(palavras.map((p) => p.textContent)).toEqual(CLI.split(' '))
-    for (const palavra of palavras) expect(palavra).toHaveClass('indent-0')
+    const blocos = [...container.querySelectorAll('span.inline-block')]
+    expect(blocos.map((p) => p.textContent)).toEqual(
+      CLI.split(' ').filter((p) => p.startsWith('-')),
+    )
+    for (const bloco of blocos) expect(bloco).toHaveClass('indent-0')
+    expect(container.querySelector('code')).toHaveTextContent(CLI)
   })
 
   it('com o prompt, o $ fica fora da leitura e da seleção', () => {

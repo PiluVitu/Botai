@@ -13,7 +13,7 @@ export function Integracoes() {
       titulo="O que foi testado, e o que ainda não."
       apoio="O motor roda em qualquer ferramenta que execute JS na página, e o servidor atende qualquer linguagem que fale HTTP. O selo diz o que já tem teste."
     >
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-3">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,190px),1fr))] gap-3">
         {INTEGRACOES.map(({ nome, testado, selo }) => (
           <li
             key={nome}

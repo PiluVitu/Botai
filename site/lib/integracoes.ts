@@ -8,7 +8,7 @@ const testado = (nome: string, selo = 'Testado'): Integracao => ({
 const semTeste = (nome: string, via: 'JS' | 'HTTP'): Integracao => ({
   nome,
   testado: false,
-  selo: `Sem teste · via ${via}`,
+  selo: `Sem teste · ${via}`,
 })
 
 export const INTEGRACOES: Integracao[] = [

@@ -13,6 +13,7 @@ import { MOTOR } from '@pilutech/botai-core'
 import { ATALHOS } from '@pilutech/botai-core/atalhos'
 import { IMAGEM_DO_SERVIDOR, PACOTE_DO_CORE, REPOSITORIO } from './conteudo'
 import { HOJE_DO_EXEMPLO, SEMENTE_DO_EXEMPLO } from './exemplo'
+import { ESTADO_SEM_URL } from './extensao'
 
 export type IdDaPorta =
   | 'extensao'
@@ -37,7 +38,7 @@ export type Porta = {
 
 type Dados = Omit<Porta, 'numero'>
 
-const NPX = `npx ${PACOTE_DO_CORE}@${MOTOR}`
+const NPX = `npx -y ${PACOTE_DO_CORE}@${MOTOR}`
 
 const DADOS: Dados[] = [
   {
@@ -46,7 +47,7 @@ const DADOS: Dados[] = [
     icone: faPuzzlePiece,
     linha:
       'Preenche o formulário da aba num atalho, ou um campo só pelo botão direito.',
-    onde: 'Chrome 123+ e Edge pela Chrome Web Store, Firefox 153+ pela Firefox Add-ons. Opera em revisão.',
+    onde: `Chrome 123+ e Edge pela Chrome Web Store, Firefox 153+ pela Firefox Add-ons. Opera ${ESTADO_SEM_URL.opera}.`,
     comando: {
       linhas: [
         `${ATALHOS.chrome.mac} no Mac · ${ATALHOS.chrome.windows} no Windows e no Linux · ${ATALHOS.firefox.linux} no Firefox para Linux`,

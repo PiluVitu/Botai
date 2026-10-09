@@ -24,9 +24,11 @@ describe('Integracoes', () => {
 
   it('as 13 integrações, cada uma com o nome e o selo', () => {
     const secao = renderizar()
-    const itens = within(within(secao).getByRole('list')).getAllByRole(
-      'listitem',
+    const lista = within(secao).getByRole('list')
+    expect(lista).toHaveClass(
+      'grid-cols-[repeat(auto-fill,minmax(min(100%,190px),1fr))]',
     )
+    const itens = within(lista).getAllByRole('listitem')
     expect(itens.map((li) => li.textContent)).toEqual(
       INTEGRACOES.map((i) => `${i.nome}${i.selo}`),
     )
@@ -36,7 +38,9 @@ describe('Integracoes', () => {
   it('"Testado" só nas provadas, e nada de "Roda via"', () => {
     const secao = renderizar()
     expect(within(secao).getAllByText(/^Testado/)).toHaveLength(7)
-    expect(within(secao).getAllByText(/^Sem teste · via /)).toHaveLength(6)
+    expect(within(secao).getAllByText(/^Sem teste · (JS|HTTP)$/)).toHaveLength(
+      6,
+    )
     expect(secao).not.toHaveTextContent(/Roda via/)
   })
 
@@ -48,7 +52,7 @@ describe('Integracoes', () => {
       'data-icon',
       'circle-check',
     )
-    const [cypress] = within(secao).getAllByText('Sem teste · via JS')
+    const [cypress] = within(secao).getAllByText('Sem teste · JS')
     expect(cypress).toHaveClass('text-muted-foreground')
     expect(cypress.querySelector('svg')).toHaveAttribute('data-icon', 'plug')
   })

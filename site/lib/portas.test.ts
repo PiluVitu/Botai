@@ -28,6 +28,9 @@ import {
   PESSOA_DO_EXEMPLO,
   SEMENTE_DO_EXEMPLO,
 } from './exemplo'
+import { ESTADO_SEM_URL } from './extensao'
+import { lerUrlsDasLojas } from './lojas'
+import { botoesDasLojas } from './modelo'
 import { NOTA_DAS_PORTAS, PORTAS, type IdDaPorta } from './portas'
 
 const RAIZ = join(__dirname, '..', '..')
@@ -86,8 +89,18 @@ describe('as oito portas', () => {
     const chromium = /minimum_chrome_version: '(\d+)'/.exec(wxt)?.[1]
     const firefox = /strict_min_version: '(\d+)\.0'/.exec(wxt)?.[1]
     expect(porta('extensao').onde).toBe(
-      `Chrome ${chromium}+ e Edge pela Chrome Web Store, Firefox ${firefox}+ pela Firefox Add-ons. Opera em revisão.`,
+      `Chrome ${chromium}+ e Edge pela Chrome Web Store, Firefox ${firefox}+ pela Firefox Add-ons. Opera ${ESTADO_SEM_URL.opera}.`,
     )
+  })
+
+  // Publicou o Opera no lojas.json? A porta 01 deixa de dizer "em revisão" no mesmo PR.
+  it('o estado do Opera é o de ESTADO_SEM_URL, e só enquanto o lojas.json não tem a URL', () => {
+    const opera =
+      botoesDasLojas(lerUrlsDasLojas()).find((b) => b.loja === 'opera')?.url ??
+      null
+    expect(
+      porta('extensao').onde.includes(`Opera ${ESTADO_SEM_URL.opera}`),
+    ).toBe(opera === null)
   })
 
   // O install.sh recusa Windows e musl.
@@ -125,15 +138,20 @@ describe('as oito portas', () => {
 describe('comando inventado não passa', () => {
   it('a CLI fixa a versão do core e o hoje', () => {
     expect(porta('cli').comando.linhas).toEqual([
-      `npx ${PACOTE_DO_CORE}@${core.MOTOR} pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql | psql "$DATABASE_URL"`,
+      `npx -y ${PACOTE_DO_CORE}@${core.MOTOR} pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql | psql "$DATABASE_URL"`,
     ])
   })
 
-  // O argv que o terminal passaria: sem o `npx`, sem o pacote e sem o `| psql`.
+  // O argv que o terminal passaria: sem o `npx -y`, sem o pacote e sem o `| psql`.
+  // Sem o -y, o npx de cache frio pergunta pelo stdout, que vai para o psql: a pergunta some e vira SQL.
   it('o comando da CLI roda e sai com o SQL de 1000 pessoas', () => {
     const [linha] = porta('cli').comando.linhas
-    const [npx, pacote, ...resto] = linha.split(' ')
-    expect([npx, pacote]).toEqual(['npx', `${PACOTE_DO_CORE}@${core.MOTOR}`])
+    const [npx, sim, pacote, ...resto] = linha.split(' ')
+    expect([npx, sim, pacote]).toEqual([
+      'npx',
+      '-y',
+      `${PACOTE_DO_CORE}@${core.MOTOR}`,
+    ])
     const argv = resto.slice(0, resto.indexOf('|'))
     let dados = ''
     const codigo = executar(argv, {

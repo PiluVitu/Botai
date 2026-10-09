@@ -28,3 +28,22 @@ export const DoHeroClaro: Story = {
   args: DoHero.args,
   globals: { tema: 'claro' },
 }
+
+// O stub evita a recusa do clipboard no iframe do Storybook; o check dura TEMPO_DO_COPIADO.
+export const Copiado: Story = {
+  args: DoHero.args,
+  beforeEach: () => {
+    const original = navigator.clipboard.writeText
+    navigator.clipboard.writeText = () => Promise.resolve()
+    return () => {
+      navigator.clipboard.writeText = original
+    }
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button'))
+  },
+}
+export const CopiadoClaro: Story = {
+  ...Copiado,
+  globals: { tema: 'claro' },
+}

@@ -79,11 +79,13 @@ describe('as regras', () => {
   })
 
   // A UF muda CPF, título, DDD e endereço; nome, nascimento, e-mail, empresa e cartão não.
-  it('a UF amarra os documentos e o DDD, não "o resto"', () => {
+  // O RG é sempre SSP/SP, e o PIS e o CNPJ não dependem dela: "os documentos" prometeria demais.
+  it('a UF amarra o CPF, o DDD e o título, não "o resto" nem "os documentos"', () => {
     const [cep] = REGRAS
     expect(cep.texto).toBe(
-      'O CEP existe, e a rua, o bairro e a cidade batem com ele. A UF do endereço amarra os documentos e o DDD.',
+      'O CEP existe, e a rua, o bairro e a cidade batem com ele. A UF dele amarra o CPF, o DDD e o título.',
     )
+    expect(REGRAS.map((r) => r.texto).join(' ')).not.toMatch(/os documentos/)
     expect(REGRAS.map((r) => r.texto).join(' ')).not.toMatch(/o resto/)
   })
 

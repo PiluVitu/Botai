@@ -34,7 +34,7 @@ export const REGRAS: Regra[] = [
     chip: endereco.uf,
     titulo: 'CEP real',
     texto:
-      'O CEP existe, e a rua, o bairro e a cidade batem com ele. A UF do endereço amarra os documentos e o DDD.',
+      'O CEP existe, e a rua, o bairro e a cidade batem com ele. A UF dele amarra o CPF, o DDD e o título.',
   },
   {
     chip: `…${DESTAQUES.cpf[1]}${DESTAQUES.cpf[2]}`,

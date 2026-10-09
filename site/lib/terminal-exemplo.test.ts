@@ -51,6 +51,7 @@ describe('a saída do terminal do hero', () => {
     expect(ENVELOPE_DO_EXEMPLO.motor).toBe(MOTOR)
   })
 
+  // A reticência vai no fim da linha anterior: uma linha só de "…," deixava o terminal bem mais alto que o formulário.
   it('o recorte, com reticências onde a CLI imprime chaves que a janela omite', () => {
     const p = PESSOA_DO_EXEMPLO
     const j = (valor: unknown) => JSON.stringify(valor)
@@ -62,16 +63,12 @@ describe('a saída do terminal do hero', () => {
         '  "semente": "42",',
         '  "hoje": "2026-10-05",',
         '  "pessoa": {',
-        `    "nome": { …, "completo": ${j(p.nome.completo)}, … },`,
-        `    "nascimento": { …, "br": ${j(p.nascimento.br)}, … },`,
-        `    "cpf": ${j(p.cpf)},`,
-        '    …,',
+        `    "nome": { …, "completo": ${j(p.nome.completo)}, … }, …,`,
+        `    "cpf": ${j(p.cpf)}, …,`,
         `    "celular": { …, "formatado": ${j(p.celular.formatado)}, … },`,
-        `    "email": { …, "endereco": ${j(p.email.endereco)}, … },`,
-        '    …,',
+        `    "email": { …, "endereco": ${j(p.email.endereco)}, … }, …,`,
         `    "endereco": { "cep": ${j(p.endereco.cep)}, …, "cidade": ${j(p.endereco.cidade)}, "uf": ${j(p.endereco.uf)}, … },`,
-        `    "empresa": { …, "cnpj": ${j(p.empresa.cnpj)} },`,
-        '    …',
+        `    "empresa": { …, "cnpj": ${j(p.empresa.cnpj)} }, …`,
         '  }',
         '}',
       ].join('\n'),
@@ -83,7 +80,6 @@ describe('a saída do terminal do hero', () => {
     const texto = textoDaSaida(SAIDA_DO_TERMINAL)
     for (const valor of [
       'Márcio Carvalho Rodrigues',
-      '26/02/1970',
       '634.132.403-07',
       '(98) 97702-9128',
       'marcio-rodrigues-0337@tuamaeaquelaursa.com',
@@ -104,7 +100,6 @@ describe('a saída do terminal do hero', () => {
     emOrdem(membrosNoRecuo(2), Object.keys(PESSOA_DO_EXEMPLO))
     expect(membrosNoRecuo(2)).toEqual([
       'nome',
-      'nascimento',
       'cpf',
       'celular',
       'email',
@@ -123,9 +118,15 @@ describe('abreviar', () => {
     e: 5,
   }
 
-  it('um bloco de reticências por sequência de chaves omitidas', () => {
+  it('uma reticência por sequência de chaves omitidas, no fim da linha anterior', () => {
     expect(textoDaSaida(abreviar(OBJETO, { a: true, e: true }))).toBe(
-      ['{', '  "a": 1,', '  …,', '  "e": 5', '}'].join('\n'),
+      ['{', '  "a": 1, …,', '  "e": 5', '}'].join('\n'),
+    )
+  })
+
+  it('a reticência que abre um objeto fica numa linha própria', () => {
+    expect(textoDaSaida(abreviar(OBJETO, { e: true }))).toBe(
+      ['{', '  …,', '  "e": 5', '}'].join('\n'),
     )
   })
 
@@ -138,11 +139,26 @@ describe('abreviar', () => {
         '  "d": {',
         '    …,',
         '    "n": null',
-        '  },',
-        '  …',
+        '  }, …',
         '}',
       ].join('\n'),
     )
+  })
+
+  it('a reticência entra como sinal na linha anterior, sem mexer nas outras', () => {
+    expect(abreviar({ a: 1, b: 2 }, { a: true })).toEqual([
+      { recuo: 0, trechos: [{ tipo: 'sinal', texto: '{' }] },
+      {
+        recuo: 1,
+        trechos: [
+          { tipo: 'chave', texto: '"a": ' },
+          { tipo: 'valor', texto: '1' },
+          { tipo: 'sinal', texto: ',' },
+          { tipo: 'sinal', texto: ' …' },
+        ],
+      },
+      { recuo: 0, trechos: [{ tipo: 'sinal', texto: '}' }] },
+    ])
   })
 
   it('sem omissão, sem reticências', () => {
