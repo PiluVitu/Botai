@@ -6,11 +6,11 @@ import type { Browser } from 'wxt/browser'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import { montarPessoa } from '@pilutech/botai-core/pessoa'
 import { sfc32 } from '@pilutech/botai-core/prng'
-import { favoritosItem, pessoaItem } from '../../lib/armazenamento'
+import { cartaoItem, favoritosItem, pessoaItem } from '../../lib/armazenamento'
 import { primeiroNome, type Favorito } from '../../lib/favoritos'
 import { idadeEm } from '../../lib/hoje'
 import type { RespostaPreencher } from '../../lib/mensagens'
-import { PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
+import { PESSOA_ANTIGA, PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
 import { LINHAS_DO_DESIGN, resumoDe } from '../../test/resumos'
 import { App } from './App'
 
@@ -288,6 +288,124 @@ describe('App do popup: favoritos', () => {
     await userEvent.setup().click(await estrela())
     expect(await guardados()).toHaveLength(3)
     expect(screen.getByText(/Os 3 lugares estão ocupados/)).toBeInTheDocument()
+  })
+})
+
+describe('App do popup: cartão das próximas pessoas', () => {
+  const grupoCartao = async () =>
+    within(await screen.findByRole('region', { name: 'Cartão' }))
+  const guardada = async () => {
+    const pessoa = await pessoaItem.getValue()
+    if (!pessoa) throw new Error('sem pessoa')
+    return pessoa
+  }
+
+  it('escolher Pagar.me e recusado grava em local:botai_cartao, sem mexer na ativa', async () => {
+    await pessoaItem.setValue(P)
+    render(<App />)
+    const cartao = await grupoCartao()
+    const user = userEvent.setup()
+    await user.click(cartao.getByRole('button', { name: 'Pagar.me' }))
+    await vi.waitFor(async () =>
+      expect(await cartaoItem.getValue()).toEqual({
+        provedor: 'pagarme',
+        cenario: 'aprovado',
+      }),
+    )
+    await user.click(
+      await cartao.findByRole('button', { name: 'recusado', pressed: false }),
+    )
+    await vi.waitFor(async () =>
+      expect(await cartaoItem.getValue()).toEqual({
+        provedor: 'pagarme',
+        cenario: 'recusado',
+      }),
+    )
+    expect(
+      await cartao.findByRole('button', {
+        name: 'Nova pessoa com Pagar.me · recusado',
+      }),
+    ).toBeInTheDocument()
+    expect(await pessoaItem.getValue()).toEqual(P)
+    expect(
+      cartao.getByText('aprovado', { selector: '[data-tipo]' }),
+    ).toBeInTheDocument()
+  })
+
+  it('"Nova pessoa com Pagar.me · recusado" gera a ativa com o número do cenário', async () => {
+    await cartaoItem.setValue({ provedor: 'pagarme', cenario: 'recusado' })
+    await pessoaItem.setValue(P)
+    render(<App />)
+    const cartao = await grupoCartao()
+    await userEvent.setup().click(
+      cartao.getByRole('button', {
+        name: 'Nova pessoa com Pagar.me · recusado',
+      }),
+    )
+    await vi.waitFor(async () =>
+      expect((await guardada()).cartao).toMatchObject({
+        numero: '4000000000000028',
+        provedor: 'pagarme',
+        cenario: 'recusado',
+      }),
+    )
+    const nova = await grupoCartao()
+    expect(await nova.findByText('4000 0000 0000 0028')).toBeInTheDocument()
+    expect(
+      nova.getByText('recusado', { selector: '[data-tipo]' }),
+    ).toHaveAttribute('data-tipo', 'erro')
+  })
+
+  it('o "Nova pessoa" de sempre também usa a escolha guardada', async () => {
+    await cartaoItem.setValue({ provedor: 'stripe', cenario: 'recusado-saldo' })
+    await pessoaItem.setValue(P)
+    render(<App />)
+    await userEvent
+      .setup()
+      .click(await screen.findByRole('button', { name: 'Nova pessoa' }))
+    await vi.waitFor(async () =>
+      expect((await guardada()).cartao.numero).toBe('4000000000009995'),
+    )
+  })
+
+  it('a primeira geração, no 1a, usa a escolha guardada', async () => {
+    await cartaoItem.setValue({ provedor: 'pagarme', cenario: 'chargeback' })
+    render(<App />)
+    await userEvent
+      .setup()
+      .click(await screen.findByRole('button', { name: 'Gerar pessoa' }))
+    await vi.waitFor(async () =>
+      expect((await guardada()).cartao).toMatchObject({
+        provedor: 'pagarme',
+        cenario: 'chargeback',
+      }),
+    )
+  })
+
+  it('valor inválido guardado (o catálogo mudou) aparece como o padrão', async () => {
+    await fakeBrowser.storage.local.set({
+      botai_cartao: { provedor: 'pagarme', cenario: 'sumiu' },
+    })
+    await pessoaItem.setValue(P)
+    render(<App />)
+    const cartao = await grupoCartao()
+    expect(cartao.getByRole('button', { name: 'Stripe' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(
+      cartao.getByRole('button', { name: 'Nova pessoa com Stripe · aprovado' }),
+    ).toBeInTheDocument()
+  })
+
+  it('pessoa antiga guardada (sem provedor no cartão) abre no 1b como Stripe aprovado', async () => {
+    await pessoaItem.setValue(PESSOA_ANTIGA)
+    render(<App />)
+    const cartao = await grupoCartao()
+    expect(
+      cartao.getByText('aprovado', { selector: '[data-tipo]' }),
+    ).toHaveAttribute('data-tipo', 'ok')
+    expect(cartao.getByText('Stripe', { selector: 'span' })).toBeInTheDocument()
   })
 })
 
