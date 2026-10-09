@@ -22,9 +22,17 @@ test.describe('/privacidade', () => {
     await expect(page.getByRole('row', { name: /^menus\b/ })).toContainText(
       'Só no Firefox',
     )
-    await expect(page.getByRole('row', { name: /^storage\b/ })).toContainText(
-      'até 3 favoritas',
+    const storage = page.getByRole('row', { name: /^storage\b/ })
+    await expect(storage).toContainText('até 3 favoritas')
+    await expect(storage).toContainText(
+      'o cartão de teste escolhido para as próximas pessoas',
     )
+    await expect(
+      page.getByRole('heading', {
+        level: 3,
+        name: 'A preferência do cartão de teste',
+      }),
+    ).toBeVisible()
     await page.getByRole('link', { name: 'Botaí', exact: true }).click()
     await expect(page).toHaveURL('/')
   })

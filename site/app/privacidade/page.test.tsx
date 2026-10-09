@@ -15,7 +15,8 @@ describe('/privacidade', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Política de privacidade do Botaí',
     )
-    // A data muda com o texto: é a da 1.1.0, que trouxe os favoritos.
+    // A data muda com o texto: é a da 1.2.0, que trouxe a preferência do cartão de teste
+    // (a 1.1.0, dos favoritos, também é de 2026-10-09).
     const data = screen.getByText('9 de outubro de 2026')
     expect(data.tagName).toBe('TIME')
     expect(data).toHaveAttribute('dateTime', '2026-10-09')
@@ -49,25 +50,27 @@ describe('/privacidade', () => {
     ).toEqual([
       'A pessoa fictícia ativa',
       'As pessoas favoritas e os apelidos',
+      'A preferência do cartão de teste',
       'Os campos e o endereço da aba',
       'A escolha de tema claro ou escuro',
       'Os registros de acesso a este site',
       'O que você manda ao suporte por e-mail',
     ])
     const listas = document.querySelectorAll('dl')
-    expect(listas).toHaveLength(6)
+    expect(listas).toHaveLength(7)
     for (const lista of listas)
       expect(
         [...lista.querySelectorAll('dt')].map((dt) => dt.textContent),
       ).toEqual(['Para quê', 'Base legal', 'Com quem', 'Por quanto tempo'])
-    expect(listas[4]).toHaveTextContent('art. 7º, IX')
-    expect(listas[4]).toHaveTextContent('Vercel')
-    expect(listas[5]).toHaveTextContent('art. 7º, II')
-    expect(listas[5]).toHaveTextContent('Gmail')
+    expect(listas[5]).toHaveTextContent('art. 7º, IX')
+    expect(listas[5]).toHaveTextContent('Vercel')
+    expect(listas[6]).toHaveTextContent('art. 7º, II')
+    expect(listas[6]).toHaveTextContent('Gmail')
   })
 
   // Contrato da 1.1.0: storage.local com local:botai_pessoa (a ativa) e local:botai_favoritos (até 3).
-  it('"O que fica guardado": a pessoa ativa e até 3 favoritas, com apelido, só no navegador', () => {
+  // A 1.2.0 soma local:botai_cartao, a preferência do cartão de teste das próximas pessoas.
+  it('"O que fica guardado": a pessoa ativa, até 3 favoritas com apelido e a preferência do cartão, só no navegador', () => {
     const paragrafo = screen.getByRole('heading', {
       level: 2,
       name: 'O que fica guardado',
@@ -76,12 +79,43 @@ describe('/privacidade', () => {
       'Só a pessoa de teste ativa',
       'até 3 pessoas favoritas que você guardar',
       'com o apelido que você der',
+      'a preferência do cartão de teste das próximas pessoas',
+      'o provedor (Stripe ou Pagar.me) e o cenário (aprovado, recusado, pendente…)',
+      'que não é dado pessoal',
       'no armazenamento local da extensão no seu navegador (storage.local).',
       'Nada disso é sincronizado entre dispositivos nem enviado.',
     ])
       expect(paragrafo).toHaveTextContent(trecho)
-    expect(screen.getByRole('row', { name: /^storage\b/ })).toHaveTextContent(
+    const storage = screen.getByRole('row', { name: /^storage\b/ })
+    expect(storage).toHaveTextContent(
       'a pessoa fictícia ativa e até 3 favoritas, com os apelidos',
+    )
+    expect(storage).toHaveTextContent(
+      'o cartão de teste escolhido para as próximas pessoas',
+    )
+    expect(document.body).toHaveTextContent(
+      'até 3 favoritas que você escolher e o cartão de teste das próximas pessoas.',
+    )
+  })
+
+  // A escolha vale só para as pessoas novas: a ativa e as favoritas ficam com o cartão delas.
+  it('a preferência do cartão não é dado pessoal, fica até outra escolha e não muda as pessoas guardadas', () => {
+    const cartao = document.querySelectorAll('dl')[2]
+    expect(cartao).toHaveTextContent(
+      'Não se aplica: é uma opção da extensão, não um dado pessoal',
+    )
+    expect(cartao).toHaveTextContent(
+      'Até você escolher outro cartão no popup ou remover a extensão. A pessoa ativa e as favoritas mantêm o cartão com que foram geradas.',
+    )
+    const apagar = screen.getByRole('heading', {
+      level: 2,
+      name: 'Como apagar os dados',
+    }).nextElementSibling
+    expect(apagar).toHaveTextContent(
+      'Escolher outro cartão no popup troca a preferência do cartão.',
+    )
+    expect(apagar).toHaveTextContent(
+      'com a pessoa ativa, os favoritos e a preferência do cartão.',
     )
   })
 
@@ -157,7 +191,7 @@ describe('/privacidade', () => {
   // resultado (api.ts, para o "Mostrar" do popup) e regrava 1 s depois
   // (segunda-passada.ts). Nada disso é gravado em disco nem enviado.
   it('o que a extensão lê da página fica na memória dela até recarregar', () => {
-    const campos = document.querySelectorAll('dl')[2]
+    const campos = document.querySelectorAll('dl')[3]
     expect(campos).toHaveTextContent(
       'Na memória da página, até ela ser recarregada, trocada por outra ou fechada. Nada é gravado nem enviado.',
     )
