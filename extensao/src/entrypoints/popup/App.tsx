@@ -9,7 +9,16 @@ import { PopupShell } from '../../components/popup-shell'
 import { PrimeiroUso } from '../../components/primeiro-uso'
 import { ResultadoPreenchimento } from '../../components/resultado-preenchimento'
 import { Rodape } from '../../components/rodape'
-import { gerarPessoaNova, pessoaItem } from '../../lib/armazenamento'
+import {
+  devolverFavorito,
+  favoritosItem,
+  gerarPessoaNova,
+  guardarFavorito,
+  pessoaItem,
+  renomearFavorito,
+  tirarFavorito,
+  usarFavorito,
+} from '../../lib/armazenamento'
 import {
   aposPreencher,
   estadoAoAbrir,
@@ -18,6 +27,7 @@ import {
   verDados,
   type EstadoPopup,
 } from '../../lib/estado-popup'
+import type { Favorito } from '../../lib/favoritos'
 import { idadeEm } from '../../lib/hoje'
 import { enviar, type RespostaPreencher } from '../../lib/mensagens'
 import {
@@ -47,20 +57,25 @@ function abrirPaginaDeAtalhos(navegador: Navegador): void {
   void browser.tabs.create({ url: PAGINA_DE_ATALHOS[navegador] })
 }
 
-function usePessoa(): Pessoa | null | undefined {
-  const [pessoa, setPessoa] = useState<Pessoa | null | undefined>(undefined)
+interface ItemObservavel<T> {
+  getValue(): Promise<T>
+  watch(ouvinte: (novo: T) => void): () => void
+}
+
+function useGuardado<T>(item: ItemObservavel<T>): T | undefined {
+  const [valor, setValor] = useState<T | undefined>(undefined)
   useEffect(() => {
     let vivo = true
-    void pessoaItem.getValue().then((guardada) => {
-      if (vivo) setPessoa(guardada)
+    void item.getValue().then((guardado) => {
+      if (vivo) setValor(guardado)
     })
-    const pararDeOuvir = pessoaItem.watch((nova) => setPessoa(nova))
+    const pararDeOuvir = item.watch((novo) => setValor(novo))
     return () => {
       vivo = false
       pararDeOuvir()
     }
-  }, [])
-  return pessoa
+  }, [item])
+  return valor
 }
 
 function useAtalho(): string | undefined {
@@ -81,20 +96,35 @@ function useAtalho(): string | undefined {
 }
 
 export function App() {
-  const pessoa = usePessoa()
+  const pessoa = useGuardado(pessoaItem)
+  const favoritos = useGuardado(favoritosItem)
   const aba = useAbaAlvo()
   const atalho = useAtalho()
-  if (pessoa === undefined || aba === undefined || atalho === undefined)
+  if (
+    pessoa === undefined ||
+    favoritos === undefined ||
+    aba === undefined ||
+    atalho === undefined
+  )
     return null
-  return <TelaDoPopup pessoa={pessoa} aba={aba} atalho={atalho} />
+  return (
+    <TelaDoPopup
+      pessoa={pessoa}
+      favoritos={favoritos}
+      aba={aba}
+      atalho={atalho}
+    />
+  )
 }
 
 function TelaDoPopup({
   pessoa,
+  favoritos,
   aba,
   atalho,
 }: {
   pessoa: Pessoa | null
+  favoritos: Favorito[]
   aba: AbaAlvo | null
   atalho: string
 }) {
@@ -170,10 +200,16 @@ function TelaDoPopup({
         idade={idadeEm(pessoa.nascimento.iso, hojeEmSaoPaulo())}
         atalho={atalho}
         preencherDesabilitado={aba === null || estado.situacao !== 'ok'}
+        favoritos={favoritos}
         onPreencher={() => void preencher()}
         onNovaPessoa={() => void gerarPessoaNova()}
         onAbrirCaixa={() => abrirCaixa(pessoa)}
         onCopiar={(valor) => navigator.clipboard.writeText(valor)}
+        onGuardarFavorito={() => guardarFavorito(pessoa)}
+        onTirarFavorito={tirarFavorito}
+        onDevolverFavorito={devolverFavorito}
+        onRenomearFavorito={renomearFavorito}
+        onUsarFavorito={(id) => void usarFavorito(id)}
       />
     )
   }
