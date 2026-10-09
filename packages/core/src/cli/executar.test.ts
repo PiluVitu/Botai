@@ -1,7 +1,9 @@
 import { validarCPF } from '../cpf'
 import type { EnvelopeDaPessoa, EnvelopeDasPessoas } from '../envelope'
 import { gerarEnvelopeDaPessoa } from '../envelope'
+import { CATALOGO_DE_CARTOES, escolherNumero, luhnValido } from '../cartao'
 import { gerarPessoa, gerarPessoas } from '../gerar'
+import { rngDeSemente } from '../semente'
 import { MOTOR } from '../versao'
 import { executar, SAIDA } from './executar'
 
@@ -168,6 +170,174 @@ describe('botai pessoas', () => {
   })
 })
 
+describe('cartões de teste em pessoa e pessoas', () => {
+  test('pessoa --cartao pagarme --cenario recusado: a mesma pessoa, com o cartão do cenário', () => {
+    const r = rodar(
+      'pessoa',
+      '--semente',
+      'botai',
+      '--hoje',
+      HOJE,
+      '--cartao',
+      'pagarme',
+      '--cenario',
+      'recusado',
+    )
+    expect(r.codigo).toBe(0)
+    expect((JSON.parse(r.stdout) as EnvelopeDaPessoa).pessoa).toEqual(
+      gerarPessoa({
+        semente: 'botai',
+        hoje: HOJE,
+        cartao: { provedor: 'pagarme', cenario: 'recusado' },
+      }),
+    )
+  })
+
+  test('pessoa --cenario sem --cartao usa a stripe', () => {
+    const r = rodar('pessoa', '--semente', 'x', '--cenario', 'recusado-saldo')
+    expect(
+      (JSON.parse(r.stdout) as EnvelopeDaPessoa).pessoa.cartao,
+    ).toMatchObject({
+      provedor: 'stripe',
+      cenario: 'recusado-saldo',
+      numero: '4000000000009995',
+    })
+  })
+
+  const CSV = [
+    '--semente',
+    'lote',
+    '--hoje',
+    HOJE,
+    '--formato',
+    'csv',
+    '--campos',
+    'nome,cartao_numero,cartao_provedor,cartao_cenario',
+  ]
+
+  test('pessoas --cenarios sem -n: n é a soma, em grupos na ordem dada', () => {
+    const r = rodar(
+      'pessoas',
+      '--cartao',
+      'pagarme',
+      '--cenarios',
+      'recusado:10,aprovado:2,pendente:1',
+      ...CSV,
+    )
+    const lote = gerarPessoas(13, {
+      semente: 'lote',
+      hoje: HOJE,
+      cartao: {
+        provedor: 'pagarme',
+        cenarios: { recusado: 10, aprovado: 2, pendente: 1 },
+      },
+    })
+    expect(r).toEqual({
+      codigo: 0,
+      stdout: `nome,cartao_numero,cartao_provedor,cartao_cenario\r\n${lote
+        .map(
+          (p) =>
+            `${p.nome.completo},${p.cartao.numero},pagarme,${p.cartao.cenario}\r\n`,
+        )
+        .join('')}`,
+      stderr: '',
+    })
+    expect(r.stdout.trimEnd().split('\r\n')).toHaveLength(14)
+  })
+
+  test('com -n igual à soma, a saída é a mesma', () => {
+    const argv = ['pessoas', '--cenarios', 'recusado:2,aprovado:1', ...CSV]
+    expect(rodar(...argv, '-n', '3')).toEqual(rodar(...argv))
+  })
+
+  test('--cartao sem --cenarios: todas aprovadas no provedor', () => {
+    const r = rodar('pessoas', '-n', '3', '--cartao', 'pagarme', ...CSV)
+    expect(
+      r.stdout
+        .trimEnd()
+        .split('\r\n')
+        .slice(1)
+        .map((l) => l.split(',').slice(1).join(',')),
+    ).toEqual(Array(3).fill('4000000000000010,pagarme,aprovado'))
+  })
+
+  // Cada linha reproduz sozinha: botai pessoa --semente <a da linha> --cartao <provedor> --cenario <cenário>.
+  test('ndjson com cenários: cada linha tem a semente exata e o cartão do grupo', () => {
+    const linhas = rodar(
+      'pessoas',
+      '--cenarios',
+      'chargeback:1,aprovado:1',
+      '--cartao',
+      'pagarme',
+      '--semente',
+      'lote',
+      '--hoje',
+      HOJE,
+      '--formato',
+      'ndjson',
+    )
+      .stdout.trimEnd()
+      .split('\n')
+      .map((l) => JSON.parse(l) as EnvelopeDaPessoa)
+    expect(linhas.map((l) => [l.semente, l.pessoa.cartao.cenario])).toEqual([
+      ['lote/0', 'chargeback'],
+      ['lote/1', 'aprovado'],
+    ])
+    for (const l of linhas)
+      expect(
+        (
+          JSON.parse(
+            rodar(
+              'pessoa',
+              '--semente',
+              l.semente,
+              '--hoje',
+              l.hoje,
+              '--cartao',
+              l.pessoa.cartao.provedor,
+              '--cenario',
+              l.pessoa.cartao.cenario,
+            ).stdout,
+          ) as EnvelopeDaPessoa
+        ).pessoa,
+      ).toEqual(l.pessoa)
+  })
+})
+
+describe('botai cartao', () => {
+  test.each([
+    [[], '5555555555554444'],
+    [['--formatado'], '5555 5555 5555 4444'],
+    [['--cartao', 'pagarme'], '4000000000000010'],
+    [
+      ['--cartao', 'pagarme', '--cenario', 'chargeback', '--formatado'],
+      '4000 0000 0000 0069',
+    ],
+    [['--cenario', 'recusado-cvc'], '4000000000000127'],
+  ])('%j com --semente avulso', (argv, esperado) => {
+    expect(rodar('cartao', ...argv, '--semente', 'avulso')).toEqual({
+      codigo: 0,
+      stdout: `${esperado}\n`,
+      stderr: '',
+    })
+  })
+
+  test('a semente escolhe entre Visa e Mastercard no aprovado da stripe', () => {
+    for (const semente of ['avulso', 'b', 'c', 'd'])
+      expect(rodar('cartao', '--semente', semente).stdout).toBe(
+        `${escolherNumero(rngDeSemente(semente)).numero}\n`,
+      )
+  })
+
+  test('sem semente, sorteia um número do catálogo que passa no Luhn', () => {
+    const numero = rodar('cartao').stdout.trim()
+    expect(luhnValido(numero)).toBe(true)
+    expect(
+      CATALOGO_DE_CARTOES.stripe[0].numeros.map((n) => n.numero),
+    ).toContain(numero)
+  })
+})
+
 describe('avulsos', () => {
   test.each([
     [['cpf'], '37188580375'],
@@ -224,6 +394,14 @@ describe('ajuda e versão', () => {
   test.each([
     [['pessoa', '--help'], '--dominio-email'],
     [['pessoas', '-h'], 'Colunas: nome, prenome'],
+    [['pessoas', '-h'], 'cartao_provedor, cartao_cenario'],
+    [['pessoas', '-h'], '--cenarios C:N,C:N'],
+    [['pessoa', '--help'], '--cenario C'],
+    [['pessoa', '--help'], 'pendente-cancelado'],
+    [['cartao', '--help'], '4000 0000 0000 0069'],
+    [['cartao', '--help'], 'docs.pagar.me'],
+    [['--help'], 'botai cartao [--cartao stripe|pagarme]'],
+    [['--help'], 'recusado-expirado'],
     [['cpf', '--help'], '--formatado'],
     [['validar', '--help'], 'Tipos: cpf'],
   ])('%j', (argv, trecho) => {
@@ -256,7 +434,72 @@ describe('erros de uso: saída 2, mensagem no stderr e nada no stdout', () => {
     [['pessoa', '--uf', 'XX'], '--uf: uf desconhecida "XX"'],
     [['pessoa', '--hoje', '2026-02-30'], '--hoje: hoje precisa ser uma data'],
     [['pessoa', '--dominio-email', 'localhost'], '--dominio-email: domínio'],
-    [['pessoas'], '-n é obrigatório'],
+    [['pessoas'], '-n é obrigatório sem --cenarios'],
+    [
+      ['pessoa', '--cartao', 'adyen'],
+      '--cartao: provedor de cartão desconhecido "adyen" (use stripe, pagarme)',
+    ],
+    [
+      ['pessoa', '--cenario', 'chargeback'],
+      '--cenario: cenário desconhecido "chargeback" para o provedor stripe (use aprovado, recusado, pendente, recusado-saldo, recusado-roubado, recusado-perdido, recusado-expirado, recusado-cvc, erro-processamento)',
+    ],
+    [['pessoa', '--cenarios', 'aprovado:1'], 'opção desconhecida: --cenarios'],
+    [
+      ['pessoas', '-n', '1', '--cenario', 'recusado'],
+      'opção desconhecida: --cenario',
+    ],
+    [
+      ['pessoas', '-n', '5', '--cenarios', 'recusado:10'],
+      '-n: n (5) diferente da soma dos cenários (10)',
+    ],
+    [
+      [
+        'pessoas',
+        '--cartao',
+        'pagarme',
+        '--cenarios',
+        'recusado-cvc:1',
+        '--formato',
+        'csv',
+      ],
+      '--cenarios: cenário desconhecido "recusado-cvc" para o provedor pagarme',
+    ],
+    [
+      ['pessoas', '--cenarios', 'recusado'],
+      '--cenarios: cenarios precisa ser cenario:quantidade',
+    ],
+    [
+      ['pessoas', '--cenarios', 'recusado:0', '--formato', 'sql'],
+      '--cenarios: quantidade inválida "0"',
+    ],
+    [
+      ['pessoas', '--cenarios', 'aprovado:1,aprovado:2'],
+      '--cenarios: cenário repetido "aprovado"',
+    ],
+    [
+      [
+        'pessoas',
+        '--cenarios',
+        'aprovado:100000,recusado:1',
+        '--formato',
+        'csv',
+      ],
+      '--cenarios: a soma dos cenários (100001) passa do limite de 100000 pessoas',
+    ],
+    [
+      ['pessoas', '--cartao', 'adyen', '--cenarios', 'aprovado:1'],
+      '--cartao: provedor de cartão desconhecido',
+    ],
+    [
+      ['cartao', '--cartao', 'adyen'],
+      '--cartao: provedor de cartão desconhecido',
+    ],
+    [
+      ['cartao', '--cenario', 'pendente-3ds'],
+      '--cenario: cenário desconhecido "pendente-3ds"',
+    ],
+    [['cartao', '--uf', 'SP'], 'opção desconhecida: --uf'],
+    [['cartao', 'extra'], 'argumento inesperado: extra'],
     [['pessoas', '-n', 'x'], '-n precisa ser um inteiro'],
     [['pessoas', '-n', '100001', '--formato', 'csv'], '-n: n precisa ser'],
     [['pessoas', '-n', '100001', '--formato', 'sql'], '-n: n precisa ser'],
