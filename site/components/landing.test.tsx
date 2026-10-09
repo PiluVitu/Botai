@@ -53,6 +53,39 @@ describe('Landing', () => {
       ).toBeTruthy()
   })
 
+  // O main é a coluna: o hero e as 10 seções; cabeçalho e rodapé ficam fora dele.
+  it('o main tem o hero, os números e as seções; o cabeçalho e o rodapé ficam fora', () => {
+    renderizar()
+    const main = screen.getByRole('main')
+    expect(
+      [...main.children].map(
+        (secao) =>
+          secao.getAttribute('aria-labelledby') ??
+          secao.getAttribute('aria-label'),
+      ),
+    ).toEqual([
+      'hero-titulo',
+      'Números',
+      'portas-titulo',
+      'semente-titulo',
+      'pessoa-titulo',
+      'quem-titulo',
+      'integracoes-titulo',
+      'extensao-titulo',
+      'cuidados-titulo',
+      'final-titulo',
+    ])
+    expect(main).not.toContainElement(screen.getByRole('banner'))
+    expect(main).not.toContainElement(screen.getByRole('contentinfo'))
+  })
+
+  it('o «Instalar a extensão» do hero leva à seção Extensão', () => {
+    renderizar()
+    expect(
+      screen.getByRole('link', { name: 'Instalar a extensão' }),
+    ).toHaveAttribute('href', '#extensao')
+  })
+
   it('a marca leva ao início da página', () => {
     renderizar()
     expect(

@@ -28,7 +28,10 @@ test.describe('/privacidade', () => {
 
   test('a landing leva até aqui', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: 'Política de privacidade' }).click()
+    await page
+      .getByRole('region', { name: 'Fictício, mas com cuidado.' })
+      .getByRole('link', { name: 'Política de privacidade' })
+      .click()
     await expect(page).toHaveURL('/privacidade')
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Política de privacidade',
@@ -41,7 +44,7 @@ test.describe('/privacidade', () => {
     await page.goto('/')
     await page
       .getByRole('contentinfo')
-      .getByRole('link', { name: 'Privacidade', exact: true })
+      .getByRole('link', { name: 'Política de privacidade', exact: true })
       .click()
     await expect(page).toHaveURL('/privacidade')
     await page

@@ -21,7 +21,6 @@ describe('ParaQuem', () => {
     expect(secao).toHaveAttribute('id', 'para-quem')
     expect(secao).toHaveAttribute('aria-labelledby', 'quem-titulo')
     expect(within(secao).getByText('04')).toBeInTheDocument()
-    expect(secao.querySelector('[data-esqueleto]')).toBeNull()
   })
 
   it('cinco personas e o convite, numa grade só', () => {

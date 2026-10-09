@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/piluvitu-design-system-c5cbccd6-fba7-4d67-9f03-d4819fa56130/styles.css">
+<script src="_ds/piluvitu-design-system-c5cbccd6-fba7-4d67-9f03-d4819fa56130/_ds_bundle.js"></script>
+<style>body{margin:0;background:#e9ecf1}a{color:#075985}a:hover{color:#0c4a6e}</style>
+</helmet>
+<section style="padding:64px;font-family:var(--font-sans);display:flex;flex-direction:column;gap:32px">
+<p style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em;color:#0f141f">Botaí v2 · telas</p>
+<div style="display:flex;gap:64px;align-items:flex-start">
+<div id="1a" style="display:flex;flex-direction:column;gap:12px"><span style="font-family:var(--font-mono);font-size:14px;color:#334155">1a · desktop 1440 · escuro</span><iframe src="Botai v2.dc.html?tema=escuro" title="Desktop escuro" onLoad="{{ medir }}" style="width:1440px;height:{{ hD }}px;border:0;border-radius:12px;background:#090b11"></iframe></div>
+<div id="1b" style="display:flex;flex-direction:column;gap:12px"><span style="font-family:var(--font-mono);font-size:14px;color:#334155">1b · desktop 1440 · claro</span><iframe src="Botai v2.dc.html?tema=claro" title="Desktop claro" onLoad="{{ medir }}" style="width:1440px;height:{{ hD }}px;border:0;border-radius:12px;background:#f7f9fc"></iframe></div>
+<div id="1c" style="display:flex;flex-direction:column;gap:12px"><span style="font-family:var(--font-mono);font-size:14px;color:#334155">1c · mobile 390 · escuro</span><iframe src="Botai v2.dc.html?tema=escuro" title="Mobile escuro" onLoad="{{ medir }}" style="width:390px;height:{{ hM }}px;border:0;border-radius:12px;background:#090b11"></iframe></div>
+<div id="1d" style="display:flex;flex-direction:column;gap:12px"><span style="font-family:var(--font-mono);font-size:14px;color:#334155">1d · mobile 390 · claro</span><iframe src="Botai v2.dc.html?tema=claro" title="Mobile claro" onLoad="{{ medir }}" style="width:390px;height:{{ hM }}px;border:0;border-radius:12px;background:#f7f9fc"></iframe></div>
+<div id="1e" style="display:flex;flex-direction:column;gap:12px"><span style="font-family:var(--font-mono);font-size:14px;color:#334155">1e · Open Graph 1200×630</span><iframe src="Botai v2 OG.dc.html" title="Open Graph" style="width:1200px;height:630px;border:0;border-radius:12px"></iframe></div>
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { hD: 7600, hM: 15000 };
+  medir = (ev) => {
+    const f = ev.currentTarget;
+    const tentar = (n) => {
+      try {
+        const d = f.contentDocument;
+        const ft = d && d.querySelector('footer');
+        const h = ft && Math.ceil(ft.getBoundingClientRect().bottom + d.defaultView.scrollY);
+        if (h && h > 1200) {
+          const k = f.offsetWidth > 800 ? 'hD' : 'hM';
+          if (Math.abs(h - this.state[k]) > 4) this.setState({ [k]: h });
+        }
+      } catch (e) {}
+      if (n > 0) setTimeout(() => tentar(n - 1), 1200);
+    };
+    tentar(6);
+  };
+  renderVals() { return { medir: this.medir, hD: this.state.hD, hM: this.state.hM }; }
+}
+</script>
+</body>
+</html>

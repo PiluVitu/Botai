@@ -1,12 +1,60 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+import type { AxeResults, RunOptions } from 'axe-core'
 import { LOJA_UI } from '../components/lojas-ui'
 import { CAPTURAS } from '../lib/capturas'
 import { ANCORAS_DA_LANDING } from '../lib/conteudo'
+import { COMANDO_DO_EXEMPLO } from '../lib/exemplo'
+import { ESTADO_SEM_URL, NOME_DO_NAVEGADOR } from '../lib/extensao'
 import { lerUrlsDasLojas } from '../lib/lojas'
 import { botoesDasLojas } from '../lib/modelo'
+import { PORTAS } from '../lib/portas'
 
 // O esperado sai do mesmo lojas.json que a página lê no build.
 const botoes = botoesDasLojas(lerUrlsDasLojas())
+
+// Os elementos do topo, do main e do rodapé que passam da coluna (a do main). O vazamento para o
+// gutter não aumenta o scrollWidth, então cada caixa é conferida. A tabela de atalhos rola dentro
+// da moldura dela (região focável), e o que está lá dentro fica de fora da conta.
+async function vazadosDaColuna(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const coluna = (
+      document.querySelector('main') as HTMLElement
+    ).getBoundingClientRect()
+    return [...document.querySelectorAll('header *, main *, footer *')]
+      .filter((elemento) => !elemento.closest('[role="region"][tabindex]'))
+      .filter((elemento) => {
+        const caixa = elemento.getBoundingClientRect()
+        return (
+          caixa.width > 1 &&
+          (caixa.right > coluna.right + 0.5 || caixa.left < coluna.left - 0.5)
+        )
+      })
+      .map(
+        (elemento) =>
+          `${elemento.tagName} ${(elemento.textContent ?? '').slice(0, 40)}`,
+      )
+  })
+}
+
+async function violacoesDoAxe(page: Page): Promise<string[]> {
+  await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') })
+  return page.evaluate(async () => {
+    const { axe } = window as unknown as {
+      axe: { run: (alvo: Document, opcoes: RunOptions) => Promise<AxeResults> }
+    }
+    const { violations } = await axe.run(document, {
+      runOnly: {
+        type: 'tag',
+        values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'],
+      },
+    })
+    return violations
+      .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+      .map(
+        (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`,
+      )
+  })
+}
 
 test.describe('/', () => {
   test('as seções do design, na ordem, sem erro de hidratação', async ({
@@ -39,28 +87,34 @@ test.describe('/', () => {
     expect(erros).toEqual([])
   })
 
-  test('botões de loja seguem o lojas.json: link na publicada, "Em breve" sem link na que falta', async ({
+  test('lojas seguem o lojas.json: link na publicada, o estado em texto na que falta', async ({
     page,
   }) => {
     await page.goto('/')
+    const lista = page
+      .locator('#extensao')
+      .getByRole('list', { name: 'Instalar pela loja' })
     for (const { loja, url } of botoes) {
       const rotulo = LOJA_UI[loja].rotulo
       if (url) {
         const links = page.getByRole('link', { name: rotulo, exact: true })
         await expect(links).toHaveCount(1)
-        for (const link of await links.all()) {
-          await expect(link).toHaveAttribute('href', url)
-          await expect(link).toHaveAttribute('target', '_blank')
-        }
+        await expect(lista.getByRole('link', { name: rotulo })).toHaveAttribute(
+          'href',
+          url,
+        )
+        await expect(links).toHaveAttribute('target', '_blank')
       } else {
-        const botoesDesabilitados = page.getByRole('button', {
-          name: `${rotulo} Em breve`,
-        })
-        await expect(botoesDesabilitados).toHaveCount(1)
-        for (const botao of await botoesDesabilitados.all())
-          await expect(botao).toBeDisabled()
+        await expect(
+          lista.getByRole('listitem').filter({
+            hasText: `${NOME_DO_NAVEGADOR[loja]} ${ESTADO_SEM_URL[loja]}`,
+          }),
+        ).toHaveCount(1)
+        await expect(page.getByRole('link', { name: rotulo })).toHaveCount(0)
       }
     }
+    await expect(lista.getByRole('button')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /em breve/i })).toHaveCount(0)
     if (!botoes.some(({ loja }) => loja === 'edge'))
       await expect(page.getByText('Microsoft Edge Add-ons')).toHaveCount(0)
     await expect(page.locator('a[href="#"]')).toHaveCount(0)
@@ -83,6 +137,48 @@ test.describe('/', () => {
           .evaluate((img) => (img as HTMLImageElement).naturalWidth),
       )
       .toBeGreaterThan(0)
+  })
+
+  // O html leva `motion-safe:scroll-smooth` e o data-scroll-behavior que faz o Next desligar a
+  // rolagem suave na troca de rota (só as âncoras rolam devagar).
+  test('rolagem suave só sem "reduzir movimento"', async ({ page }) => {
+    await page.goto('/')
+    const rolagem = () =>
+      page.evaluate(
+        () => getComputedStyle(document.documentElement).scrollBehavior,
+      )
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-scroll-behavior',
+      'smooth',
+    )
+    expect(await rolagem()).toBe('smooth')
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    expect(await rolagem()).toBe('auto')
+  })
+
+  test('copiar: o comando do hero e o de uma porta vão para a área de transferência', async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.goto('/')
+    const area = () => page.evaluate(() => navigator.clipboard.readText())
+
+    const hero = page.getByRole('button', {
+      name: `Copiar comando: ${COMANDO_DO_EXEMPLO}`,
+    })
+    await hero.click()
+    expect(await area()).toBe(COMANDO_DO_EXEMPLO)
+    await expect(hero.locator('svg[data-icon="check"]')).toBeVisible()
+    await expect(hero.locator('xpath=..').getByRole('status')).toHaveText(
+      'Copiado',
+    )
+
+    const cli = PORTAS.find((porta) => porta.id === 'cli')!
+    await page
+      .getByRole('button', { name: `Copiar comando da porta ${cli.nome}` })
+      .click()
+    expect(await area()).toBe(cli.comando.linhas.join('\n'))
   })
 
   test('o suporte do rodapé leva [Botaí] no assunto', async ({ page }) => {
@@ -114,6 +210,28 @@ test.describe('/', () => {
       )
       await expect(docs).not.toHaveAttribute('target')
     }
+  })
+
+  // O selo «Sem teste · via HTTP» numa coluna de 190 px quebrava em duas linhas dentro da pílula.
+  test('a 1440 px, cada selo das integrações cabe numa linha', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/')
+    const selos = page
+      .getByRole('region', { name: 'O que foi testado, e o que ainda não.' })
+      .locator('li > span')
+    await expect(selos).toHaveCount(13)
+    const alturas = await selos.evaluateAll((spans) =>
+      spans.map((s) => ({
+        texto: s.textContent,
+        linhas: Math.round(
+          s.getBoundingClientRect().height /
+            parseFloat(getComputedStyle(s).lineHeight),
+        ),
+      })),
+    )
+    expect(alturas.filter((s) => s.linhas > 1)).toEqual([])
   })
 
   // Sem piscar: a classe tem de vir do script inline do next-themes, antes de qualquer JS do React.
@@ -190,7 +308,7 @@ test.describe('/', () => {
       .toBe(true)
   })
 
-  test.describe('atalho de quem visita', () => {
+  test.describe('atalho de quem visita, no formulário do hero', () => {
     const CASOS = [
       [
         'MacIntel',
@@ -202,7 +320,7 @@ test.describe('/', () => {
         'Linux x86_64',
         'Mozilla/5.0 (X11; Linux x86_64; rv:153.0) Gecko/20100101 Firefox/153.0',
         'Alt+Shift+P',
-        'Linux',
+        'Firefox no Linux',
       ],
       [
         'Win32',
@@ -229,9 +347,9 @@ test.describe('/', () => {
           { plataforma, userAgent },
         )
         await page.goto('/')
-        const hero = page.locator('section[aria-labelledby="hero-titulo"]')
-        await expect(hero.locator('kbd')).toHaveText(tecla)
-        await expect(hero).toContainText(`preenche a página no ${sistema}`)
+        await expect(
+          page.locator('section[aria-labelledby="hero-titulo"] kbd'),
+        ).toHaveText(tecla)
       })
     }
 
@@ -251,6 +369,59 @@ test.describe('/', () => {
     })
   })
 
+  test.describe('menu de seções, abaixo de 900 px', () => {
+    test.use({ viewport: { width: 390, height: 844 } })
+
+    test('abre, leva à seção e fecha; Escape e clique fora também fecham', async ({
+      page,
+    }) => {
+      await page.goto('/')
+      const banner = page.getByRole('banner')
+      await expect(
+        banner.getByRole('navigation', { name: 'Seções' }),
+      ).toBeHidden()
+      const botao = banner.getByRole('button', { name: 'Abrir menu' })
+      await expect(botao).toHaveAttribute('aria-expanded', 'false')
+
+      await botao.click()
+      await expect(botao).toHaveAttribute('aria-expanded', 'true')
+      const painel = page.locator(
+        `#${await botao.getAttribute('aria-controls')}`,
+      )
+      await expect(painel).toBeVisible()
+      await expect(painel.getByRole('link')).toHaveText(
+        ANCORAS_DA_LANDING.map(({ rotulo }) => rotulo),
+      )
+      await painel.getByRole('link', { name: 'Para quem' }).click()
+      await expect(page).toHaveURL(/#para-quem$/)
+      await expect(page.locator('#para-quem h2')).toBeInViewport()
+      await expect(botao).toHaveAttribute('aria-expanded', 'false')
+      await expect(painel).toBeHidden()
+
+      await botao.click()
+      await page.keyboard.press('Escape')
+      await expect(botao).toHaveAttribute('aria-expanded', 'false')
+      await expect(botao).toBeFocused()
+
+      // O painel cobre o hero logo abaixo do cabeçalho: o clique fora vai no gutter, no pé da tela.
+      await botao.click()
+      await expect(painel).toBeVisible()
+      await page.mouse.click(4, 830)
+      await expect(botao).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    test('aberto, passa no axe e cabe na coluna a 320 px', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 800 })
+      await page.goto('/')
+      await page.getByRole('button', { name: 'Abrir menu' }).click()
+      await expect(
+        page.getByRole('banner').getByRole('navigation', { name: 'Seções' }),
+      ).toBeVisible()
+      expect(await vazadosDaColuna(page)).toEqual([])
+      expect(await violacoesDoAxe(page)).toEqual([])
+    })
+  })
+
   // Review Focus 3.
   test.describe('a 320 px', () => {
     test.use({ viewport: { width: 320, height: 800 } })
@@ -265,8 +436,8 @@ test.describe('/', () => {
       expect(largura.rolavel).toBeLessThanOrEqual(largura.visivel)
     })
 
-    // Um botão que vaza para dentro do gutter não aumenta o scrollWidth: confere cada um contra a lista.
-    test('nenhum botão de loja passa da borda da lista', async ({ page }) => {
+    // Um item que vaza para dentro do gutter não aumenta o scrollWidth: confere cada um contra a lista.
+    test('nenhuma loja passa da borda da lista', async ({ page }) => {
       await page.goto('/')
       const listas = page.getByRole('list', { name: 'Instalar pela loja' })
       await expect(listas).toHaveCount(1)
@@ -283,40 +454,24 @@ test.describe('/', () => {
       expect(vazados).toEqual([])
     })
 
-    // O cabeçalho tem a marca, as 4 âncoras, o Docs, o GitHub e o tema, e o rodapé tem o Docs ao lado
-    // do Suporte: os dois quebram linha. Como nos botões de loja, o vazamento para o gutter não
-    // aparece no scrollWidth.
-    test('o cabeçalho, as portas e o rodapé não passam da coluna', async ({
+    // Cabeçalho (marca, Docs só com ícone, GitHub, tema e menu), hero (comando e as duas janelas),
+    // portas, extensão e rodapé: os comandos quebram por palavra em vez de vazar.
+    test('nada do cabeçalho, das seções e do rodapé passa da coluna', async ({
       page,
     }) => {
       await page.goto('/')
-      await expect(page.locator('#portas h2')).toBeAttached()
-      await expect(
+      for (const alvo of [
+        page.getByRole('banner'),
+        page.locator('section[aria-labelledby="hero-titulo"] pre'),
+        page.locator('#portas h2'),
+        page.locator('#extensao h2'),
         page.getByRole('contentinfo').getByRole('link', { name: 'Docs' }),
-      ).toBeAttached()
-      const vazados = await page.evaluate(() => {
-        const coluna = (
-          document.querySelector('main') as HTMLElement
-        ).getBoundingClientRect()
-        return [
-          ...document.querySelectorAll('header *'),
-          ...document.querySelectorAll('footer *'),
-          ...document.querySelectorAll('#portas *'),
-        ]
-          .filter((elemento) => {
-            const caixa = elemento.getBoundingClientRect()
-            return (
-              caixa.width > 0 &&
-              (caixa.right > coluna.right + 0.5 ||
-                caixa.left < coluna.left - 0.5)
-            )
-          })
-          .map(
-            (elemento) =>
-              `${elemento.tagName} ${(elemento.textContent ?? '').slice(0, 40)}`,
-          )
-      })
-      expect(vazados).toEqual([])
+      ])
+        await expect(alvo.first()).toBeAttached()
+      await expect(
+        page.getByRole('banner').getByRole('link', { name: 'Docs' }),
+      ).toBeVisible()
+      expect(await vazadosDaColuna(page)).toEqual([])
     })
   })
 })

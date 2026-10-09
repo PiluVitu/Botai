@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { expect, test } from '@playwright/test'
+import { ESTADO_SEM_URL, NOME_DO_NAVEGADOR } from '../lib/extensao'
 import { lerUrlsDasLojas } from '../lib/lojas'
 
 // Roda só pelo playwright.lojas.config.ts, que builda a landing com este arquivo no lugar do lojas.json.
@@ -30,17 +31,24 @@ test('Firefox publicado: um link, na seção Extensão, em aba nova', async ({
   }
 })
 
-// Review Focus 1: link de outra loja ou em http não vira botão. O Edge sem link nem aparece.
-test('Chrome e Opera seguem "Em breve", desabilitados e sem link, e o Edge some', async ({
+// Review Focus 1: link de outra loja ou em http não vira link. Sem URL, a loja é texto com o estado
+// (nunca botão desabilitado), e o Edge sem link nem aparece.
+test('Chrome e Opera viram texto com o estado, sem link nem botão, e o Edge some', async ({
   page,
 }) => {
   await page.goto('/')
+  const lista = page
+    .locator('#extensao')
+    .getByRole('list', { name: 'Instalar pela loja' })
   await expect(page.getByText('Microsoft Edge Add-ons')).toHaveCount(0)
-  for (const rotulo of ['Chrome Web Store', 'Opera add-ons']) {
-    const botoes = page.getByRole('button', { name: `${rotulo} Em breve` })
-    await expect(botoes).toHaveCount(1)
-    for (const botao of await botoes.all()) await expect(botao).toBeDisabled()
-  }
+  for (const loja of ['chrome', 'opera'] as const)
+    await expect(
+      lista.getByRole('listitem').filter({
+        hasText: `${NOME_DO_NAVEGADOR[loja]} ${ESTADO_SEM_URL[loja]}`,
+      }),
+    ).toHaveCount(1)
+  await expect(lista.getByRole('button')).toHaveCount(0)
+  await expect(lista.getByRole('link')).toHaveCount(1)
   await expect(page.locator('a[href*="microsoftedge"]')).toHaveCount(0)
 })
 

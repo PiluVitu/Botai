@@ -63,9 +63,4 @@ describe('Portas', () => {
     expect(comTestado).toEqual(['Motor'])
     expect(secao()).not.toHaveTextContent(/dispon[ií]vel/i)
   })
-
-  it('sem o marcador do esqueleto', () => {
-    const { container } = render(<Portas />)
-    expect(container.querySelector('[data-esqueleto]')).toBeNull()
-  })
 })

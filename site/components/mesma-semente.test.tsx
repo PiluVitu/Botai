@@ -117,11 +117,6 @@ describe('MesmaSemente', () => {
       'CODE',
     )
   })
-
-  it('sem o marcador do esqueleto', () => {
-    const { container } = render(<MesmaSemente />)
-    expect(container.querySelector('[data-esqueleto]')).toBeNull()
-  })
 })
 
 describe('os fatos da seção', () => {

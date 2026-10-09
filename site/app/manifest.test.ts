@@ -12,7 +12,7 @@ it('nome, idioma, cores e o ícone de 300×300', () => {
     name: 'Botaí',
     short_name: 'Botaí',
     description:
-      'Extensão para Chrome, Firefox, Edge e Opera que gera dados de teste: CPF e CNPJ válidos, CEP real com endereço, e preenche o formulário com um atalho.',
+      'Dados de teste brasileiros para formulários: CPF e CNPJ válidos, CEP real com endereço. Extensão para Chrome e Firefox, CLI, servidor HTTP, Docker e Playwright.',
     lang: 'pt-BR',
     start_url: '/',
     display: 'browser',

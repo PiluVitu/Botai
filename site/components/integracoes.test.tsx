@@ -20,7 +20,6 @@ describe('Integracoes', () => {
         'O motor roda em qualquer ferramenta que execute JS na página, e o servidor atende qualquer linguagem que fale HTTP. O selo diz o que já tem teste.',
       ),
     ).toBeInTheDocument()
-    expect(secao.querySelector('[data-esqueleto]')).toBeNull()
   })
 
   it('as 13 integrações, cada uma com o nome e o selo', () => {

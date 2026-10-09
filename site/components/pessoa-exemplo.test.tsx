@@ -32,7 +32,6 @@ describe('PessoaExemplo', () => {
         'A UF do endereço amarra o CPF, o DDD e o título. Todos os documentos passam no dígito verificador.',
       ),
     ).toBeInTheDocument()
-    expect(secao.querySelector('[data-esqueleto]')).toBeNull()
   })
 
   it('o nome, o nascimento e a semente saem da pessoa do exemplo', () => {

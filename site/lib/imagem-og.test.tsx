@@ -23,10 +23,19 @@ jest.mock('next/og', () => ({
   },
 }))
 
-type Falsa = { elemento: ReactElement; opcoes: unknown }
+type Fonte = { name: string; data: Buffer; weight: number; style: string }
+type Falsa = {
+  elemento: ReactElement
+  opcoes: { width: number; height: number; fonts: Fonte[] }
+}
+
+let falsa: Falsa
+beforeAll(async () => {
+  falsa = (await imagemOgDaHome()) as unknown as Falsa
+})
 
 function cartao(): Falsa {
-  return imagemOgDaHome() as unknown as Falsa
+  return falsa
 }
 
 type Props = { style?: CSSProperties; children?: ReactNode }
@@ -46,8 +55,48 @@ function* elementos(no: ReactNode): Generator<ReactElement<Props>> {
 
 describe('imagem OG da home', () => {
   it('1200×630, como as outras rotas', () => {
-    expect(cartao().opcoes).toEqual({ width: 1200, height: 630 })
+    expect(cartao().opcoes).toMatchObject({ width: 1200, height: 630 })
     expect(size).toEqual({ width: 1200, height: 630 })
+  })
+
+  // A hierarquia do design depende do peso 800 e da mono; a fonte padrão do next/og só tem o 400.
+  // O Satori lê .woff (não .woff2), e nada é baixado no build: os arquivos vêm do node_modules.
+  it('as fontes do design, de arquivo local: Plus Jakarta Sans 800 e JetBrains Mono 400', () => {
+    const fontes = cartao().opcoes.fonts
+    expect(
+      fontes.map(({ name, weight, style }) => ({ name, weight, style })),
+    ).toEqual([
+      { name: 'Plus Jakarta Sans', weight: 800, style: 'normal' },
+      { name: 'JetBrains Mono', weight: 400, style: 'normal' },
+    ])
+    for (const { data } of fontes)
+      expect(Buffer.from(data).subarray(0, 4).toString('latin1')).toBe('wOFF')
+  })
+
+  it('a marca e o título em Plus Jakarta Sans; domínio, comando e pé em JetBrains Mono', () => {
+    const fontes = new Map<string, unknown>()
+    // A fonte é herdada, como no CSS: o texto fica com a do ancestral mais próximo que a declara.
+    function percorrer(no: ReactNode, herdada: unknown) {
+      if (!isValidElement<Props>(no)) return
+      if (typeof no.type === 'function') {
+        percorrer((no.type as (p: Props) => ReactNode)(no.props), herdada)
+        return
+      }
+      const fonte = no.props.style?.fontFamily ?? herdada
+      for (const filho of Children.toArray(no.props.children))
+        if (typeof filho === 'string') fontes.set(filho, fonte)
+        else percorrer(filho, fonte)
+    }
+    percorrer(cartao().elemento, undefined)
+    for (const texto of [NOME, POSICIONAMENTO])
+      expect(fontes.get(texto)).toBe('Plus Jakarta Sans')
+    for (const texto of [
+      'botai.pilutech.com.br',
+      COMANDO_DO_OG,
+      PE_DO_OG,
+      'Powered by PiluTech',
+    ])
+      expect(fontes.get(texto)).toBe('JetBrains Mono')
   })
 
   it('o texto do design: marca, domínio, posicionamento, comando, portas e PiluTech', () => {
@@ -107,14 +156,14 @@ describe('imagem OG da home', () => {
     }
   })
 
-  it('a rota da home usa o cartão novo e o alt do posicionamento', () => {
+  it('a rota da home usa o cartão novo e o alt do posicionamento', async () => {
     expect(alt).toBe(
       'Botaí: dados de teste brasileiros em todo lugar que o seu teste roda',
     )
     expect(alt).toBe(
       `${NOME}: ${POSICIONAMENTO.charAt(0).toLowerCase()}${POSICIONAMENTO.slice(1, -1)}`,
     )
-    const { container } = render((Image() as unknown as Falsa).elemento)
+    const { container } = render(((await Image()) as unknown as Falsa).elemento)
     expect(container).toHaveTextContent(POSICIONAMENTO)
   })
 })

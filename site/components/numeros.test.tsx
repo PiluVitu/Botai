@@ -30,8 +30,4 @@ describe('Numeros', () => {
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
   })
-
-  it('nada é esqueleto', () => {
-    expect(renderizar().querySelector('[data-esqueleto]')).toBeNull()
-  })
 })

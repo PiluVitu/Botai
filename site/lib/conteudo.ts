@@ -14,7 +14,6 @@ export const PROPOSTA =
 export const POSICIONAMENTO =
   'Dados de teste brasileiros em todo lugar que o seu teste roda.'
 export const URL_DA_PILUTECH = 'https://pilutech.com.br'
-export const URL_DA_PILULABS = 'https://piluvitu.com.br/pilulabs'
 export const URL_DA_DOCUMENTACAO = 'https://docs.botai.pilutech.com.br'
 export const EMAIL_DE_SUPORTE = EMAIL_DA_PILUTECH
 export const MAILTO = {
@@ -32,11 +31,6 @@ export const ANCORAS_DA_LANDING = [
   { id: 'extensao', rotulo: 'Extensão' },
 ] as const
 export type AncoraDaLanding = (typeof ANCORAS_DA_LANDING)[number]['id']
-
-export const DOCUMENTOS = [
-  { href: '/privacidade', rotulo: 'Privacidade' },
-  { href: '/termos', rotulo: 'Termos de uso' },
-]
 
 export function historicoDe(arquivo: string): string {
   return `${REPOSITORIO}/commits/main/site/${arquivo}`

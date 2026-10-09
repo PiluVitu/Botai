@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   ANCORAS_DA_LANDING,
-  DOCUMENTOS,
   EMAIL_DE_SUPORTE,
   historicoDe,
   MAILTO,
@@ -15,7 +14,6 @@ import {
   REQUISITOS_DO_SOFTWARE,
   URL_DA_DOCUMENTACAO,
   URL_DA_LICENCA,
-  URL_DA_PILULABS,
   URL_DA_PILUTECH,
 } from './conteudo'
 
@@ -80,13 +78,6 @@ describe('documentos e código-fonte', () => {
     )
     expect(licenca).toMatch(/^MIT License\n\nCopyright \(c\) \d{4} PiluTech\n/)
   })
-
-  it('o rodapé leva à privacidade e aos termos, nessa ordem', () => {
-    expect(DOCUMENTOS).toEqual([
-      { href: '/privacidade', rotulo: 'Privacidade' },
-      { href: '/termos', rotulo: 'Termos de uso' },
-    ])
-  })
 })
 
 describe('contato e links da PiluTech', () => {
@@ -103,8 +94,7 @@ describe('contato e links da PiluTech', () => {
     })
   })
 
-  it('a vitrine PiluLabs mora no piluvitu.com.br, e a PiluTech no pilutech.com.br', () => {
-    expect(URL_DA_PILULABS).toBe('https://piluvitu.com.br/pilulabs')
+  it('a PiluTech mora no pilutech.com.br', () => {
     expect(URL_DA_PILUTECH).toBe('https://pilutech.com.br')
   })
 

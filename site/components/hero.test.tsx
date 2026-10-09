@@ -74,11 +74,10 @@ describe('Hero', () => {
     expect(hero.querySelector('kbd')).toHaveTextContent('Ctrl+Shift+Y')
   })
 
-  it('o formulário diz «6 de 6 campos preenchidos», e nada é esqueleto', () => {
+  it('o formulário diz «6 de 6 campos preenchidos»', () => {
     const hero = renderizar()
     expect(
       within(hero).getByText('6 de 6 campos preenchidos'),
     ).toBeInTheDocument()
-    expect(hero.querySelector('[data-esqueleto]')).toBeNull()
   })
 })

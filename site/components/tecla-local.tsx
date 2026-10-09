@@ -38,12 +38,3 @@ export function TeclaLocal({ className }: { className?: string }) {
     </kbd>
   )
 }
-
-export function AtalhoLocal() {
-  const { nomeDoSistema } = useAtalhoDoVisitante()
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <TeclaLocal /> preenche a página no {nomeDoSistema}
-    </span>
-  )
-}

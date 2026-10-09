@@ -4,7 +4,7 @@ import { NOME } from './conteudo'
 export const TITULO_DA_HOME =
   'Botaí: gerador de CPF, CNPJ e CEP para testar formulários'
 export const DESCRICAO_DA_HOME =
-  'Extensão para Chrome, Firefox, Edge e Opera que gera dados de teste: CPF e CNPJ válidos, CEP real com endereço, e preenche o formulário com um atalho.'
+  'Dados de teste brasileiros para formulários: CPF e CNPJ válidos, CEP real com endereço. Extensão para Chrome e Firefox, CLI, servidor HTTP, Docker e Playwright.'
 export const TITULO_DA_PRIVACIDADE = 'Política de privacidade do Botaí'
 export const DESCRICAO_DA_PRIVACIDADE =
   'Como o Botaí trata seus dados: a extensão não envia nada. O que ela acessa e guarda, as permissões, o que este site registra e seus direitos na LGPD.'

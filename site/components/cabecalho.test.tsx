@@ -70,10 +70,9 @@ describe('Cabecalho', () => {
     )
   })
 
-  it('a linha pode quebrar, e nada fica marcado como esqueleto', () => {
+  it('a linha pode quebrar', () => {
     renderizar()
     const banner = screen.getByRole('banner')
     expect(banner).toHaveClass('relative', 'flex-wrap')
-    expect(banner.querySelector('[data-esqueleto]')).toBeNull()
   })
 })

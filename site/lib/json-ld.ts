@@ -7,6 +7,7 @@ import {
   REQUISITOS_DO_SOFTWARE,
   URL_DA_PILUTECH,
 } from './conteudo'
+import { DESCRICAO_DA_HOME } from './seo'
 import { urlAbsoluta } from './site'
 
 export const CONTEXTO = 'https://schema.org'
@@ -40,6 +41,7 @@ export function jsonLdDaHome(
         '@type': 'WebSite',
         '@id': `${raiz}#site`,
         name: NOME,
+        description: DESCRICAO_DA_HOME,
         url: raiz,
         inLanguage: 'pt-BR',
         publisher: pilutech,

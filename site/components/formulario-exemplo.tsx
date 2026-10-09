@@ -5,7 +5,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { cn } from '@piluvitu/ui/cn'
 import { PESSOA_DO_EXEMPLO } from '@/lib/exemplo'
-import { TeclaLocal } from './atalho-local'
+import { TeclaLocal } from './tecla-local'
 import { JanelaExemplo } from './janela-exemplo'
 
 const { nome, email, cpf, celular, endereco } = PESSOA_DO_EXEMPLO
