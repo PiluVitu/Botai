@@ -1,6 +1,6 @@
 {
-  "formato": 1,
-  "motor": "0.2.0",
+  "formato": 2,
+  "motor": "0.5.0",
   "semente": "lote",
   "hoje": "2026-10-05",
   "pessoas": [
@@ -64,7 +64,9 @@
         "validade": "07/29",
         "mes": "07",
         "ano": "29",
-        "cvv": "763"
+        "cvv": "763",
+        "provedor": "stripe",
+        "cenario": "aprovado"
       }
     },
     {
@@ -127,7 +129,9 @@
         "validade": "08/31",
         "mes": "08",
         "ano": "31",
-        "cvv": "716"
+        "cvv": "716",
+        "provedor": "stripe",
+        "cenario": "aprovado"
       }
     },
     {
@@ -190,7 +194,9 @@
         "validade": "01/29",
         "mes": "01",
         "ano": "29",
-        "cvv": "529"
+        "cvv": "529",
+        "provedor": "stripe",
+        "cenario": "aprovado"
       }
     },
     {
@@ -253,7 +259,9 @@
         "validade": "02/31",
         "mes": "02",
         "ano": "31",
-        "cvv": "651"
+        "cvv": "651",
+        "provedor": "stripe",
+        "cenario": "aprovado"
       }
     },
     {
@@ -316,7 +324,9 @@
         "validade": "11/28",
         "mes": "11",
         "ano": "28",
-        "cvv": "353"
+        "cvv": "353",
+        "provedor": "stripe",
+        "cenario": "aprovado"
       }
     }
   ]
