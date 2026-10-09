@@ -1,15 +1,9 @@
 ---
 title: Pessoas favoritas
 sidebar_label: Favoritos
-description: Guarde até 3 pessoas favoritas com apelido, troque a pessoa ativa no popup e preencha a página com qualquer uma pelo botão direito. Chega na versão 1.1.0.
+description: Guarde até 3 pessoas favoritas com apelido, troque a pessoa ativa no popup e preencha a página com qualquer uma pelo botão direito. Desde a versão 1.1.0.
 sidebar_position: 5
 ---
-
-:::note[Documentado]
-
-Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas: elas têm a 1.0.0. Esta página vem do código da 1.1.0, e a auditoria de 2026-10-08 não a rodou.
-
-:::
 
 Além da pessoa ativa, a extensão guarda até 3 pessoas favoritas, cada uma com um apelido. Com elas, você volta a uma pessoa que já cadastrou num ambiente de teste, sem gerar outra.
 

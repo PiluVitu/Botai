@@ -98,12 +98,6 @@ O campo pode não ter sido reconhecido. O classificador lê, nesta ordem, o `aut
 
 ## Como volto a uma pessoa que já usei na extensão? {#voltar-a-uma-pessoa}
 
-:::note[Documentado]
-
-Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.1.0, e a auditoria de 2026-10-08 não o rodou.
-
-:::
-
 Guarde-a nos favoritos: a estrela, no popup, guarda até 3 pessoas, cada uma com um apelido. Para voltar, clique no favorito no popup ou use o botão direito › Botaí › Preencher com. "Nova pessoa" não apaga favoritos. Mais em [Pessoas favoritas](./extensao/favoritos.md).
 
 Para a mesma pessoa em outra máquina, use uma semente na CLI ou no fixture ([Semente e hoje](./conceitos/semente-e-hoje.md)).

@@ -119,7 +119,7 @@ Mais em [Download e verificação](../binarios/download-e-verificacao.md).
 | Edge (Chromium 123+) | a mesma página da Chrome Web Store                                                                       |
 | Firefox 153.0+       | [Firefox Add-ons](https://addons.mozilla.org/pt-BR/firefox/addon/bota%C3%AD/)                            |
 
-As duas lojas estão no ar com a versão 1.0.0. O Opera 109+ está em revisão na loja. Safari e Firefox para Android estão fora.
+As duas lojas estão no ar com a versão 1.2.0. O Opera 109+ está em revisão na loja. Safari e Firefox para Android estão fora.
 
 Mais em [Instalar a extensão](../extensao/instalar.md).
 

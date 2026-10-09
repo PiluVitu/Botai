@@ -60,7 +60,7 @@ Porta é cada jeito de usar o Botaí. Todas usam o mesmo gerador, e as que preen
 
 O que cada linha tem de prova:
 
-- **Extensão:** as duas lojas estão no ar com a versão 1.0.0, e o E2E roda no Chromium.
+- **Extensão:** as duas lojas estão no ar com a versão 1.2.0, e o E2E roda no Chromium.
 - **Imagem:** as duas arquiteturas estão publicadas; a linux/arm64 rodou na auditoria.
 - **Binários:** o darwin-arm64 rodou na auditoria.
 - **Motor:** provado no Playwright sem o fixture e no CDP puro, o protocolo do Puppeteer.
