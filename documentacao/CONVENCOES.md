@@ -17,7 +17,7 @@ A árvore é a da seção 10 do relatório. As pastas já existem, cada uma com 
 | `intro.md` (`slug: /`, a raiz do site)                                                                                                                                      | 1                |
 | `comecar/`: `escolha-sua-porta`, `primeira-pessoa`, `instalacao`                                                                                                            | 1, 2, 3          |
 | `conceitos/`: `a-pessoa`, `semente-e-hoje`, `lote-e-unicidade`, `envelope-e-esquema`, `dados-por-tras`, `versoes-e-dourados`, `uso-responsavel`                             | 1 a 7            |
-| `extensao/`: `instalar`, `preencher-a-pagina`, `inserir-um-campo`, `popup`, `privacidade-e-permissoes`, `limites`                                                           | 1 a 6            |
+| `extensao/`: `instalar`, `preencher-a-pagina`, `inserir-um-campo`, `popup`, `favoritos`, `privacidade-e-permissoes`, `limites`                                              | 1 a 7            |
 | `cli/`: `visao-geral`, `pessoa`, `pessoas`, `geradores-avulsos`, `validar`, `codigos-de-saida`, `receitas-de-banco`                                                         | 1 a 7            |
 | `servidor/`: `botai-serve`, `api-http`, `seguranca-e-limites`                                                                                                               | 1, 2, 3          |
 | `docker/`: `imagem`, `github-actions`, `docker-compose`                                                                                                                     | 1, 2, 3          |
@@ -85,6 +85,7 @@ Ninguém rodou esta receita com o Selenium. O que foi provado: o motor preenche 
 ```
 
 - O aviso fica logo antes do trecho que ele qualifica; se vale para a página inteira (como `integracoes/selenium.md`), fica no topo, antes da primeira seção.
+- **Recurso de uma versão da extensão que ainda não saiu nas lojas** (hoje, os favoritos da 1.1.0, em `extensao/favoritos.md`): é "documentado". A página do recurso leva o `:::note[Documentado]` no topo, com a versão em que ele chega; a seção de outra página que o descreve leva o mesmo aviso; a menção de uma linha (item de lista, link) diz "a partir da versão X" e linka a página. Quando a loja publicar a versão, tire os avisos e o "ainda não saiu nas lojas" (`grep -rn "1.1.0" docs`).
 - `:::caution` e `:::note` com esses títulos são **reservados** ao status. Para o resto: `:::tip` (dica prática), `:::info` (contexto) e `:::danger` (armadilha que dá resultado errado sem erro, como "pessoa X não é a 1ª de pessoas X" ou o motor de outra janela dando 0 preenchidos). Não use `:::warning`: ele se parece com o `:::caution`.
 - Linha em branco depois de `:::tipo[Título]` e antes do `:::` final (o Prettier pede).
 

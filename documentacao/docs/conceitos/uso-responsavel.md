@@ -45,7 +45,7 @@ O `botai serve` não tem CORS, TLS nem autenticação. Por padrão, ele escuta s
 
 ## A extensão não fala com a rede {#extensao}
 
-A extensão não faz nenhuma chamada de rede e não pede `host_permission` em produção. As permissões são `activeTab`, `scripting`, `contextMenus` e `storage` (o Firefox soma `menus`), e no Firefox `data_collection_permissions` é `none`. A pessoa fica guardada só na chave `local:botai_pessoa` do `storage.local`. Mais em [Privacidade e permissões](../extensao/privacidade-e-permissoes.md).
+A extensão não faz nenhuma chamada de rede e não pede `host_permission` em produção. As permissões são `activeTab`, `scripting`, `contextMenus` e `storage` (o Firefox soma `menus`), e no Firefox `data_collection_permissions` é `none`. A pessoa ativa fica guardada só na chave `local:botai_pessoa` do `storage.local`. A partir da versão 1.1.0, as até 3 [pessoas favoritas](../extensao/favoritos.md), com os apelidos, ficam na chave `local:botai_favoritos`, também só no navegador. Mais em [Privacidade e permissões](../extensao/privacidade-e-permissoes.md#o-que-fica-guardado).
 
 ## O que o Botaí não gera {#nao-gera}
 

@@ -115,6 +115,7 @@ O motor roda no mundo MAIN da página: um site que troca protótipos nativos pod
 ## Extensão {#extensao}
 
 - **Sem opções**: não há semente, UF nem domínio de e-mail.
+- **Favoritos** (a partir da versão 1.1.0): até 3, com apelido de até 24 caracteres, só no navegador, sem sincronizar ([Pessoas favoritas](./extensao/favoritos.md)).
 - **O `activeTab` cai quando a aba navega**: cada etapa de um fluxo precisa de um novo gesto (atalho, popup ou menu).
 - **Páginas proibidas** (`chrome://`, `about:`, lojas de extensão, leitor de PDF, `file:` sem permissão): a extensão não preenche, e o atalho não faz nada.
 - **O E2E funcional existe só no Chromium.** Firefox, Edge e Opera reais dependem de checklists manuais.

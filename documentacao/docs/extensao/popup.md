@@ -1,6 +1,6 @@
 ---
 title: O popup
-description: Os cinco estados do popup do Botaí, de 1a a 1e, como copiar um valor da pessoa e como achar um campo não reconhecido com a mira.
+description: Os cinco estados do popup do Botaí, de 1a a 1e, como copiar um valor da pessoa, achar um campo não reconhecido com a mira e usar os favoritos.
 sidebar_position: 4
 ---
 
@@ -31,6 +31,24 @@ Se o formulário é seu, a lista diz o que ajustar: um `autocomplete` ou um labe
 ## Trocar a pessoa
 
 "Nova pessoa" troca a pessoa guardada. Os próximos preenchimentos e cópias usam a nova.
+
+## Favoritos {#favoritos}
+
+:::note[Documentado]
+
+Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.1.0, e a auditoria de 2026-10-08 não o rodou.
+
+:::
+
+O popup guarda até 3 [pessoas favoritas](./favoritos.md), cada uma com um apelido, além da pessoa ativa (a que o atalho, o botão "Preencher esta página" e o menu usam):
+
+- a estrela ao lado do nome guarda a pessoa ativa nos favoritos ou a tira de lá;
+- o lápis troca o apelido, que começa com o primeiro nome e tem até 24 caracteres;
+- os chips "Favoritos n/3" trocam a pessoa ativa: clique num favorito para usá-lo;
+- tirar um favorito mostra "Desfazer" por 5 s;
+- com 3 guardados, a estrela fica desabilitada.
+
+"Nova pessoa" troca só a ativa e nunca apaga um favorito.
 
 ## O atalho
 
