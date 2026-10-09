@@ -9,8 +9,8 @@ test.describe('/privacidade', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Política de privacidade do Botaí',
     )
-    await expect(page.locator('time[datetime="2026-10-02"]')).toHaveText(
-      '2 de outubro de 2026',
+    await expect(page.locator('time[datetime="2026-10-09"]')).toHaveText(
+      '9 de outubro de 2026',
     )
     await expect(
       page
@@ -21,6 +21,9 @@ test.describe('/privacidade', () => {
     ).toBeVisible()
     await expect(page.getByRole('row', { name: /^menus\b/ })).toContainText(
       'Só no Firefox',
+    )
+    await expect(page.getByRole('row', { name: /^storage\b/ })).toContainText(
+      'até 3 favoritas',
     )
     await page.getByRole('link', { name: 'Botaí', exact: true }).click()
     await expect(page).toHaveURL('/')

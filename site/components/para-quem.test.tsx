@@ -66,6 +66,7 @@ describe('ParaQuem', () => {
     expect(
       Array.from(secao.querySelectorAll('code'), (c) => c.textContent),
     ).toEqual([
+      'Botão direito › Botaí › Preencher com',
       'Botão direito › Botaí › Inserir',
       'botai.preencher(page)',
       '--uf PI',

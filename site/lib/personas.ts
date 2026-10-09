@@ -22,6 +22,7 @@ export const PERSONAS: Persona[] = [
     etiquetas: ['extensão'],
     itens: [
       'Um atalho preenche o cadastro inteiro, e a mesma pessoa fica guardada entre as etapas de um fluxo.',
+      'Guarde até 3 pessoas favoritas, com apelido, e preencha com qualquer uma em `Botão direito › Botaí › Preencher com`.',
       '`Botão direito › Botaí › Inserir` põe CPF, e-mail, CEP e mais 20 tipos num campo só.',
       '“Abrir caixa de entrada” abre a caixa pública, onde chega o e-mail de confirmação.',
     ],

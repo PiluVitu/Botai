@@ -15,9 +15,10 @@ describe('/privacidade', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Política de privacidade do Botaí',
     )
-    const data = screen.getByText('2 de outubro de 2026')
+    // A data muda com o texto: é a da 1.1.0, que trouxe os favoritos.
+    const data = screen.getByText('9 de outubro de 2026')
     expect(data.tagName).toBe('TIME')
-    expect(data).toHaveAttribute('dateTime', '2026-10-02')
+    expect(data).toHaveAttribute('dateTime', '2026-10-09')
   })
 
   it('as seções da política, na ordem', () => {
@@ -46,22 +47,66 @@ describe('/privacidade', () => {
     expect(
       screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent),
     ).toEqual([
-      'A pessoa fictícia gerada',
+      'A pessoa fictícia ativa',
+      'As pessoas favoritas e os apelidos',
       'Os campos e o endereço da aba',
       'A escolha de tema claro ou escuro',
       'Os registros de acesso a este site',
       'O que você manda ao suporte por e-mail',
     ])
     const listas = document.querySelectorAll('dl')
-    expect(listas).toHaveLength(5)
+    expect(listas).toHaveLength(6)
     for (const lista of listas)
       expect(
         [...lista.querySelectorAll('dt')].map((dt) => dt.textContent),
       ).toEqual(['Para quê', 'Base legal', 'Com quem', 'Por quanto tempo'])
-    expect(listas[3]).toHaveTextContent('art. 7º, IX')
-    expect(listas[3]).toHaveTextContent('Vercel')
-    expect(listas[4]).toHaveTextContent('art. 7º, II')
-    expect(listas[4]).toHaveTextContent('Gmail')
+    expect(listas[4]).toHaveTextContent('art. 7º, IX')
+    expect(listas[4]).toHaveTextContent('Vercel')
+    expect(listas[5]).toHaveTextContent('art. 7º, II')
+    expect(listas[5]).toHaveTextContent('Gmail')
+  })
+
+  // Contrato da 1.1.0: storage.local com local:botai_pessoa (a ativa) e local:botai_favoritos (até 3).
+  it('"O que fica guardado": a pessoa ativa e até 3 favoritas, com apelido, só no navegador', () => {
+    const paragrafo = screen.getByRole('heading', {
+      level: 2,
+      name: 'O que fica guardado',
+    }).nextElementSibling
+    for (const trecho of [
+      'Só a pessoa de teste ativa',
+      'até 3 pessoas favoritas que você guardar',
+      'com o apelido que você der',
+      'no armazenamento local da extensão no seu navegador (storage.local).',
+      'Nada disso é sincronizado entre dispositivos nem enviado.',
+    ])
+      expect(paragrafo).toHaveTextContent(trecho)
+    expect(screen.getByRole('row', { name: /^storage\b/ })).toHaveTextContent(
+      'a pessoa fictícia ativa e até 3 favoritas, com os apelidos',
+    )
+  })
+
+  // "Nova pessoa" troca só a ativa e nunca apaga um favorito.
+  it('os favoritos ficam até você tirá-los, e "Nova pessoa" não os apaga', () => {
+    const [ativa, favoritas] = document.querySelectorAll('dl')
+    expect(ativa).toHaveTextContent(
+      'Até você clicar em “Nova pessoa”, escolher uma favorita ou remover a extensão.',
+    )
+    expect(favoritas).toHaveTextContent(
+      'Até você tirar a pessoa dos favoritos ou remover a extensão. “Nova pessoa” não apaga favoritos.',
+    )
+    const apagar = screen.getByRole('heading', {
+      level: 2,
+      name: 'Como apagar os dados',
+    }).nextElementSibling
+    expect(apagar).toHaveTextContent(
+      '“Nova pessoa”, no popup ou no menu, troca a pessoa ativa por outra, mas não apaga os favoritos.',
+    )
+    expect(apagar).toHaveTextContent(
+      'A estrela, no popup, tira uma pessoa dos favoritos.',
+    )
+    expect(document.body).toHaveTextContent(
+      'A pessoa fictícia ativa e as favoritas, com os apelidos, ficam no perfil do seu navegador',
+    )
   })
 
   it('os direitos do art. 18, o prazo e a ANPD', () => {
@@ -87,19 +132,24 @@ describe('/privacidade', () => {
   })
 
   // O menu real (criarMenus) tem também "Nova pessoa" e "Abrir caixa de entrada",
-  // e este abre um site de terceiro: a permissão precisa dizer isso.
+  // e este abre um site de terceiro: a permissão precisa dizer isso. A lista não é
+  // exata: a 1.1.0 soma o "Preencher com" (os favoritos), e todo título literal do
+  // menus.ts precisa aparecer na linha.
   it('a linha do contextMenus cita cada item do menu do botão direito', () => {
     const itens = [
       ...ler('src/lib/menus.ts').matchAll(/title: '([^']+)'/g),
     ].map((m) => m[1])
-    expect(itens).toEqual([
-      'Preencher esta página',
-      'Inserir',
-      'Nova pessoa',
-      'Abrir caixa de entrada',
-    ])
+    expect(itens).toEqual(
+      expect.arrayContaining([
+        'Preencher esta página',
+        'Inserir',
+        'Nova pessoa',
+        'Abrir caixa de entrada',
+      ]),
+    )
     const linha = screen.getByRole('row', { name: /^contextMenus\b/ })
     for (const item of itens) expect(linha).toHaveTextContent(item)
+    expect(linha).toHaveTextContent('“Preencher com” (um dos favoritos)')
     expect(linha).toHaveTextContent('site de terceiro')
   })
 
@@ -107,7 +157,7 @@ describe('/privacidade', () => {
   // resultado (api.ts, para o "Mostrar" do popup) e regrava 1 s depois
   // (segunda-passada.ts). Nada disso é gravado em disco nem enviado.
   it('o que a extensão lê da página fica na memória dela até recarregar', () => {
-    const campos = document.querySelectorAll('dl')[1]
+    const campos = document.querySelectorAll('dl')[2]
     expect(campos).toHaveTextContent(
       'Na memória da página, até ela ser recarregada, trocada por outra ou fechada. Nada é gravado nem enviado.',
     )
@@ -145,12 +195,13 @@ describe('/privacidade', () => {
   })
 
   // Review Focus 1: o texto vale antes e depois das lojas, e ele lê a URL da aba ativa.
+  // Com as pessoas favoritas, os favoritos que ele não lê são os do navegador.
   it('não afirma o que o código não sustenta', () => {
     expect(document.body).not.toHaveTextContent(
       /dispon[ií]vel|publicad[oa] nas lojas|Na Firefox Add-ons/i,
     )
     expect(document.body).toHaveTextContent(
-      'não lê o histórico, outras abas, favoritos nem cookies',
+      'não lê o histórico, outras abas, os favoritos do navegador nem cookies',
     )
   })
 

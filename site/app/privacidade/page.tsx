@@ -18,7 +18,7 @@ import {
 } from '@/lib/seo'
 import { urlDoSite } from '@/lib/site'
 
-const VIGENCIA = { iso: '2026-10-02', texto: '2 de outubro de 2026' }
+const VIGENCIA = { iso: '2026-10-09', texto: '9 de outubro de 2026' }
 const POLITICA_DA_VERCEL = 'https://vercel.com/legal/privacy-policy'
 const POLITICA_DO_GOOGLE = 'https://policies.google.com/privacy'
 const ANPD = 'https://www.gov.br/anpd/pt-br'
@@ -39,13 +39,13 @@ const PERMISSOES = [
   {
     nome: 'contextMenus',
     paraQue:
-      'Os itens do botão direito: “Preencher esta página”, “Inserir › CPF / E-mail / CEP…”, “Nova pessoa” e “Abrir caixa de entrada”, que abre numa aba nova a caixa pública do e-mail gerado, num site de terceiro.',
+      'Os itens do botão direito: “Preencher esta página”, “Preencher com” (um dos favoritos), “Inserir › CPF / E-mail / CEP…”, “Nova pessoa” e “Abrir caixa de entrada”, que abre numa aba nova a caixa pública do e-mail gerado, num site de terceiro.',
     onde: 'Todos',
   },
   {
     nome: 'storage',
     paraQue:
-      'Guardar no seu navegador a pessoa fictícia gerada, para repetir o mesmo cadastro.',
+      'Guardar no seu navegador a pessoa fictícia ativa e até 3 favoritas, com os apelidos, para repetir o mesmo cadastro.',
     onde: 'Todos',
   },
   {
@@ -58,11 +58,21 @@ const PERMISSOES = [
 
 const TRATAMENTOS = [
   {
-    dado: 'A pessoa fictícia gerada',
+    dado: 'A pessoa fictícia ativa',
     paraQue: 'Repetir o mesmo cadastro até você pedir outra pessoa.',
     base: 'Não se aplica: ela é inventada e fica só no seu navegador. A PiluTech não a recebe.',
     comQuem: 'Ninguém.',
-    prazo: 'Até você clicar em “Nova pessoa” ou remover a extensão.',
+    prazo:
+      'Até você clicar em “Nova pessoa”, escolher uma favorita ou remover a extensão.',
+  },
+  {
+    dado: 'As pessoas favoritas e os apelidos',
+    paraQue:
+      'Voltar a uma pessoa que você guardou, pelo popup ou pelo “Preencher com” do botão direito.',
+    base: 'Não se aplica: as pessoas são inventadas, o apelido é o que você escreve, e tudo fica só no seu navegador. A PiluTech não os recebe.',
+    comQuem: 'Ninguém.',
+    prazo:
+      'Até você tirar a pessoa dos favoritos ou remover a extensão. “Nova pessoa” não apaga favoritos.',
   },
   {
     dado: 'Os campos e o endereço da aba',
@@ -125,9 +135,9 @@ export default function PrivacidadePage() {
           <>
             a extensão {NOME} não coleta nem envia dados. Ela só lê os
             formulários da aba em que você a aciona, no seu navegador, e guarda
-            nele a pessoa fictícia que gerou. Este site não usa cookies nem
-            analytics; a hospedagem registra dados técnicos de acesso, como em
-            qualquer site.
+            nele a pessoa fictícia ativa e até 3 favoritas que você escolher.
+            Este site não usa cookies nem analytics; a hospedagem registra dados
+            técnicos de acesso, como em qualquer site.
           </>
         }
       >
@@ -164,11 +174,14 @@ export default function PrivacidadePage() {
 
         <h2>O que fica guardado</h2>
         <p>
-          Só a pessoa fictícia gerada (nome, documentos, endereço, contato,
-          empresa e cartão de teste), no armazenamento local da extensão no seu
-          navegador (<code>storage.local</code>). Assim você repete o mesmo
-          cadastro até pedir outra pessoa. Ela não é sincronizada entre
-          dispositivos.
+          Só a pessoa de teste ativa, a que o atalho, o botão “Preencher esta
+          página” e o menu usam, e até 3 pessoas favoritas que você guardar, com
+          o apelido que você der a cada uma. As pessoas são fictícias (nome,
+          documentos, endereço, contato, empresa e cartão de teste) e ficam só
+          no armazenamento local da extensão no seu navegador (
+          <code>storage.local</code>). Nada disso é sincronizado entre
+          dispositivos nem enviado. Assim você repete o mesmo cadastro até pedir
+          outra pessoa, ou volta a uma favorita.
         </p>
 
         <h2>O que é enviado</h2>
@@ -238,13 +251,15 @@ export default function PrivacidadePage() {
         </table>
         <p>
           Ele não pede acesso a todos os sites e não lê o histórico, outras
-          abas, favoritos nem cookies.
+          abas, os favoritos do navegador nem cookies.
         </p>
 
         <h2>Como apagar os dados</h2>
         <p>
-          “Nova pessoa”, no popup, troca a pessoa guardada por outra. Remover a
-          extensão apaga o armazenamento local dela.
+          “Nova pessoa”, no popup ou no menu, troca a pessoa ativa por outra,
+          mas não apaga os favoritos. A estrela, no popup, tira uma pessoa dos
+          favoritos. Remover a extensão apaga o armazenamento local dela, com a
+          pessoa ativa e os favoritos.
         </p>
 
         <h2>Este site</h2>
@@ -313,10 +328,10 @@ export default function PrivacidadePage() {
         <h2>Segurança</h2>
         <p>
           A extensão não envia nada, então não existe dado dela num servidor
-          para vazar. A pessoa fictícia fica no perfil do seu navegador, sem
-          criptografia própria: quem usa o seu computador e o seu perfil
-          consegue vê-la. Este site só responde por HTTPS. O código da extensão
-          e o do site são{' '}
+          para vazar. A pessoa fictícia ativa e as favoritas, com os apelidos,
+          ficam no perfil do seu navegador, sem criptografia própria: quem usa o
+          seu computador e o seu perfil consegue vê-las. Este site só responde
+          por HTTPS. O código da extensão e o do site são{' '}
           <a href={REPOSITORIO} target="_blank" rel="noopener noreferrer">
             abertos
           </a>{' '}
