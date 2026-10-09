@@ -6,7 +6,7 @@ O nome vem de "bota aí", expressão piauiense, e é o que a extensão faz: bota
 
 ## O que gera
 
-Uma pessoa de teste falsa e coerente, que fica guardada até você pedir outra:
+Uma pessoa de teste falsa e coerente, que fica guardada até você pedir outra (e até 3 favoritas, com apelido, para voltar a elas depois):
 
 - CPF e CNPJ com os dígitos verificadores corretos, além de RG, PIS/NIS e título de eleitor;
 - CEP real, com rua, bairro, cidade e UF que batem com ele;
@@ -44,6 +44,7 @@ Uma pessoa de teste falsa e coerente, que fica guardada até você pedir outra:
 - **A página inteira:** `⌥⇧P` no Mac ou `Ctrl+Shift+Y` no Windows e no Linux (no Firefox para Linux, `Alt+Shift+P`), ou clique no ícone do Botaí e em "Preencher esta página".
 - **Um campo só:** botão direito no campo › `Botaí › Inserir › CPF` (ou E-mail, CEP…), para o que a detecção automática errar.
 - **Ver e copiar os dados:** o popup mostra a pessoa inteira; "Nova pessoa" gera outra.
+- **Favoritos:** a estrela ao lado do nome guarda a pessoa ativa, com um apelido ("admin do staging", "comprador PJ"); cabem até 3. Um clique no chip do favorito a torna a pessoa ativa de novo, que é a que o atalho e o "Preencher" usam; pelo botão direito, `Botaí › Preencher com › <apelido>` preenche a página com ela direto. "Nova pessoa" troca só a ativa: os favoritos ficam. Clicar de novo na estrela tira o favorito, e o "Desfazer" o devolve por 5 segundos.
 
 ## Cuidados
 
@@ -90,7 +91,7 @@ O Botaí sai em quatro lojas pela PiluTech. Como o release funciona está no [`C
 
 ## Privacidade e termos
 
-O Botaí não coleta nem envia dados: ele só lê os formulários da aba em que você o aciona e guarda no navegador a pessoa fictícia que gerou. A [política de privacidade](https://botai.pilutech.com.br/privacidade) e os [termos de uso](https://botai.pilutech.com.br/termos) moram no site do Botaí; o texto deles fica em `site/app/privacidade/page.tsx` e `site/app/termos/page.tsx`.
+O Botaí não coleta nem envia dados: ele só lê os formulários da aba em que você o aciona e guarda no navegador a pessoa fictícia ativa e até 3 favoritas que você guardar. A [política de privacidade](https://botai.pilutech.com.br/privacidade) e os [termos de uso](https://botai.pilutech.com.br/termos) moram no site do Botaí; o texto deles fica em `site/app/privacidade/page.tsx` e `site/app/termos/page.tsx`.
 
 ## Licença
 

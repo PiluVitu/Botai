@@ -1,8 +1,12 @@
-import { render, screen, within } from '@testing-library/react'
+import { montarPessoa } from '@pilutech/botai-core/pessoa'
+import { sfc32 } from '@pilutech/botai-core/prng'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { primeiroNome, type Favorito, type Removido } from '../lib/favoritos'
 import { PESSOA_DOURADA as P } from '../test/pessoa-dourada'
-import { iniciais, PessoaPronta, type PessoaProntaProps } from './pessoa-pronta'
+import { iniciais } from './cabecalho-pessoa'
+import { PessoaPronta, type PessoaProntaProps } from './pessoa-pronta'
 
 function props(extra: Partial<PessoaProntaProps> = {}): PessoaProntaProps {
   return {
@@ -10,25 +14,32 @@ function props(extra: Partial<PessoaProntaProps> = {}): PessoaProntaProps {
     idade: 33,
     atalho: '⌥⇧P',
     preencherDesabilitado: false,
+    favoritos: [],
     onPreencher: vi.fn(),
     onNovaPessoa: vi.fn(),
     onAbrirCaixa: vi.fn(),
     onCopiar: vi
       .fn<(valor: string) => Promise<void>>()
       .mockResolvedValue(undefined),
+    onGuardarFavorito: vi
+      .fn<() => Promise<Favorito | null>>()
+      .mockResolvedValue(null),
+    onTirarFavorito: vi
+      .fn<(id: string) => Promise<Removido | null>>()
+      .mockResolvedValue(null),
+    onDevolverFavorito: vi
+      .fn<(removido: Removido) => Promise<unknown>>()
+      .mockResolvedValue(true),
+    onRenomearFavorito: vi
+      .fn<(id: string, apelido: string) => Promise<unknown>>()
+      .mockResolvedValue(true),
+    onUsarFavorito: vi.fn(),
     ...extra,
   }
 }
 
 const botaoPreencher = () =>
   screen.getByRole('button', { name: /Preencher esta página/ })
-
-describe('iniciais', () => {
-  it('pega a primeira letra do primeiro e do último nome', () => {
-    expect(iniciais('Maria Eduarda Souza')).toBe('MS')
-    expect(iniciais('  vinícius oliveira costa ')).toBe('VC')
-  })
-})
 
 describe('PessoaPronta (1b)', () => {
   it('mostra iniciais, nome, idade e cidade da pessoa', () => {
@@ -119,5 +130,222 @@ describe('PessoaPronta (1b)', () => {
       .click(pessoais.getByRole('button', { name: 'Copiar CPF' }))
     expect(copiar).toHaveBeenCalledWith(P.cpf)
     expect(await pessoais.findByText('copiado')).toBeInTheDocument()
+  })
+})
+
+describe('PessoaPronta (1b): favoritos', () => {
+  const outra = (n: number) =>
+    montarPessoa(sfc32(n, n + 1, n + 2, n + 3), '2026-10-01')
+  const [A, B] = [outra(10), outra(20)]
+  const favorito = (id: string, apelido: string, pessoa = P): Favorito => ({
+    id,
+    apelido,
+    pessoa,
+    guardadoEm: '2026-10-09T12:00:00.000Z',
+  })
+  const ATIVA = favorito('f-ativa', 'admin do staging')
+  const estrela = () =>
+    screen.getByRole('button', { name: /favoritos|Limite de 3/ })
+  const campo = () =>
+    screen.getByRole('textbox', { name: 'Apelido do favorito' })
+
+  it('a faixa de favoritos fica entre a pessoa e o "Preencher"', () => {
+    render(<PessoaPronta {...props()} />)
+    const titulo = screen.getByRole('heading', { level: 2, name: 'Favoritos' })
+    expect(
+      screen
+        .getByRole('heading', { level: 1 })
+        .compareDocumentPosition(titulo) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      titulo.compareDocumentPosition(botaoPreencher()) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('a estrela guarda a ativa e abre o apelido com o primeiro nome; Enter salva o que se digitou', async () => {
+    const guardar = vi
+      .fn<() => Promise<Favorito | null>>()
+      .mockResolvedValue(favorito('f-novo', primeiroNome(P)))
+    const renomear = vi
+      .fn<(id: string, apelido: string) => Promise<unknown>>()
+      .mockResolvedValue(true)
+    render(
+      <PessoaPronta
+        {...props({ onGuardarFavorito: guardar, onRenomearFavorito: renomear })}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(estrela())
+    expect(guardar).toHaveBeenCalledTimes(1)
+    expect(
+      await screen.findByRole('textbox', { name: 'Apelido do favorito' }),
+    ).toHaveValue(primeiroNome(P))
+    expect(campo()).toHaveFocus()
+    await user.keyboard('admin do staging{Enter}')
+    expect(renomear).toHaveBeenCalledWith('f-novo', 'admin do staging')
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('Esc depois de guardar fecha o apelido sem renomear: fica o primeiro nome', async () => {
+    const guardar = vi
+      .fn<() => Promise<Favorito | null>>()
+      .mockResolvedValue(favorito('f-novo', primeiroNome(P)))
+    const renomear = vi.fn()
+    render(
+      <PessoaPronta
+        {...props({ onGuardarFavorito: guardar, onRenomearFavorito: renomear })}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(estrela())
+    await screen.findByRole('textbox', { name: 'Apelido do favorito' })
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('textbox')).toBeNull()
+    expect(renomear).not.toHaveBeenCalled()
+  })
+
+  it('"Guardar esta" faz o mesmo que a estrela', async () => {
+    const guardar = vi
+      .fn<() => Promise<Favorito | null>>()
+      .mockResolvedValue(favorito('f-novo', primeiroNome(P)))
+    render(<PessoaPronta {...props({ onGuardarFavorito: guardar })} />)
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Guardar esta' }))
+    expect(guardar).toHaveBeenCalledTimes(1)
+    expect(
+      await screen.findByRole('textbox', { name: 'Apelido do favorito' }),
+    ).toBeInTheDocument()
+  })
+
+  it('se o storage não guardou (outra janela encheu a lista), não abre o apelido', async () => {
+    render(<PessoaPronta {...props()} />)
+    await userEvent.setup().click(estrela())
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('a ativa favorita mostra o apelido; o lápis abre a edição com ele e salva o novo', async () => {
+    const renomear = vi
+      .fn<(id: string, apelido: string) => Promise<unknown>>()
+      .mockResolvedValue(true)
+    render(
+      <PessoaPronta
+        {...props({ favoritos: [ATIVA], onRenomearFavorito: renomear })}
+      />,
+    )
+    expect(screen.getAllByText('admin do staging')).toHaveLength(2)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Renomear favorito' }))
+    expect(campo()).toHaveValue('admin do staging')
+    await user.clear(campo())
+    await user.type(campo(), 'admin novo')
+    await user.click(screen.getByRole('button', { name: 'Salvar' }))
+    expect(renomear).toHaveBeenCalledWith('f-ativa', 'admin novo')
+  })
+
+  it('tirar a ativa dos favoritos mostra o aviso com Desfazer, que devolve o mesmo favorito', async () => {
+    const removido: Removido = { favorito: ATIVA, posicao: 1 }
+    const tirar = vi
+      .fn<(id: string) => Promise<Removido | null>>()
+      .mockResolvedValue(removido)
+    const devolver = vi
+      .fn<(r: Removido) => Promise<unknown>>()
+      .mockResolvedValue(true)
+    render(
+      <PessoaPronta
+        {...props({
+          favoritos: [favorito('f-a', 'outro', A), ATIVA],
+          onTirarFavorito: tirar,
+          onDevolverFavorito: devolver,
+        })}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(estrela())
+    expect(tirar).toHaveBeenCalledWith('f-ativa')
+    await vi.waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'admin do staging saiu dos favoritos.',
+      ),
+    )
+    await user.click(screen.getByRole('button', { name: 'Desfazer' }))
+    expect(devolver).toHaveBeenCalledWith(removido)
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
+  it('o aviso some sozinho em 5 s', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    try {
+      const tirar = vi
+        .fn<(id: string) => Promise<Removido | null>>()
+        .mockResolvedValue({ favorito: ATIVA, posicao: 0 })
+      render(
+        <PessoaPronta
+          {...props({ favoritos: [ATIVA], onTirarFavorito: tirar })}
+        />,
+      )
+      await userEvent
+        .setup({ advanceTimers: vi.advanceTimersByTime })
+        .click(estrela())
+      await vi.waitFor(() =>
+        expect(screen.getByRole('status')).not.toBeEmptyDOMElement(),
+      )
+      act(() => vi.advanceTimersByTime(5000))
+      expect(screen.getByRole('status')).toBeEmptyDOMElement()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('um chip pede para usar aquele favorito', async () => {
+    const usar = vi.fn()
+    render(
+      <PessoaPronta
+        {...props({
+          favoritos: [favorito('f-a', 'comprador PJ', A)],
+          onUsarFavorito: usar,
+        })}
+      />,
+    )
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'comprador PJ' }))
+    expect(usar).toHaveBeenCalledWith('f-a')
+  })
+
+  it('trocar a ativa no meio da edição cancela o apelido, e ele não volta com ela', async () => {
+    const { rerender } = render(
+      <PessoaPronta {...props({ favoritos: [ATIVA] })} />,
+    )
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Renomear favorito' }))
+    expect(campo()).toBeInTheDocument()
+    rerender(<PessoaPronta {...props({ pessoa: B, favoritos: [ATIVA] })} />)
+    expect(screen.queryByRole('textbox')).toBeNull()
+    rerender(<PessoaPronta {...props({ favoritos: [ATIVA] })} />)
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('com 3 favoritos e a ativa de fora, a estrela fica no limite e a nota explica', async () => {
+    const guardar = vi.fn()
+    render(
+      <PessoaPronta
+        {...props({
+          favoritos: [
+            favorito('f-1', 'um', A),
+            favorito('f-2', 'dois', B),
+            favorito('f-3', 'três', outra(30)),
+          ],
+          onGuardarFavorito: guardar,
+        })}
+      />,
+    )
+    expect(estrela()).toHaveAccessibleName('Limite de 3 favoritos')
+    expect(estrela()).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByText(/Os 3 lugares estão ocupados/)).toBeInTheDocument()
+    await userEvent.setup().click(estrela())
+    expect(guardar).not.toHaveBeenCalled()
   })
 })

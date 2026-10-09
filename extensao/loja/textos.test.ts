@@ -2,6 +2,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { LIMITE_FAVORITOS } from '../src/lib/favoritos'
 import { lerSecoes, permissoesJustificadas } from './textos'
 
 const ler = (arquivo: string) =>
@@ -93,6 +94,7 @@ describe('textos da listagem', () => {
     ].map((m) => m[1])
     expect(itens).toEqual([
       'Preencher esta página',
+      'Preencher com',
       'Inserir',
       'Nova pessoa',
       'Abrir caixa de entrada',
@@ -126,7 +128,8 @@ describe('notas para os revisores', () => {
 })
 
 // A política em botai.pilutech.com.br/privacidade diz que a extensão não envia nada e só
-// guarda a pessoa em local:botai_pessoa. Se um destes falhar, atualize a política antes.
+// guarda no navegador a pessoa ativa (local:botai_pessoa) e até 3 favoritas
+// (local:botai_favoritos). Se um destes falhar, atualize a política antes (site/app/privacidade).
 describe('o que a política promete, o código da extensão cumpre', () => {
   const src = path.join(import.meta.dirname, '..', 'src')
   const fontes = readdirSync(src, { recursive: true, encoding: 'utf8' })
@@ -142,12 +145,24 @@ describe('o que a política promete, o código da extensão cumpre', () => {
       )
   })
 
-  it('uma chave de storage só, local:botai_pessoa, e nada em sync', () => {
+  it('duas chaves de storage, local:botai_favoritos e local:botai_pessoa, e nada em sync', () => {
     const chaves = fontes.flatMap((fonte) =>
       [...fonte.matchAll(/['"`]((?:local|sync|session|managed):[\w-]+)/g)].map(
         (m) => m[1],
       ),
     )
-    expect(chaves).toEqual(['local:botai_pessoa'])
+    expect(chaves.sort()).toEqual([
+      'local:botai_favoritos',
+      'local:botai_pessoa',
+    ])
+  })
+
+  it('a justificativa do storage e a descrição falam dos favoritos com o limite do código', () => {
+    expect(textos.get('Justificativa: storage')).toBe(
+      `Guardar no próprio navegador (storage.local) a pessoa de teste ativa e até ${LIMITE_FAVORITOS} pessoas favoritas que a pessoa guardar, para reutilizá-las. Nada é sincronizado nem enviado.`,
+    )
+    expect(textos.get('Descrição')).toContain(
+      `• até ${LIMITE_FAVORITOS} pessoas favoritas, com apelido, para voltar a elas depois`,
+    )
   })
 })

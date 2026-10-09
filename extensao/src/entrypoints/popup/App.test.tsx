@@ -4,7 +4,10 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Browser } from 'wxt/browser'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
-import { pessoaItem } from '../../lib/armazenamento'
+import { montarPessoa } from '@pilutech/botai-core/pessoa'
+import { sfc32 } from '@pilutech/botai-core/prng'
+import { favoritosItem, pessoaItem } from '../../lib/armazenamento'
+import { primeiroNome, type Favorito } from '../../lib/favoritos'
 import { idadeEm } from '../../lib/hoje'
 import type { RespostaPreencher } from '../../lib/mensagens'
 import { PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
@@ -169,6 +172,122 @@ describe('App do popup', () => {
     )
     await user.click(pessoais.getByRole('button', { name: 'Copiar CPF' }))
     expect(escrever).toHaveBeenCalledWith(P.cpf)
+  })
+})
+
+describe('App do popup: favoritos', () => {
+  const outra = (n: number) =>
+    montarPessoa(sfc32(n, n + 1, n + 2, n + 3), '2026-10-01')
+  const [A, B] = [outra(10), outra(20)]
+  const favorito = (id: string, apelido: string, pessoa: typeof P) =>
+    ({
+      id,
+      apelido,
+      pessoa,
+      guardadoEm: '2026-10-09T12:00:00.000Z',
+    }) satisfies Favorito
+  const estrela = () =>
+    screen.findByRole('button', { name: /favoritos|Limite de 3/ })
+  const guardados = () => favoritosItem.getValue()
+
+  it('a estrela guarda a ativa em local:botai_favoritos e o apelido digitado fica acima do nome', async () => {
+    await pessoaItem.setValue(P)
+    render(<App />)
+    const user = userEvent.setup()
+    await user.click(await estrela())
+    const campo = await screen.findByRole('textbox', {
+      name: 'Apelido do favorito',
+    })
+    expect(campo).toHaveValue(primeiroNome(P))
+    await vi.waitFor(async () =>
+      expect(await guardados()).toEqual([
+        expect.objectContaining({ apelido: primeiroNome(P), pessoa: P }),
+      ]),
+    )
+    await user.clear(campo)
+    await user.type(campo, 'admin do staging{Enter}')
+    await vi.waitFor(async () =>
+      expect((await guardados())[0].apelido).toBe('admin do staging'),
+    )
+    expect(
+      await screen.findByRole('button', { name: 'Tirar dos favoritos' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(
+      screen.getByRole('button', { name: 'admin do staging' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(await pessoaItem.getValue()).toEqual(P)
+  })
+
+  it('o chip troca a ativa pela pessoa do favorito, sem mexer na lista', async () => {
+    const lista = [favorito('f-a', 'comprador PJ', A)]
+    await favoritosItem.setValue(lista)
+    await pessoaItem.setValue(P)
+    render(<App />)
+    await userEvent
+      .setup()
+      .click(await screen.findByRole('button', { name: 'comprador PJ' }))
+    expect(
+      await screen.findByRole('heading', { level: 1, name: A.nome.completo }),
+    ).toBeInTheDocument()
+    expect(await pessoaItem.getValue()).toEqual(A)
+    expect(await guardados()).toEqual(lista)
+  })
+
+  it('"Nova pessoa" troca só a ativa: os favoritos ficam', async () => {
+    const lista = [favorito('f-p', 'admin do staging', P)]
+    await favoritosItem.setValue(lista)
+    await pessoaItem.setValue(P)
+    render(<App />)
+    await userEvent
+      .setup()
+      .click(await screen.findByRole('button', { name: 'Nova pessoa' }))
+    await vi.waitFor(async () =>
+      expect(await pessoaItem.getValue()).not.toEqual(P),
+    )
+    expect(await guardados()).toEqual(lista)
+    expect(
+      await screen.findByRole('button', { name: 'Guardar nos favoritos' }),
+    ).toBeInTheDocument()
+  })
+
+  it('tirar a ativa e desfazer devolve o favorito na mesma posição, com o apelido', async () => {
+    const lista = [
+      favorito('f-a', 'comprador PJ', A),
+      favorito('f-p', 'admin do staging', P),
+      favorito('f-b', 'cliente do PI', B),
+    ]
+    await favoritosItem.setValue(lista)
+    await pessoaItem.setValue(P)
+    render(<App />)
+    const user = userEvent.setup()
+    await user.click(
+      await screen.findByRole('button', { name: 'Tirar dos favoritos' }),
+    )
+    await vi.waitFor(async () =>
+      expect((await guardados()).map((f) => f.id)).toEqual(['f-a', 'f-b']),
+    )
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'admin do staging saiu dos favoritos.',
+    )
+    await user.click(screen.getByRole('button', { name: 'Desfazer' }))
+    await vi.waitFor(async () => expect(await guardados()).toEqual(lista))
+    expect(
+      await screen.findByRole('button', { name: 'Tirar dos favoritos' }),
+    ).toBeInTheDocument()
+  })
+
+  it('com 3 favoritos e a ativa de fora, a estrela fica no limite', async () => {
+    await favoritosItem.setValue([
+      favorito('f-a', 'um', A),
+      favorito('f-b', 'dois', B),
+      favorito('f-c', 'três', outra(30)),
+    ])
+    await pessoaItem.setValue(P)
+    render(<App />)
+    expect(await estrela()).toHaveAccessibleName('Limite de 3 favoritos')
+    await userEvent.setup().click(await estrela())
+    expect(await guardados()).toHaveLength(3)
+    expect(screen.getByText(/Os 3 lugares estão ocupados/)).toBeInTheDocument()
   })
 })
 

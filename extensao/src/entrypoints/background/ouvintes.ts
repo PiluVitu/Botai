@@ -1,12 +1,19 @@
 import type { FieldKind } from '@pilutech/botai-core/campos'
 import { browser, type Browser } from 'wxt/browser'
 import {
+  favoritosItem,
   gerarPessoaNova,
   obterOuGerarPessoa,
   pessoaItem,
+  usarFavorito,
 } from '../../lib/armazenamento'
 import type { Mensagem } from '../../lib/mensagens'
-import { criarMenus, MENU, PREFIXO_INSERIR } from '../../lib/menus'
+import {
+  criarMenus,
+  MENU,
+  PREFIXO_INSERIR,
+  PREFIXO_PREENCHER_COM,
+} from '../../lib/menus'
 import { inserirNoCampo, mostrarCampo, preencherPagina } from './acoes'
 
 export const COMANDO_PREENCHER = 'botai-preencher'
@@ -16,8 +23,14 @@ type CliqueNoMenu = Browser.contextMenus.OnClickData & {
   targetElementId?: number
 }
 
-export async function recriarMenus(): Promise<void> {
-  await criarMenus(await pessoaItem.getValue())
+let filaDosMenus: Promise<void> = Promise.resolve()
+
+export function recriarMenus(): Promise<void> {
+  const vez = filaDosMenus.then(async () =>
+    criarMenus(await pessoaItem.getValue(), await favoritosItem.getValue()),
+  )
+  filaDosMenus = vez.catch(() => undefined)
+  return vez
 }
 
 export async function aoComando(
@@ -41,6 +54,11 @@ export async function aoClicarMenu(
     const pessoa = await obterOuGerarPessoa()
     if (pessoa.email.caixaUrl)
       await browser.tabs.create({ url: pessoa.email.caixaUrl })
+    return
+  }
+  if (id.startsWith(PREFIXO_PREENCHER_COM)) {
+    const favorita = await usarFavorito(id.slice(PREFIXO_PREENCHER_COM.length))
+    if (favorita && aba?.id !== undefined) await preencherPagina(aba.id)
     return
   }
   if (aba?.id === undefined) return

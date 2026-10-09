@@ -1,15 +1,18 @@
 import type { FieldKind } from '@pilutech/botai-core/campos'
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { browser, type Browser } from 'wxt/browser'
+import { primeiroNome, type Favorito } from './favoritos'
 
 export const MENU = {
   preencher: 'botai-preencher',
+  preencherCom: 'botai-preencher-com',
   inserir: 'botai-inserir',
   novaPessoa: 'botai-nova-pessoa',
   abrirCaixa: 'botai-abrir-caixa',
 } as const
 
 export const PREFIXO_INSERIR = 'botai-inserir:'
+export const PREFIXO_PREENCHER_COM = 'botai-preencher-com:'
 
 export const ITENS_INSERIR: readonly {
   kind: FieldKind
@@ -58,7 +61,10 @@ function tituloDoItem(item: ItemInserir, pessoa: Pessoa | null): string {
   return item.rotulo
 }
 
-export async function criarMenus(pessoa: Pessoa | null): Promise<void> {
+export async function criarMenus(
+  pessoa: Pessoa | null,
+  favoritos: readonly Favorito[] = [],
+): Promise<void> {
   await browser.contextMenus.removeAll()
   const paginaECampo = contextos('page', 'editable')
   const campo = contextos('editable')
@@ -69,6 +75,20 @@ export async function criarMenus(pessoa: Pessoa | null): Promise<void> {
     title: 'Preencher esta página',
     contexts: paginaECampo,
   })
+  if (favoritos.length > 0) {
+    criar({
+      id: MENU.preencherCom,
+      title: 'Preencher com',
+      contexts: paginaECampo,
+    })
+    for (const favorito of favoritos)
+      criar({
+        id: `${PREFIXO_PREENCHER_COM}${favorito.id}`,
+        parentId: MENU.preencherCom,
+        title: `${favorito.apelido} · ${primeiroNome(favorito.pessoa)}`,
+        contexts: paginaECampo,
+      })
+  }
   criar({ id: 'botai-sep-1', type: 'separator', contexts: paginaECampo })
   criar({ id: MENU.inserir, title: 'Inserir', contexts: campo })
   ITENS_INSERIR.forEach((item, i) => {

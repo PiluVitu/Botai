@@ -1,7 +1,32 @@
+import { montarPessoa } from '@pilutech/botai-core/pessoa'
+import { sfc32 } from '@pilutech/botai-core/prng'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import { PESSOA_DOURADA } from '../test/pessoa-dourada'
-import { atualizarTitulosMenu, criarMenus, ITENS_INSERIR, MENU } from './menus'
+import { primeiroNome, type Favorito } from './favoritos'
+import {
+  atualizarTitulosMenu,
+  criarMenus,
+  ITENS_INSERIR,
+  MENU,
+  PREFIXO_PREENCHER_COM,
+} from './menus'
+
+const OUTRA = montarPessoa(sfc32(10, 11, 12, 13), '2026-10-01')
+const FAVORITOS: Favorito[] = [
+  {
+    id: 'f-1',
+    apelido: 'admin do staging',
+    pessoa: PESSOA_DOURADA,
+    guardadoEm: '2026-10-09T12:00:00.000Z',
+  },
+  {
+    id: 'f-2',
+    apelido: 'comprador PJ',
+    pessoa: OUTRA,
+    guardadoEm: '2026-10-09T12:05:00.000Z',
+  },
+]
 
 // O fakeBrowser não implementa contextMenus: create/removeAll/update viram stubs.
 const criar = vi.fn()
@@ -150,6 +175,50 @@ describe('criarMenus', () => {
     )
   })
 
+  it('sem favoritos, não há "Preencher com"', async () => {
+    await criarMenus(PESSOA_DOURADA, [])
+    expect(criados().filter((c) => c.id.startsWith(MENU.preencherCom))).toEqual(
+      [],
+    )
+  })
+
+  it('com favoritos, "Preencher com" vem logo depois de "Preencher esta página", nos mesmos contextos', async () => {
+    await criarMenus(PESSOA_DOURADA, FAVORITOS)
+    const topo = criados().filter((c) => c.parentId === undefined)
+    expect(topo.slice(0, 3)).toEqual([
+      {
+        id: 'botai-preencher',
+        title: 'Preencher esta página',
+        contexts: ['page', 'editable'],
+      },
+      {
+        id: 'botai-preencher-com',
+        title: 'Preencher com',
+        contexts: ['page', 'editable'],
+      },
+      { id: 'botai-sep-1', type: 'separator', contexts: ['page', 'editable'] },
+    ])
+  })
+
+  it('um item por favorito, na ordem da lista: "<apelido> · <primeiro nome>"', async () => {
+    await criarMenus(PESSOA_DOURADA, FAVORITOS)
+    expect(PREFIXO_PREENCHER_COM).toBe('botai-preencher-com:')
+    expect(criados().filter((c) => c.parentId === MENU.preencherCom)).toEqual([
+      {
+        id: 'botai-preencher-com:f-1',
+        parentId: 'botai-preencher-com',
+        title: `admin do staging · ${primeiroNome(PESSOA_DOURADA)}`,
+        contexts: ['page', 'editable'],
+      },
+      {
+        id: 'botai-preencher-com:f-2',
+        parentId: 'botai-preencher-com',
+        title: `comprador PJ · ${primeiroNome(OUTRA)}`,
+        contexts: ['page', 'editable'],
+      },
+    ])
+  })
+
   it('mostra o CPF e o CEP da pessoa no título; sem pessoa, só o rótulo', async () => {
     await criarMenus(PESSOA_DOURADA)
     const titulo = (id: string) => criados().find((c) => c.id === id)?.title
@@ -193,7 +262,7 @@ describe('criarMenus por navegador', () => {
 
   it("no Firefox, todo item soma 'password', porque lá 'editable' não inclui senha", async () => {
     vi.stubEnv('FIREFOX', 'true')
-    await criarMenus(null)
+    await criarMenus(null, FAVORITOS)
     const contextosDe = (id: string) =>
       criados().find((c) => c.id === id)?.contexts
     expect(contextosDe('botai-preencher')).toEqual([
@@ -203,6 +272,11 @@ describe('criarMenus por navegador', () => {
     ])
     expect(contextosDe('botai-inserir')).toEqual(['editable', 'password'])
     expect(contextosDe('botai-inserir:senha')).toEqual(['editable', 'password'])
+    expect(contextosDe('botai-preencher-com:f-1')).toEqual([
+      'page',
+      'editable',
+      'password',
+    ])
     expect(criados().every((c) => c.contexts.includes('password'))).toBe(true)
   })
 })

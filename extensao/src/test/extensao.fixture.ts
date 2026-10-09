@@ -8,6 +8,7 @@ import {
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import path from 'node:path'
 import type { browser } from 'wxt/browser'
+import type { Favorito } from '../lib/favoritos'
 import type { Mensagem } from '../lib/mensagens'
 
 declare const chrome: typeof browser
@@ -114,6 +115,13 @@ export async function pessoaGuardada(sw: Worker): Promise<Pessoa | undefined> {
     chrome.storage.local.get('botai_pessoa'),
   )
   return botai_pessoa as Pessoa | undefined
+}
+
+export async function favoritosGuardados(sw: Worker): Promise<Favorito[]> {
+  const { botai_favoritos } = await sw.evaluate(() =>
+    chrome.storage.local.get('botai_favoritos'),
+  )
+  return (botai_favoritos as Favorito[] | undefined) ?? []
 }
 
 export async function idDaAbaAtiva(sw: Worker): Promise<number> {

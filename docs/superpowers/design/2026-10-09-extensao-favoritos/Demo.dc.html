@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Botaí: demo dos favoritos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#38bdf8}a:hover{color:#7dd3fc}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 960px; height: 720px; box-sizing: border-box; padding: 40px; background: #141b29; display: flex; gap: 40px; align-items: flex-start; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #e7ecf3">
+
+  <div style="width: 380px; height: 640px; flex: none; background: #090b11; border: 1px solid #1c3140; border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,.45); display: flex; flex-direction: column; overflow: hidden">
+    <div style="flex: none; display: flex; align-items: center; gap: 8px; padding: 12px 12px 12px 14px; border-bottom: 1px solid #1c3140">
+      <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="#38bdf8"></rect><rect x="3" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="3" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="4.6" y="3" width="1.3" height="4.5" rx="0.3" fill="#0a0f1a"></rect></svg>
+      <span style="font-weight: 700; font-size: 14px; letter-spacing: -.01em">Botaí</span>
+      <span style="font: 500 9.5px 'JetBrains Mono', monospace; letter-spacing: .12em; text-transform: uppercase; color: #94a0b3">dados de teste</span>
+      <span style="margin-left: auto; display: flex; align-items: center; gap: 5px; font: 500 10.5px 'JetBrains Mono', monospace; color: #94a0b3; padding: 3px 8px; border: 1px solid #1c3140; border-radius: 999px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #34d399"></span>localhost:3000</span>
+    </div>
+
+    <div style="flex: 1; min-height: 0; overflow-y: auto">
+      <div style="display: flex; gap: 12px; align-items: center; padding: 16px 12px 10px 16px">
+        <div style="width: 40px; height: 40px; flex: none; border-radius: 999px; background: #141b29; border: 1px solid #1c3140; display: flex; align-items: center; justify-content: center; font: 600 13px 'JetBrains Mono', monospace; color: #38bdf8">{{ p.ini }}</div>
+
+        <sc-if value="{{ naoEditando }}" hint-placeholder-val="{{ true }}">
+          <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px">
+            <sc-if value="{{ favAtiva }}" hint-placeholder-val="{{ true }}">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font: 600 11px 'JetBrains Mono', monospace; color: #f5b82e">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="#f5b82e" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"></path></svg>{{ apelidoAtivo }}
+                <button onClick="{{ renomear }}" aria-label="Renomear favorito" title="Renomear" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 6px; background: transparent; color: #94a0b3; cursor: pointer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></button>
+              </span>
+            </sc-if>
+            <span style="font-size: 16px; font-weight: 700; letter-spacing: -.01em">{{ p.nome }}</span>
+            <span style="font: 500 11px 'JetBrains Mono', monospace; color: #94a0b3">{{ p.idade }} anos · {{ p.cidade }}, {{ p.uf }}</span>
+          </div>
+          <button onClick="{{ estrela }}" aria-pressed="{{ favAtiva }}" aria-label="{{ rotuloEstrela }}" title="{{ rotuloEstrela }}" style="width: 36px; height: 36px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid {{ bordaEstrela }}; background: transparent; color: {{ corEstrela }}; opacity: {{ opacidadeEstrela }}; cursor: {{ cursorEstrela }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="{{ preenchimentoEstrela }}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"></path></svg></button>
+        </sc-if>
+
+        <sc-if value="{{ editando }}" hint-placeholder-val="{{ false }}">
+          <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px">
+            <label for="apelido" style="font: 500 10px 'JetBrains Mono', monospace; letter-spacing: .2em; text-transform: uppercase; color: #f5b82e">Apelido do favorito</label>
+            <div style="display: flex; gap: 6px">
+              <input id="apelido" value="{{ rascunho }}" onChange="{{ digitar }}" onKeyDown="{{ tecla }}" maxlength="24" autofocus="autofocus" style="flex: 1; min-width: 0; height: 32px; box-sizing: border-box; padding: 0 10px; border-radius: 10px; border: 1px solid #38bdf8; background: #0f141f; color: #e7ecf3; font: 500 12.5px 'Plus Jakarta Sans', sans-serif; outline: 2px solid rgba(56,189,248,.25)">
+              <button onClick="{{ salvar }}" style="height: 32px; padding: 0 12px; border: none; border-radius: 10px; background: #38bdf8; color: #04131a; font-weight: 600; font-size: 12.5px; cursor: pointer">Salvar</button>
+            </div>
+            <span style="font: 500 11px 'JetBrains Mono', monospace; color: #94a0b3">{{ contador }}/24 · Enter salva, Esc cancela</span>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ temAviso }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="margin: 0 16px 10px; padding: 8px 8px 8px 12px; border: 1px solid #1c3140; border-radius: 12px; background: #0f141f; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #94a0b3">
+          <span><strong style="color: #e7ecf3">{{ aviso.apelido }}</strong> saiu dos favoritos.</span>
+          <button onClick="{{ desfazer }}" style="margin-left: auto; height: 26px; padding: 0 10px; border: 1px solid #1c3140; border-radius: 8px; background: transparent; color: #38bdf8; font-weight: 600; font-size: 12px; cursor: pointer">Desfazer</button>
+        </div>
+      </sc-if>
+
+      <div style="padding: 2px 16px 12px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 8px; font: 500 10px 'JetBrains Mono', monospace; letter-spacing: .2em; text-transform: uppercase; color: #94a0b3">Favoritos <span style="color: #38bdf8; letter-spacing: 0">{{ total }}/3</span><span style="flex: 1; height: 1px; background: #1c3140"></span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="2">
+            <button onClick="{{ c.usar }}" aria-pressed="{{ c.ativo }}" title="Usar {{ c.apelido }}" style="display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 5px; border-radius: 999px; border: 1px solid {{ c.borda }}; background: {{ c.fundo }}; color: #e7ecf3; font-size: 11.5px; font-weight: 500; cursor: pointer"><span style="width: 22px; height: 22px; border-radius: 999px; background: {{ c.fundoIni }}; color: {{ c.corIni }}; display: flex; align-items: center; justify-content: center; font: 600 9.5px 'JetBrains Mono', monospace">{{ c.ini }}</span>{{ c.apelido }}</button>
+          </sc-for>
+          <sc-if value="{{ podeGuardar }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ estrela }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; border: 1px dashed rgba(56,189,248,.55); background: transparent; color: #38bdf8; font-size: 11.5px; font-weight: 500; cursor: pointer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Guardar esta</button>
+          </sc-if>
+          <sc-if value="{{ semFavoritos }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: #94a0b3">Nenhum ainda. A estrela guarda a pessoa ativa.</span>
+          </sc-if>
+        </div>
+        <sc-if value="{{ limite }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 10px 12px; border: 1px solid #1c3140; background: #0f141f; border-radius: 12px; font-size: 12px; line-height: 1.5; color: #94a0b3">Os 3 lugares estão ocupados. Para guardar <strong style="color: #e7ecf3">{{ p.primeiro }}</strong>, abra um favorito e clique na estrela para tirá-lo.</div>
+        </sc-if>
+      </div>
+
+      <div style="padding: 2px 16px 14px; display: flex; flex-direction: column; gap: 8px">
+        <button onClick="{{ preencher }}" style="height: 40px; border: none; border-radius: 14px; background: #38bdf8; color: #04131a; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg>Preencher esta página<span style="font: 500 10.5px 'JetBrains Mono', monospace; padding: 2px 6px; border-radius: 6px; background: rgba(4,19,26,.14)">⌥⇧P</span></button>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <button onClick="{{ novaPessoa }}" style="height: 32px; border: 1px solid #1c3140; border-radius: 14px; background: transparent; color: #e7ecf3; font-weight: 500; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3"></path></svg>Nova pessoa</button>
+          <button style="height: 32px; border: 1px solid #1c3140; border-radius: 14px; background: transparent; color: #e7ecf3; font-weight: 500; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: default"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 13l3-8h12l3 8v6H3z M3 13h5l1 3h6l1-3h5"></path></svg>Caixa de entrada</button>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid #1c3140; padding: 10px 16px 12px">
+        <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; padding: 5px 0 5px 8px; font-size: 12px"><span style="color: #94a0b3">Nome</span><span style="font: 500 12.5px 'JetBrains Mono', monospace">{{ p.nome }}</span></div>
+        <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; padding: 5px 0 5px 8px; font-size: 12px"><span style="color: #94a0b3">CPF</span><span style="font: 500 12.5px 'JetBrains Mono', monospace">{{ p.cpf }}</span></div>
+        <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; padding: 5px 0 5px 8px; font-size: 12px"><span style="color: #94a0b3">Celular</span><span style="font: 500 12.5px 'JetBrains Mono', monospace">{{ p.cel }}</span></div>
+        <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; padding: 5px 0 5px 8px; font-size: 12px"><span style="color: #94a0b3">E-mail</span><span style="font: 500 12.5px 'JetBrains Mono', monospace; overflow-wrap: anywhere">{{ p.email }}</span></div>
+      </div>
+    </div>
+
+    <div style="flex: none; padding: 10px 16px; border-top: 1px solid #1c3140; display: flex; align-items: center; gap: 8px; font: 500 11px 'JetBrains Mono', monospace; color: #94a0b3"><span style="padding: 2px 6px; border: 1px solid #1c3140; border-radius: 6px; color: #e7ecf3">⌥⇧P</span><span>preenche com a ativa</span></div>
+  </div>
+
+  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+    <div style="font: 500 10.5px 'JetBrains Mono', monospace; letter-spacing: .2em; text-transform: uppercase; color: #94a0b3">Página de teste</div>
+    <div style="position: relative; height: 420px; border: 1px solid #1c3140; border-radius: 10px; background: #f4f6f9; color: #111827; padding: 24px; box-sizing: border-box; font-family: system-ui, sans-serif">
+      <div style="font-weight: 600; font-size: 15px; margin-bottom: 14px">Criar conta</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px; color: #4b5563">
+        <span>Nome completo</span>
+        <div style="height: 32px; border: 1px solid #d1d5db; border-radius: 8px; background: #ffffff; display: flex; align-items: center; padding: 0 10px; color: #111827; font-size: 13px">{{ campoNome }}</div>
+        <span>CPF</span>
+        <div style="height: 32px; border: 1px solid #d1d5db; border-radius: 8px; background: #ffffff; display: flex; align-items: center; padding: 0 10px; color: #111827; font-size: 13px">{{ campoCpf }}</div>
+      </div>
+      <button onClick="{{ alternarMenu }}" style="margin-top: 18px; height: 34px; padding: 0 14px; border: 1px dashed #6b7280; border-radius: 8px; background: #ffffff; color: #374151; font-size: 12.5px; cursor: pointer">Simular botão direito num campo</button>
+      <sc-if value="{{ menu }}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; left: 120px; top: 150px; width: 250px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 10px 28px rgba(0,0,0,.18); padding: 5px 0; font-size: 13px">
+          <div style="padding: 6px 14px; color: #6b7280; font-size: 11px; letter-spacing: .05em">BOTAÍ</div>
+          <button onClick="{{ preencherPeloMenu }}" style="display: block; width: 100%; text-align: left; padding: 6px 14px; border: none; background: transparent; color: #111827; font-size: 13px; cursor: pointer">Preencher esta página</button>
+          <sc-if value="{{ temFavoritos }}" hint-placeholder-val="{{ true }}">
+            <div style="padding: 6px 14px 2px; color: #6b7280; font-size: 12px">Preencher com ›</div>
+            <sc-for list="{{ chips }}" as="c" hint-placeholder-count="2">
+              <button onClick="{{ c.usarPeloMenu }}" style="display: block; width: 100%; text-align: left; padding: 6px 14px 6px 26px; border: none; background: transparent; color: #111827; font-size: 13px; cursor: pointer">{{ c.apelido }} · {{ c.primeiro }}</button>
+            </sc-for>
+          </sc-if>
+          <div style="height: 1px; background: #e5e7eb; margin: 5px 0"></div>
+          <button onClick="{{ novaPessoaPeloMenu }}" style="display: block; width: 100%; text-align: left; padding: 6px 14px; border: none; background: transparent; color: #111827; font-size: 13px; cursor: pointer">Nova pessoa</button>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{ temFeito }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="padding: 10px 14px; border: 1px solid rgba(52,211,153,.4); background: rgba(52,211,153,.1); border-radius: 12px; font-size: 13px; color: #e7ecf3">{{ feito }}</div>
+    </sc-if>
+    <div style="font-size: 12.5px; line-height: 1.6; color: #94a0b3">Experimente: clique na estrela, dê um apelido, gere uma nova pessoa, troque pelos chips, tire um favorito e desfaça, guarde 3 e veja o limite, e use o botão direito simulado.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":720}}'>
+var PESSOAS = [
+  { nome: 'Maria Eduarda Souza', ini: 'MS', idade: 35, cidade: 'São Paulo', uf: 'SP', cpf: '384.529.176-19', cel: '(11) 98734-2156', email: 'maria.souza@tuamaeaquelaursa.com' },
+  { nome: 'Rafael Costa Lima', ini: 'RC', idade: 29, cidade: 'Teresina', uf: 'PI', cpf: '464.313.713-48', cel: '(86) 99371-2428', email: 'rafael.lima@tuamaeaquelaursa.com' },
+  { nome: 'Ana Ferreira Rocha', ini: 'AF', idade: 41, cidade: 'Recife', uf: 'PE', cpf: '271.840.364-05', cel: '(81) 99812-4470', email: 'ana.rocha@tuamaeaquelaursa.com' },
+  { nome: 'João Oliveira Mendes', ini: 'JO', idade: 52, cidade: 'Curitiba', uf: 'PR', cpf: '593.118.209-72', cel: '(41) 99655-3019', email: 'joao.mendes@tuamaeaquelaursa.com' },
+  { nome: 'Beatriz Alves Nunes', ini: 'BA', idade: 24, cidade: 'Salvador', uf: 'BA', cpf: '802.447.615-30', cel: '(71) 99240-8816', email: 'beatriz.nunes@tuamaeaquelaursa.com' },
+  { nome: 'Carlos Pereira Dias', ini: 'CD', idade: 47, cidade: 'Porto Alegre', uf: 'RS', cpf: '136.905.480-91', cel: '(51) 99127-6603', email: 'carlos.dias@tuamaeaquelaursa.com' }
+];
+function primeiroNome(p) { return p.nome.split(' ')[0]; }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ativa: 0,
+      proxima: 1,
+      favoritos: [
+        { id: 1, apelido: 'admin do staging', p: 0 },
+        { id: 2, apelido: 'comprador PJ', p: 3 }
+      ],
+      editando: null,
+      rascunho: '',
+      aviso: null,
+      feito: '',
+      menu: false,
+      seq: 3
+    };
+  }
+  componentWillUnmount() { clearTimeout(this.tAviso); clearTimeout(this.tFeito); }
+  favDaAtiva() { var s = this.state; return s.favoritos.find(function (f) { return f.p === s.ativa; }) || null; }
+  mostrarFeito(texto) {
+    var self = this;
+    clearTimeout(this.tFeito);
+    this.setState({ feito: texto });
+    this.tFeito = setTimeout(function () { self.setState({ feito: '' }); }, 2600);
+  }
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var p = PESSOAS[s.ativa];
+    var fav = this.favDaAtiva();
+    var total = s.favoritos.length;
+    var podeGuardar = !fav && total < 3;
+    var limite = !fav && total >= 3;
+    var editando = s.editando !== null;
+    var chips = s.favoritos.map(function (f) {
+      var pessoa = PESSOAS[f.p];
+      var ativo = f.p === s.ativa;
+      return {
+        apelido: f.apelido,
+        ini: pessoa.ini,
+        primeiro: primeiroNome(pessoa),
+        ativo: ativo,
+        borda: ativo ? '#38bdf8' : '#1c3140',
+        fundo: ativo ? 'rgba(56,189,248,.12)' : '#0f141f',
+        fundoIni: ativo ? '#38bdf8' : '#141b29',
+        corIni: ativo ? '#04131a' : '#94a0b3',
+        usar: function () { self.setState({ ativa: f.p, editando: null }); },
+        usarPeloMenu: function () {
+          self.setState({ ativa: f.p, editando: null, menu: false });
+          self.mostrarFeito('Preencheu a página com ' + f.apelido + ' (' + primeiroNome(pessoa) + '), que virou a pessoa ativa.');
+        }
+      };
+    });
+    var salvar = function () {
+      var st = self.state;
+      if (st.editando === null) return;
+      var texto = st.rascunho.trim() || primeiroNome(PESSOAS[st.ativa]);
+      self.setState({
+        favoritos: st.favoritos.map(function (f) { return f.id === st.editando ? { id: f.id, apelido: texto, p: f.p } : f; }),
+        editando: null
+      });
+    };
+    var cancelar = function () { self.setState({ editando: null }); };
+    return {
+      p: { nome: p.nome, ini: p.ini, idade: p.idade, cidade: p.cidade, uf: p.uf, cpf: p.cpf, cel: p.cel, email: p.email, primeiro: primeiroNome(p) },
+      favAtiva: !!fav,
+      apelidoAtivo: fav ? fav.apelido : '',
+      total: total,
+      chips: chips,
+      podeGuardar: podeGuardar,
+      limite: limite,
+      semFavoritos: total === 0 && !podeGuardar,
+      temFavoritos: total > 0,
+      editando: editando,
+      naoEditando: !editando,
+      rascunho: s.rascunho,
+      contador: s.rascunho.length,
+      temAviso: s.aviso !== null,
+      aviso: s.aviso || { apelido: '' },
+      temFeito: s.feito !== '',
+      feito: s.feito,
+      menu: s.menu,
+      campoNome: s.feito ? p.nome : '',
+      campoCpf: s.feito ? p.cpf : '',
+      rotuloEstrela: fav ? 'Tirar dos favoritos' : (limite ? 'Limite de 3 favoritos' : 'Guardar nos favoritos'),
+      corEstrela: fav ? '#f5b82e' : '#94a0b3',
+      preenchimentoEstrela: fav ? '#f5b82e' : 'none',
+      bordaEstrela: fav ? 'transparent' : '#1c3140',
+      opacidadeEstrela: limite ? 0.45 : 1,
+      cursorEstrela: limite ? 'not-allowed' : 'pointer',
+      estrela: function () {
+        var st = self.state;
+        var atual = self.favDaAtiva();
+        if (atual) {
+          var idx = st.favoritos.indexOf(atual);
+          clearTimeout(self.tAviso);
+          self.setState({ favoritos: st.favoritos.filter(function (f) { return f !== atual; }), aviso: { apelido: atual.apelido, fav: atual, idx: idx }, editando: null });
+          self.tAviso = setTimeout(function () { self.setState({ aviso: null }); }, 5000);
+          return;
+        }
+        if (st.favoritos.length >= 3) return;
+        var nome = primeiroNome(PESSOAS[st.ativa]);
+        var novo = { id: st.seq, apelido: nome, p: st.ativa };
+        self.setState({ favoritos: st.favoritos.concat([novo]), seq: st.seq + 1, editando: novo.id, rascunho: nome });
+      },
+      renomear: function () {
+        var atual = self.favDaAtiva();
+        if (atual) self.setState({ editando: atual.id, rascunho: atual.apelido });
+      },
+      digitar: function (e) { self.setState({ rascunho: e.target.value.slice(0, 24) }); },
+      tecla: function (e) {
+        if (e.key === 'Enter') salvar();
+        if (e.key === 'Escape') cancelar();
+      },
+      salvar: salvar,
+      desfazer: function () {
+        var st = self.state;
+        if (!st.aviso) return;
+        clearTimeout(self.tAviso);
+        var lista = st.favoritos.slice();
+        lista.splice(st.aviso.idx, 0, st.aviso.fav);
+        self.setState({ favoritos: lista.slice(0, 3), aviso: null });
+      },
+      novaPessoa: function () {
+        var st = self.state;
+        var n = st.proxima === st.ativa ? (st.proxima + 1) % PESSOAS.length : st.proxima;
+        self.setState({ ativa: n, proxima: (n + 1) % PESSOAS.length, editando: null });
+      },
+      preencher: function () { self.mostrarFeito('Preencheu 21 de 23 campos com ' + PESSOAS[self.state.ativa].nome + ', a pessoa ativa.'); },
+      alternarMenu: function () { self.setState({ menu: !self.state.menu }); },
+      preencherPeloMenu: function () {
+        self.setState({ menu: false });
+        self.mostrarFeito('Preencheu 21 de 23 campos com ' + PESSOAS[self.state.ativa].nome + ', a pessoa ativa.');
+      },
+      novaPessoaPeloMenu: function () {
+        var st = self.state;
+        var n = st.proxima === st.ativa ? (st.proxima + 1) % PESSOAS.length : st.proxima;
+        self.setState({ ativa: n, proxima: (n + 1) % PESSOAS.length, editando: null, menu: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -21,6 +21,7 @@ Feito para quem desenvolve e testa formulários brasileiros. O Botaí gera uma p
 • nome, data de nascimento, celular, e-mail e senha
 • empresa (razão social, nome fantasia e CNPJ)
 • cartão de teste documentado da Stripe (número, nome, validade e CVV)
+• até 3 pessoas favoritas, com apelido, para voltar a elas depois
 
 Como usar
 • A página inteira: Ctrl+Shift+Y no Windows e no Linux, Alt+Shift+P (⌥⇧P) no Mac, ou o botão "Preencher esta página" do popup. No Firefox para Linux, o atalho é Alt+Shift+P.
@@ -54,11 +55,11 @@ Injetar, sob demanda e só na aba liberada pelo activeTab, o script que identifi
 
 ## Justificativa: contextMenus
 
-Itens no menu do botão direito: "Preencher esta página" e "Inserir › CPF / E-mail / CEP…", para preencher a página inteira ou um campo específico; "Nova pessoa", para trocar a pessoa de teste por outra; e "Abrir caixa de entrada", que abre numa aba nova a caixa pública do e-mail gerado, em tuamaeaquelaursa.com, site de terceiro.
+Itens no menu do botão direito: "Preencher esta página" e "Inserir › CPF / E-mail / CEP…", para preencher a página inteira ou um campo específico; "Preencher com › <apelido>", que aparece só quando há pessoas favoritas guardadas, para preencher a página com uma delas; "Nova pessoa", para trocar a pessoa de teste por outra; e "Abrir caixa de entrada", que abre numa aba nova a caixa pública do e-mail gerado, em tuamaeaquelaursa.com, site de terceiro.
 
 ## Justificativa: storage
 
-Guardar no próprio navegador (storage.local) a pessoa de teste gerada, para reutilizá-la até a pessoa pedir outra. Nada é sincronizado nem enviado.
+Guardar no próprio navegador (storage.local) a pessoa de teste ativa e até 3 pessoas favoritas que a pessoa guardar, para reutilizá-las. Nada é sincronizado nem enviado.
 
 ## Justificativa: menus
 

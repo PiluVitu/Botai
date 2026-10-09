@@ -1,6 +1,6 @@
 import { browser } from 'wxt/browser'
 import { defineBackground } from 'wxt/utils/define-background'
-import { pessoaItem } from '../../lib/armazenamento'
+import { favoritosItem, pessoaItem } from '../../lib/armazenamento'
 import { atualizarTitulosMenu } from '../../lib/menus'
 import {
   aoClicarMenu,
@@ -13,6 +13,7 @@ export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => void recriarMenus())
   browser.runtime.onStartup.addListener(() => void recriarMenus())
   pessoaItem.watch((pessoa) => void atualizarTitulosMenu(pessoa))
+  favoritosItem.watch(() => void recriarMenus())
   browser.commands.onCommand.addListener(
     (comando, aba) => void aoComando(comando, aba),
   )
