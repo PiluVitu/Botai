@@ -44,10 +44,7 @@ jobs:
         run: node --test scripts/*.test.mjs
 
       - name: actionlint
-        run: >-
-          docker run --rm -v "$GITHUB_WORKSPACE:/repo" --workdir /repo
-          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
-          -color
+        run: bash scripts/actionlint.sh
 
   core:
     name: Core (tsc sem DOM + Jest + build + pacote)
@@ -95,6 +92,9 @@ jobs:
 
       - name: Build e tarball do npm
         run: pnpm --filter @pilutech/botai-core run tarball
+
+      - name: Docker Hub pelo espelho (mirror.gcr.io)
+        run: bash scripts/espelho-docker-hub.sh
 
       - name: docker build sem rede (a imagem só instala o tarball)
         run: docker build --network=none -t botai:fumaca packages/core

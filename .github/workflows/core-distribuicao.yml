@@ -207,9 +207,16 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Docker Hub pelo espelho (mirror.gcr.io)
+        run: bash scripts/espelho-docker-hub.sh
+
       - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
 
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["mirror.gcr.io"]
 
       - name: Build amd64 para a fumaça
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
@@ -336,8 +343,5 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: actionlint (imagem fixada por digest)
-        run: >-
-          docker run --rm -v "$GITHUB_WORKSPACE:/repo" --workdir /repo
-          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
-          -color
+      - name: actionlint (binário fixado por versão e SHA-256)
+        run: bash scripts/actionlint.sh
