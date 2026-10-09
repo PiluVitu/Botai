@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@piluvitu/ui/cn'
 import { useSyncExternalStore } from 'react'
 import {
   atalhoDoVisitante,
@@ -10,7 +11,7 @@ import {
 
 const semInscricao = () => () => {}
 
-export function AtalhoLocal() {
+function useAtalhoDoVisitante() {
   const sistema = useSyncExternalStore(
     semInscricao,
     () => sistemaDoVisitante(navigator),
@@ -21,13 +22,28 @@ export function AtalhoLocal() {
     () => ehFirefox(navigator),
     () => VISITANTE_DO_SERVIDOR.firefox,
   )
-  const { tecla, nomeDoSistema } = atalhoDoVisitante(sistema, firefox)
+  return atalhoDoVisitante(sistema, firefox)
+}
+
+export function TeclaLocal({ className }: { className?: string }) {
+  const { tecla } = useAtalhoDoVisitante()
+  return (
+    <kbd
+      className={cn(
+        'border-border bg-muted text-foreground rounded-[6px] border px-1.5 py-0.5 font-mono text-xs',
+        className,
+      )}
+    >
+      {tecla}
+    </kbd>
+  )
+}
+
+export function AtalhoLocal() {
+  const { nomeDoSistema } = useAtalhoDoVisitante()
   return (
     <span className="inline-flex items-center gap-1.5">
-      <kbd className="border-border bg-muted text-foreground rounded-[6px] border px-1.5 py-0.5 font-mono text-xs">
-        {tecla}
-      </kbd>{' '}
-      preenche a página no {nomeDoSistema}
+      <TeclaLocal /> preenche a página no {nomeDoSistema}
     </span>
   )
 }

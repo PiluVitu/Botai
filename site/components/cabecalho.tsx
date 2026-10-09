@@ -10,6 +10,7 @@ import {
 } from '@/lib/conteudo'
 import { BotaoTema } from './botao-tema'
 import { Marca } from './marca'
+import { MenuSecoes } from './menu-secoes'
 
 export function Cabecalho() {
   return (
@@ -17,29 +18,35 @@ export function Cabecalho() {
       <a
         href="#topo"
         aria-label={`${NOME}, início`}
-        className="inline-flex items-center gap-2.5"
+        className="focus-visible:ring-ring inline-flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-2"
       >
         <Marca tamanho={26} />
         <span className="text-xl font-extrabold tracking-[-0.03em]">
           {NOME}
         </span>
       </a>
-      <nav aria-label="Seções" className="flex flex-wrap items-center gap-1">
+      <nav
+        aria-label="Seções"
+        className="hidden items-center gap-1 min-[900px]:flex"
+      >
         {ANCORAS_DA_LANDING.map((ancora) => (
           <a
             key={ancora.id}
             href={`#${ancora.id}`}
-            className="text-muted-foreground px-2.5 py-2 font-mono text-[13px] hover:underline"
+            className="text-muted-foreground focus-visible:ring-ring rounded-md px-2.5 py-2 font-mono text-[13px] underline-offset-[3px] outline-none hover:underline focus-visible:ring-2"
           >
             {ancora.rotulo}
           </a>
         ))}
       </nav>
       <div className="flex items-center gap-2">
-        <Button asChild className="gap-2 px-3.5 font-semibold">
+        <Button
+          asChild
+          className="gap-2 px-3.5 font-semibold max-[379px]:w-9 max-[379px]:px-0"
+        >
           <a href={URL_DA_DOCUMENTACAO}>
             <FontAwesomeIcon icon={faBookOpen} className="size-[15px]" />
-            Docs
+            <span className="max-[379px]:sr-only">Docs</span>
           </a>
         </Button>
         <a
@@ -50,10 +57,8 @@ export function Cabecalho() {
           <FontAwesomeIcon icon={faGithub} className="size-4" />
         </a>
         <BotaoTema />
+        <MenuSecoes ancoras={ANCORAS_DA_LANDING} />
       </div>
-      <p data-esqueleto className="text-muted-foreground font-mono text-xs">
-        Em construção: menu abaixo de 900 px (grupo 1)
-      </p>
     </header>
   )
 }
