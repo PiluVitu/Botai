@@ -64,6 +64,64 @@ test.describe('opções', () => {
   })
 })
 
+test('sem botaiCartao, o cartão é o aprovado da Stripe', ({ botai }) => {
+  expect(botai.pessoa.cartao).toMatchObject({
+    provedor: 'stripe',
+    cenario: 'aprovado',
+  })
+})
+
+test.describe('botaiCartao', () => {
+  const SEMENTE = 'checkout'
+  const HOJE = '2026-10-05'
+  test.use({
+    botaiSemente: SEMENTE,
+    botaiHoje: HOJE,
+    botaiCartao: { provedor: 'pagarme', cenario: 'recusado' },
+  })
+
+  test('o cartão sai do provedor e do cenário; o resto da pessoa é o do padrão', ({
+    botai,
+  }) => {
+    expect(botai.pessoa).toEqual(
+      gerarPessoa({
+        semente: SEMENTE,
+        hoje: HOJE,
+        cartao: { provedor: 'pagarme', cenario: 'recusado' },
+      }),
+    )
+    expect(botai.pessoa.cartao).toMatchObject({
+      numero: '4000000000000028',
+      provedor: 'pagarme',
+      cenario: 'recusado',
+    })
+    const padrao = gerarPessoa({ semente: SEMENTE, hoje: HOJE })
+    expect({ ...botai.pessoa, cartao: padrao.cartao }).toEqual(padrao)
+  })
+
+  test('botai.preencher escreve o número do cenário no campo do cartão', async ({
+    context,
+    page,
+    botai,
+  }) => {
+    await servir(context, ORIGEM, {
+      '/checkout': {
+        corpo:
+          '<!doctype html><meta charset="utf-8"><label>Número do cartão <input name="cc" autocomplete="cc-number"></label>',
+      },
+    })
+    await page.goto(`${ORIGEM}/checkout`)
+
+    const resultado = await botai.preencher(page)
+
+    expect(resultado.preenchidos).toHaveLength(1)
+    await expect(page.getByLabel('Número do cartão')).toHaveValue(
+      '4000 0000 0000 0028',
+    )
+    expect(botai.pessoa.cartao.numeroFormatado).toBe('4000 0000 0000 0028')
+  })
+})
+
 test('botai.preencher usa a pessoa do fixture', async ({
   context,
   page,

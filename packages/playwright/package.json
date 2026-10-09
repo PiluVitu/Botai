@@ -1,6 +1,6 @@
 {
   "name": "@pilutech/botai-playwright",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fixture do Playwright que gera uma pessoa brasileira de teste reproduzível e preenche formulários com o motor do Botaí",
   "license": "MIT",
   "author": "PiluTech",

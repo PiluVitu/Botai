@@ -7,7 +7,7 @@ Fixture do Playwright publicado no npm (MIT). Gera a pessoa com `@pilutech/botai
 - `src/semente.ts`: `sementeDoTeste` (projeto + arquivo com `/` + títulos, `' › '`) e `conferirHoje`.
 - `src/resultado.ts`: `ResultadoDoPreenchimento` e `juntarFrames` (tira `idx`, `contentType` e `iframesDeFora` do `ResultadoFrame`, põe o `frame`).
 - `src/preencher.ts`: lê `@pilutech/botai-core/navegador.iife.js`, instala em cada frame por `frame.evaluate(<texto>)` só se `__botaiNavegador` ainda não existe naquele documento, e chama `__botaiNavegador.preencher`. `Page` → todos os frames não destacados, em paralelo; `Locator` → `elementHandle()` + `ownerFrame()`.
-- `src/fixture.ts`: opções (`botaiSemente`, `botaiHoje`, `botaiUf`, `botaiDominioEmail`, todas `undefined` por padrão), fixture `botai`, anotações `botai-semente`/`botai-hoje`, anexo `botai-pessoa.json` quando `testInfo.status !== testInfo.expectedStatus`.
+- `src/fixture.ts`: opções (`botaiSemente`, `botaiHoje`, `botaiUf`, `botaiDominioEmail` e, desde a 0.2.0, `botaiCartao`, todas `undefined` por padrão), fixture `botai`, anotações `botai-semente`/`botai-hoje`, anexo `botai-pessoa.json` quando `testInfo.status !== testInfo.expectedStatus`.
 - `src/index.ts`: a API pública (`test`, `expect`, `fixturesBotai`, `sementeDoTeste` e os tipos).
 - `src/teste/`: páginas e ajudantes dos E2E e o projeto filho. Fora do build.
 
@@ -18,16 +18,17 @@ Fixture do Playwright publicado no npm (MIT). Gera a pessoa com `@pilutech/botai
 - **Mundo MAIN:** o motor escreve pelo setter do protótipo, o que mantém o React funcionando; o site enxerga `__botaiNavegador`.
 - **Sem contornos:** `SEM_CONTORNOS`, para não sujar screenshot nem `toHaveScreenshot`.
 - **Semente legível** (o texto da semente é o próprio identificador do teste): a anotação já serve de argumento para `botai pessoa --semente`.
+- **`botaiCartao` (0.2.0):** `{ provedor?, cenario? }` (o `OpcoesDoCartao` do core 0.5.0) vai para o `gerarPessoa` como `cartao`; sem ele, `stripe` + `aprovado`. O cenário muda só o cartão. `ErroDeOpcao` de `cartao` ou `cenario` vira `Error('botaiCartao: <mensagem do core>')`, para o teste dizer qual opção errou (o `botaiUf` e o `botaiDominioEmail` continuam com a mensagem do core, sem prefixo). Não há anotação nova: o anexo `botai-pessoa.json` já leva `provedor` e `cenario` no cartão.
 - **Peer `@playwright/test` `^1.59.1`:** a versão com que a 0.1.0 foi testada e publicada; desde 2026-10-06 o CI testa a da devDependency (1.63.0). Subir o piso do peer é decisão de versão do pacote. Uma cópia só do `@playwright/test` no projeto do usuário (o `mergeTests` existe desde a 1.39).
 - **Módulos testados no Jest sem import de pacote:** o ts-jest em CommonJS não resolve `exports`; por isso `semente.ts` e `resultado.ts` só dependem de tipos locais (o `ResultadoFrame` do core é compatível por estrutura).
 
 ## Testes
 
-| Camada                                                        | Ferramenta                                                   | Onde                                           |
-| ------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------- |
-| Lógica pura                                                   | Jest                                                         | `src/semente.test.ts`, `src/resultado.test.ts` |
-| Relatório (anotação, anexo em falha, retry, `botaiHoje` ruim) | Jest rodando um projeto Playwright filho com o reporter JSON | `src/fixture.test.ts` + `src/teste/filho/`     |
-| Fluxos                                                        | Playwright, Chromium + Firefox + WebKit                      | `src/preencher.e2e.ts`, `src/fixture.e2e.ts`   |
+| Camada                                                                         | Ferramenta                                                   | Onde                                           |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------ | ---------------------------------------------- |
+| Lógica pura                                                                    | Jest                                                         | `src/semente.test.ts`, `src/resultado.test.ts` |
+| Relatório (anotação, anexo em falha, retry, `botaiHoje` e `botaiCartao` ruins) | Jest rodando um projeto Playwright filho com o reporter JSON | `src/fixture.test.ts` + `src/teste/filho/`     |
+| Fluxos                                                                         | Playwright, Chromium + Firefox + WebKit                      | `src/preencher.e2e.ts`, `src/fixture.e2e.ts`   |
 
 - As páginas `cadastro.pagina.html` e `react.pagina.(html|tsx)` são lidas de `extensao/src/entrypoints/preencher.content/`: a extensão e o plugin testam a mesma página. A React é empacotada pelo esbuild com o `react` da extensão.
 - O E2E lê `packages/core/dourado/v1/indice.json` e confere cada dourado de pessoa única (entrada sem `n`) pelo fixture, com **todas** as `opcoes` da entrada (`botaiSemente`, `botaiHoje`, `botaiUf`, `botaiDominioEmail`): o envelope não guarda `uf` nem `dominioEmail`.
@@ -43,6 +44,8 @@ Fixture do Playwright publicado no npm (MIT). Gera a pessoa com `@pilutech/botai
 | `node packages/playwright/scripts/conferir-pacote.mjs` | `pnpm pack` + lista fechada + dependência do core na versão exata                                          |
 
 ## Publicação
+
+Versões: 0.1.0 (fase 3, core 0.4.0) e 0.2.0 (`botaiCartao`, core 0.5.0). A dependência é `workspace:*`, que o `pnpm pack` troca pela versão exata do core do repo; o `conferir-pacote.mjs` reprova se não sair exata. Publique o core antes: o `publicar-playwright.yml` falha (passo "O core da dependência já está no npm") enquanto essa versão do core não estiver no npm.
 
 Tag `playwright-v<versão>` (igual ao `package.json`, commit na `main`) → `.github/workflows/publicar-playwright.yml`: testes, `conferir-pacote.mjs --destino`, artifact, e o job `publicar` (environment com aprovação do dono, `id-token: write`) extrai o `.tgz` e roda `npm publish <pasta> --access public --provenance --ignore-scripts` com trusted publishing. Antes, o workflow confere que o `@pilutech/botai-core` da versão de que o plugin depende já está no npm. A primeira publicação (0.1.0) é do dono, com token local; o workflow pula versão que já está no npm.
 

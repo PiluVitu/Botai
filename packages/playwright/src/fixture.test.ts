@@ -10,6 +10,8 @@ const VERSAO_DO_CORE: string = JSON.parse(
 ).version
 const TITULO_RETRY = 'falha na primeira tentativa e passa na segunda'
 const TITULO_HOJE = 'botaiHoje fora do formato falha com mensagem clara'
+const TITULO_CARTAO =
+  'botaiCartao com cenário que o provedor não tem falha com mensagem clara'
 
 interface Anexo {
   name: string
@@ -91,7 +93,7 @@ describe('fixture botai num projeto de verdade (relatório JSON)', () => {
     expect(anexo?.contentType).toBe('application/json')
     const envelope = decodificar(anexo as Anexo)
     expect(envelope).toMatchObject({
-      formato: 1,
+      formato: 2,
       motor: VERSAO_DO_CORE,
       semente: `filho › filho.teste.ts › ${TITULO_RETRY}`,
     })
@@ -118,5 +120,20 @@ describe('fixture botai num projeto de verdade (relatório JSON)', () => {
     expect(primeira.errors.map((e) => e.message).join('\n')).toContain(
       'botaiHoje: esperado AAAA-MM-DD, recebido "05/10/2026"',
     )
+  })
+
+  it('botaiCartao inválido falha no setup com a opção e os cenários do provedor', () => {
+    const [primeira] = tentativas(TITULO_CARTAO)
+    expect(primeira.status).toBe('failed')
+    expect(primeira.errors.map((e) => e.message).join('\n')).toContain(
+      'botaiCartao: cenário desconhecido "recusado-cvc" para o provedor pagarme (use aprovado, recusado, pendente, pendente-recusado, pendente-cancelado, chargeback)',
+    )
+  })
+
+  it('o anexo leva o provedor e o cenário do cartão (padrão: stripe, aprovado)', () => {
+    const [primeira] = tentativas(TITULO_RETRY)
+    expect(
+      decodificar(anexoDaPessoa(primeira) as Anexo).pessoa.cartao,
+    ).toMatchObject({ provedor: 'stripe', cenario: 'aprovado' })
   })
 })

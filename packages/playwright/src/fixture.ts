@@ -1,9 +1,12 @@
 import {
+  ErroDeOpcao,
   FORMATO,
   gerarPessoa,
   hojeEmSaoPaulo,
   MOTOR,
   type EnvelopeDaPessoa,
+  type OpcoesDaPessoa,
+  type OpcoesDoCartao,
   type Semente,
 } from '@pilutech/botai-core'
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
@@ -24,6 +27,7 @@ export interface OpcoesBotai {
   botaiHoje: string | undefined
   botaiUf: UF | undefined
   botaiDominioEmail: string | undefined
+  botaiCartao: OpcoesDoCartao | undefined
 }
 
 export interface Botai {
@@ -40,14 +44,28 @@ export interface FixturesBotai extends OpcoesBotai {
   botai: Botai
 }
 
+function pessoaDoFixture(opcoes: OpcoesDaPessoa): Pessoa {
+  try {
+    return gerarPessoa(opcoes)
+  } catch (erro) {
+    if (
+      erro instanceof ErroDeOpcao &&
+      (erro.opcao === 'cartao' || erro.opcao === 'cenario')
+    )
+      throw new Error(`botaiCartao: ${erro.message}`)
+    throw erro
+  }
+}
+
 export function fixturesBotai(): Fixtures<FixturesBotai> {
   return {
     botaiSemente: [undefined, { option: true }],
     botaiHoje: [undefined, { option: true }],
     botaiUf: [undefined, { option: true }],
     botaiDominioEmail: [undefined, { option: true }],
+    botaiCartao: [undefined, { option: true }],
     botai: async (
-      { botaiSemente, botaiHoje, botaiUf, botaiDominioEmail },
+      { botaiSemente, botaiHoje, botaiUf, botaiDominioEmail, botaiCartao },
       use,
       testInfo,
     ) => {
@@ -60,13 +78,14 @@ export function fixturesBotai(): Fixtures<FixturesBotai> {
           : String(botaiSemente)
       const hoje =
         botaiHoje === undefined ? hojeEmSaoPaulo() : conferirHoje(botaiHoje)
-      const pessoa = gerarPessoa({
+      const pessoa = pessoaDoFixture({
         semente,
         hoje,
         ...(botaiUf !== undefined && { uf: botaiUf }),
         ...(botaiDominioEmail !== undefined && {
           dominioEmail: botaiDominioEmail,
         }),
+        ...(botaiCartao !== undefined && { cartao: botaiCartao }),
       })
       testInfo.annotations.push(
         { type: 'botai-semente', description: semente },
