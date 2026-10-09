@@ -95,3 +95,59 @@ test('todo workflow que publica no npm usa o environment npm, com proveniência'
     assert.match(texto, /npm publish \S+ --access public --provenance/, arquivo)
   }
 })
+
+// O Docker Hub limita o download anônimo por IP, e os runners do GitHub dividem IP com milhares
+// de repositórios: em 2026-10-09 o limite derrubou a imagem do core e o actionlint em 4 rodadas
+// seguidas. Os jobs do repositório não dependem mais do Docker Hub para passar.
+const jobs = (texto) =>
+  texto
+    .split(/^jobs:\n/m)[1]
+    .split(/^(?=  [\w-]+:\s*$)/m)
+    .filter((bloco) => /^  [\w-]+:/.test(bloco))
+
+test('o actionlint vem do release do GitHub, fixado por versão e SHA-256, e não da imagem do Docker Hub', () => {
+  const script = ler('scripts/actionlint.sh')
+  assert.match(script, /^versao=1\.7\.12$/m)
+  assert.match(script, /^sha256=[0-9a-f]{64}$/m)
+  assert.match(script, /sha256sum -c/)
+  const rodam = workflows().filter((arquivo) =>
+    workflow(arquivo).includes('actionlint'),
+  )
+  for (const arquivo of [
+    'ci.yml',
+    'botai-release.yml',
+    'core-distribuicao.yml',
+    'publicar-playwright.yml',
+  ])
+    assert.ok(rodam.includes(arquivo), arquivo)
+  for (const arquivo of rodam) {
+    assert.doesNotMatch(workflow(arquivo), /rhysd\/actionlint/, arquivo)
+    assert.match(workflow(arquivo), /bash scripts\/actionlint\.sh/, arquivo)
+  }
+})
+
+test('todo job que constrói imagem passa antes pelo espelho do Docker Hub (mirror.gcr.io)', () => {
+  let constroem = 0
+  for (const arquivo of workflows())
+    for (const job of jobs(workflow(arquivo))) {
+      const primeiro = job.search(
+        /run: docker build|uses: docker\/setup-(qemu|buildx)-action/,
+      )
+      if (primeiro < 0) continue
+      constroem++
+      const nome = `${arquivo}: ${job.split('\n')[0].trim()}`
+      const espelho = job.indexOf('bash scripts/espelho-docker-hub.sh')
+      assert.ok(espelho >= 0 && espelho < primeiro, nome)
+      if (job.includes('setup-buildx-action'))
+        assert.match(
+          job,
+          /buildkitd-config-inline: \|\n\s+\[registry\."docker\.io"\]\n\s+mirrors = \["mirror\.gcr\.io"\]/,
+          nome,
+        )
+    }
+  assert.ok(constroem >= 2, 'a imagem do CI e a do release do core')
+  assert.match(
+    ler('scripts/espelho-docker-hub.sh'),
+    /https:\/\/mirror\.gcr\.io/,
+  )
+})
