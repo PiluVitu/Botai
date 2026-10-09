@@ -1,5 +1,6 @@
 import {
   type OpcoesDaPessoa,
+  type OpcoesDoLote,
   type OpcoesResolvidas,
   pessoaResolvida,
   pessoasDoLote,
@@ -61,7 +62,7 @@ export function gerarEnvelopeDaPessoa(
 
 export function gerarEnvelopeDasPessoas(
   n: number,
-  opcoes: OpcoesDaPessoa = {},
+  opcoes: OpcoesDoLote = {},
 ): EnvelopeDasPessoas {
   return envelopeDoLote(n, resolverOpcoes(opcoes))
 }

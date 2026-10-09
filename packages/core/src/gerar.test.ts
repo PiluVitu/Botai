@@ -12,6 +12,18 @@ import { ErroDeOpcao } from './opcoes'
 import type { Pessoa } from './pessoa'
 import type { UF } from './uf'
 
+const semCartao = ({ cartao: _, ...resto }: Pessoa) => resto
+
+function erroDe(f: () => unknown): ErroDeOpcao {
+  try {
+    f()
+  } catch (erro) {
+    if (erro instanceof ErroDeOpcao) return erro
+    throw erro
+  }
+  throw new Error('esperava um ErroDeOpcao')
+}
+
 const HOJE = '2026-10-05'
 
 describe('gerarPessoa(opcoes)', () => {
@@ -172,5 +184,179 @@ describe('loteCom (sorteio de novo, campo a campo)', () => {
     expect(() => [...loteCom(2, r, () => A)]).toThrow(
       'nenhuma pessoa sem repetição na posição 1',
     )
+  })
+})
+
+describe('cartão (gerarPessoa)', () => {
+  test('provedor e cenário: a mesma pessoa, com o cartão do cenário', () => {
+    const padrao = gerarPessoa({ semente: 'botai', hoje: HOJE })
+    const p = gerarPessoa({
+      semente: 'botai',
+      hoje: HOJE,
+      cartao: { provedor: 'pagarme', cenario: 'chargeback' },
+    })
+    expect(semCartao(p)).toEqual(semCartao(padrao))
+    expect(p.cartao).toMatchObject({
+      numero: '4000000000000069',
+      provedor: 'pagarme',
+      cenario: 'chargeback',
+      validade: padrao.cartao.validade,
+      cvv: padrao.cartao.cvv,
+    })
+    expect(padrao.cartao).toMatchObject({
+      provedor: 'stripe',
+      cenario: 'aprovado',
+    })
+  })
+
+  test.each([
+    [{ provedor: 'adyen' }, 'cartao'],
+    [{ cenario: 'chargeback' }, 'cenario'],
+  ])('cartao %j inválido lança ErroDeOpcao(%s)', (cartao, opcao) => {
+    expect(
+      erroDe(() =>
+        gerarPessoa({ semente: 'x', hoje: HOJE, cartao: cartao as never }),
+      ).opcao,
+    ).toBe(opcao)
+  })
+})
+
+describe('cartão no lote (gerarPessoas)', () => {
+  const CENARIOS = { recusado: 10, aprovado: 2, pendente: 1 } as const
+  const opcoes = {
+    semente: 'lote',
+    hoje: HOJE,
+    cartao: { provedor: 'pagarme' as const, cenarios: CENARIOS },
+  }
+
+  test('os cenários saem em grupos, na ordem dada, e a pessoa i é a da semente S/i', () => {
+    const lote = gerarPessoas(13, opcoes)
+    expect(lote.map((p) => p.cartao.cenario)).toEqual([
+      ...Array(10).fill('recusado'),
+      'aprovado',
+      'aprovado',
+      'pendente',
+    ])
+    expect(new Set(lote.map((p) => p.cartao.provedor))).toEqual(
+      new Set(['pagarme']),
+    )
+    lote.forEach((p, i) =>
+      expect(p).toEqual(
+        gerarPessoa({
+          semente: `lote/${i}`,
+          hoje: HOJE,
+          cartao: { provedor: 'pagarme', cenario: p.cartao.cenario },
+        }),
+      ),
+    )
+  })
+
+  test('fora do cartão, o lote é o mesmo do lote sem cenários', () => {
+    expect(gerarPessoas(13, opcoes).map(semCartao)).toEqual(
+      gerarPessoas(13, { semente: 'lote', hoje: HOJE }).map(semCartao),
+    )
+  })
+
+  test('a ordem do objeto é a ordem dos grupos', () => {
+    const lote = gerarPessoas(3, {
+      semente: 'ordem',
+      hoje: HOJE,
+      cartao: { cenarios: { pendente: 1, recusado: 2 } },
+    })
+    expect(lote.map((p) => p.cartao.cenario)).toEqual([
+      'pendente',
+      'recusado',
+      'recusado',
+    ])
+    expect(lote.map((p) => p.cartao.numero)).toEqual([
+      '4000002760003184',
+      '4000000000000002',
+      '4000000000000002',
+    ])
+  })
+
+  test('só o provedor: todas aprovadas nele; só o cenário: todas nele', () => {
+    expect(
+      gerarPessoas(3, {
+        semente: 's',
+        hoje: HOJE,
+        cartao: { provedor: 'pagarme' },
+      }).map((p) => [p.cartao.cenario, p.cartao.numero]),
+    ).toEqual(Array(3).fill(['aprovado', '4000000000000010']))
+    expect(
+      gerarPessoas(2, {
+        semente: 's',
+        hoje: HOJE,
+        cartao: { cenario: 'recusado-saldo' },
+      }).map((p) => p.cartao.numero),
+    ).toEqual(['4000000000009995', '4000000000009995'])
+  })
+
+  test('unicidade de e-mail, CPF e CNPJ no lote inteiro, com as mesmas sementes', () => {
+    const cenarios = { aprovado: 400, recusado: 300, chargeback: 300 }
+    const lote = [
+      ...pessoasDoLote(
+        1000,
+        resolverOpcoes({
+          semente: 'mil-3',
+          hoje: HOJE,
+          cartao: { provedor: 'pagarme', cenarios },
+        }),
+      ),
+    ]
+    expect(lote.map((p) => p.semente)).toEqual(
+      [
+        ...pessoasDoLote(
+          1000,
+          resolverOpcoes({ semente: 'mil-3', hoje: HOJE }),
+        ),
+      ].map((p) => p.semente),
+    )
+    expect(lote[971].semente).toBe('mil-3/971/2')
+    expect(lote[971].pessoa.cartao.cenario).toBe('chargeback')
+    expect(new Set(lote.map((p) => p.pessoa.email.endereco)).size).toBe(1000)
+    expect(new Set(lote.map((p) => p.pessoa.cpf)).size).toBe(1000)
+    expect(new Set(lote.map((p) => p.pessoa.empresa.cnpj)).size).toBe(1000)
+  })
+
+  test('n diferente da soma dos cenários é ErroDeOpcao(n)', () => {
+    const erro = erroDe(() => gerarPessoas(12, opcoes))
+    expect(erro.opcao).toBe('n')
+    expect(erro.message).toBe('n (12) diferente da soma dos cenários (13)')
+  })
+
+  test('cenario e cenarios juntos é ErroDeOpcao(cenarios)', () => {
+    const erro = erroDe(() =>
+      gerarPessoas(1, {
+        semente: 'x',
+        hoje: HOJE,
+        cartao: { cenario: 'recusado', cenarios: { aprovado: 1 } },
+      }),
+    )
+    expect(erro.opcao).toBe('cenarios')
+    expect(erro.message).toBe('use cenario ou cenarios, não os dois')
+  })
+
+  test.each([
+    [{ provedor: 'adyen', cenarios: { aprovado: 1 } }, 'cartao'],
+    [{ provedor: 'stripe', cenarios: { chargeback: 1 } }, 'cenarios'],
+    [{ cenarios: {} }, 'cenarios'],
+    [{ cenarios: { aprovado: 0 } }, 'cenarios'],
+  ])('cartao %j lança ErroDeOpcao(%s)', (cartao, opcao) => {
+    expect(
+      erroDe(() =>
+        gerarPessoas(1, { semente: 'x', hoje: HOJE, cartao: cartao as never }),
+      ).opcao,
+    ).toBe(opcao)
+  })
+
+  // Quem escreve o lote no stdout ou no corpo HTTP não pode ter escrito nada antes do erro.
+  test('a distribuição é conferida na chamada, antes da primeira pessoa', () => {
+    const r = resolverOpcoes({
+      semente: 'x',
+      hoje: HOJE,
+      cartao: { cenarios: { aprovado: 2 } },
+    })
+    expect(() => pessoasDoLote(3, r)).toThrow(ErroDeOpcao)
   })
 })
