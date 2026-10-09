@@ -1,5 +1,6 @@
 import { cn } from '@piluvitu/ui/cn'
 import { CAPTURAS } from '@/lib/capturas'
+import { REQUISITOS_DA_EXTENSAO } from '@/lib/extensao'
 import type { BotaoDeLoja } from '@/lib/modelo'
 import { BotoesLoja } from './botoes-loja'
 import { CARTAO } from './cartao'
@@ -20,11 +21,15 @@ export function Extensao({ lojas }: { lojas: BotaoDeLoja[] }) {
           <h2 id="extensao-titulo" className={TITULO_DE_SECAO}>
             Bota aí no navegador.
           </h2>
-          <BotoesLoja lojas={lojas} />
-          <TabelaAtalhos />
-          <p data-esqueleto className="text-muted-foreground font-mono text-xs">
-            Em construção: extensão (grupo 4)
+          <p className="text-muted-foreground text-[17px] leading-[1.55] text-pretty">
+            Um atalho preenche a página inteira. O botão direito põe um dado num
+            campo só. A mesma pessoa fica guardada até você pedir outra.
           </p>
+          <BotoesLoja lojas={lojas} />
+          <p className="text-muted-foreground font-mono text-[12.5px] leading-[1.6]">
+            {REQUISITOS_DA_EXTENSAO}
+          </p>
+          <TabelaAtalhos />
         </div>
         <figure className="flex min-w-0 flex-col gap-3">
           <div className={cn(CARTAO, 'overflow-hidden')}>

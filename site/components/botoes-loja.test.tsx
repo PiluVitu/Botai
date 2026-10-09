@@ -1,65 +1,97 @@
 import { render, screen, within } from '@testing-library/react'
+import { botoesDasLojas } from '@/lib/modelo'
 import { BotoesLoja } from './botoes-loja'
 
+const SEM_LOJA = { chromeUrl: '', firefoxUrl: '', edgeUrl: '', operaUrl: '' }
+const CHROME = 'https://chromewebstore.google.com/detail/botai/abc'
 const FIREFOX = 'https://addons.mozilla.org/pt-BR/firefox/addon/botai/'
-const LOJAS = [
-  { loja: 'chrome', url: null },
-  { loja: 'firefox', url: FIREFOX },
-  { loja: 'edge', url: null },
-  { loja: 'opera', url: null },
-] as const
+const EDGE = 'https://microsoftedge.microsoft.com/addons/detail/botai/xyz'
+
+// Como no lojas.json de 2026-10-08: Chrome e Firefox no ar, Opera em revisão, Edge sem URL.
+const NO_AR = botoesDasLojas({
+  ...SEM_LOJA,
+  chromeUrl: CHROME,
+  firefoxUrl: FIREFOX,
+})
+
+function itens() {
+  return within(screen.getByRole('list', { name: 'Instalar pela loja' }))
+    .getAllByRole('listitem')
+    .map((li) => li.textContent)
+}
 
 describe('BotoesLoja', () => {
-  it('uma lista "Instalar pela loja" com as 4 lojas, na ordem recebida', () => {
-    render(<BotoesLoja lojas={[...LOJAS]} />)
-    const lista = screen.getByRole('list', { name: 'Instalar pela loja' })
-    expect(
-      within(lista)
-        .getAllByRole('listitem')
-        .map((li) => li.textContent),
-    ).toEqual([
-      'Chrome Web Store Em breve',
+  it('uma lista "Instalar pela loja", na ordem recebida, sem o Edge sem URL', () => {
+    render(<BotoesLoja lojas={NO_AR} />)
+    expect(itens()).toEqual([
+      'Chrome Web Store',
       'Firefox Add-ons',
-      'Microsoft Edge Add-ons Em breve',
-      'Opera add-ons Em breve',
+      'Opera em revisão',
     ])
   })
 
   it('loja publicada: link para a loja, em aba nova', () => {
-    render(<BotoesLoja lojas={[...LOJAS]} />)
-    const link = screen.getByRole('link', { name: 'Firefox Add-ons' })
-    expect(link).toHaveAttribute('href', FIREFOX)
-    expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    render(<BotoesLoja lojas={NO_AR} />)
+    for (const [nome, url] of [
+      ['Chrome Web Store', CHROME],
+      ['Firefox Add-ons', FIREFOX],
+    ]) {
+      const link = screen.getByRole('link', { name: nome })
+      expect(link).toHaveAttribute('href', url)
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    }
   })
 
-  // O href="#" do protótipo não vai para produção.
-  it('loja sem URL: botão "Em breve" desabilitado, sem link', () => {
-    const { container } = render(<BotoesLoja lojas={[...LOJAS]} />)
-    expect(
-      screen.getByRole('button', { name: 'Chrome Web Store Em breve' }),
-    ).toBeDisabled()
-    expect(container.querySelectorAll('a')).toHaveLength(1)
-    expect(container.querySelector('a[href="#"]')).toBeNull()
-  })
-
-  it('variante outline, para o bloco de instalar', () => {
-    render(<BotoesLoja lojas={[...LOJAS]} variante="outline" />)
-    expect(screen.getByRole('link', { name: 'Firefox Add-ons' })).toHaveClass(
-      'border-input',
+  // A v1 punha um <button disabled>: um controle que não faz nada. Na v2 é texto, com o estado da loja.
+  it('loja sem URL: texto com o nome curto e o estado, sem botão e sem link', () => {
+    const { container } = render(
+      <BotoesLoja lojas={botoesDasLojas(SEM_LOJA)} />,
+    )
+    expect(itens()).toEqual([
+      'Chrome em breve',
+      'Firefox em breve',
+      'Opera em revisão',
+    ])
+    expect(screen.queryAllByRole('button')).toEqual([])
+    expect(container.querySelectorAll('a')).toHaveLength(0)
+    expect(screen.getByText('em revisão')).toHaveClass('text-warn', 'font-mono')
+    expect(screen.getByText('em revisão').parentElement).toHaveClass(
+      'border-dashed',
     )
   })
 
-  // A 320 px, "Microsoft Edge Add-ons Em breve" numa linha só (278 px) passa da lista (272 px) e
-  // invade o gutter; o scrollWidth da página não acusa. O botão quebra o texto em vez de vazar.
-  it('o botão quebra linha em vez de passar da largura da lista', () => {
-    render(<BotoesLoja lojas={[...LOJAS]} />)
-    for (const botao of [
-      screen.getByRole('button', { name: 'Microsoft Edge Add-ons Em breve' }),
-      screen.getByRole('link', { name: 'Firefox Add-ons' }),
-    ]) {
-      expect(botao).toHaveClass('whitespace-normal', 'max-w-full', 'min-h-10')
-      expect(botao).not.toHaveClass('whitespace-nowrap')
-    }
+  it('nenhum texto diz "disponível"', () => {
+    render(<BotoesLoja lojas={botoesDasLojas(SEM_LOJA)} />)
+    expect(screen.queryByText(/dispon[ií]vel/i)).toBeNull()
+  })
+
+  it('o Edge com URL entra no lugar dele, como link', () => {
+    render(
+      <BotoesLoja lojas={botoesDasLojas({ ...SEM_LOJA, edgeUrl: EDGE })} />,
+    )
+    expect(itens()).toEqual([
+      'Chrome em breve',
+      'Firefox em breve',
+      'Microsoft Edge Add-ons',
+      'Opera em revisão',
+    ])
+    expect(
+      screen.getByRole('link', { name: 'Microsoft Edge Add-ons' }),
+    ).toHaveAttribute('href', EDGE)
+  })
+
+  // A 320 px um rótulo longo numa linha só passa da lista e invade o gutter; o scrollWidth da página
+  // não acusa. O item quebra o texto em vez de vazar.
+  it('o item quebra linha em vez de passar da largura da lista', () => {
+    render(
+      <BotoesLoja lojas={botoesDasLojas({ ...SEM_LOJA, edgeUrl: EDGE })} />,
+    )
+    const link = screen.getByRole('link', { name: 'Microsoft Edge Add-ons' })
+    expect(link).toHaveClass('whitespace-normal', 'max-w-full', 'min-h-11')
+    expect(link).not.toHaveClass('whitespace-nowrap')
+    expect(screen.getByText('em revisão').parentElement).toHaveClass(
+      'max-w-full',
+    )
   })
 })

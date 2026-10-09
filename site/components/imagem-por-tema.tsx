@@ -10,7 +10,6 @@ import {
 type ImagemPorTemaProps = {
   variantes: Record<Tema, VarianteDaCaptura>
   sizes: string
-  destaque?: boolean
 }
 
 const VISIVEL_NO: Record<Tema, string> = {
@@ -18,11 +17,7 @@ const VISIVEL_NO: Record<Tema, string> = {
   escuro: 'hidden dark:block',
 }
 
-export function ImagemPorTema({
-  variantes,
-  sizes,
-  destaque = false,
-}: ImagemPorTemaProps) {
+export function ImagemPorTema({ variantes, sizes }: ImagemPorTemaProps) {
   return (
     <>
       {(['claro', 'escuro'] as const).map((tema) => (
@@ -34,7 +29,6 @@ export function ImagemPorTema({
           height={ALTURA_DA_CAPTURA}
           sizes={sizes}
           className={cn('h-auto w-full', VISIVEL_NO[tema])}
-          {...(destaque ? { fetchPriority: 'high' as const } : {})}
         />
       ))}
     </>

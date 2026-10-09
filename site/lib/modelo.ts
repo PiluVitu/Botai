@@ -1,3 +1,4 @@
+import { NOME_DO_NAVEGADOR } from './extensao'
 import {
   fase,
   LOJAS,
@@ -12,13 +13,6 @@ export type ModeloDaLanding = {
   fase: Fase
   lojas: BotaoDeLoja[]
   notaDasLojas: string
-}
-
-const NOME_CURTO: Record<Loja, string> = {
-  chrome: 'Chrome',
-  firefox: 'Firefox',
-  edge: 'Edge',
-  opera: 'Opera',
 }
 
 const SO_COM_LINK: readonly Loja[] = ['edge']
@@ -40,7 +34,7 @@ function emLista(nomes: string[]): string {
 export function notaDasLojas(publicadas: readonly Loja[]): string {
   if (publicadas.length === 0)
     return 'Chegando às lojas do Chrome, do Firefox, do Edge e do Opera'
-  return `${emLista(publicadas.map((loja) => NOME_CURTO[loja]))} · grátis e de código aberto`
+  return `${emLista(publicadas.map((loja) => NOME_DO_NAVEGADOR[loja]))} · grátis e de código aberto`
 }
 
 export function modeloDaLanding(urls: UrlsDasLojas): ModeloDaLanding {

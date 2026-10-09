@@ -1,39 +1,98 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { render, screen, within } from '@testing-library/react'
+import {
+  MAILTO,
+  npmDe,
+  PACOTE_DO_CORE,
+  PACOTE_DO_PLAYWRIGHT,
+  REPOSITORIO,
+  URL_DA_DOCUMENTACAO,
+  URL_DA_PILUTECH,
+} from '@/lib/conteudo'
 import { Rodape } from './rodape'
 
+function links(nav: HTMLElement) {
+  return within(nav)
+    .getAllByRole('link')
+    .map((a) => [a.textContent, a.getAttribute('href')])
+}
+
 describe('Rodape', () => {
-  it('é o contentinfo, com Powered by PiluTech e o suporte por e-mail', () => {
+  it('é o contentinfo, com a marca, a licença e o Powered by PiluTech', () => {
     render(<Rodape />)
-    expect(screen.getByRole('contentinfo')).toBeInTheDocument()
+    const rodape = within(screen.getByRole('contentinfo'))
+    expect(rodape.getByText('Botaí')).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: 'Powered by PiluTech' }),
-    ).toHaveAttribute('href', 'https://pilutech.com.br')
+      rodape.getByText(
+        'Dados de teste brasileiros. Código aberto, licença MIT.',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      rodape.getByRole('link', { name: 'Powered by PiluTech' }),
+    ).toHaveAttribute('href', URL_DA_PILUTECH)
+    expect(
+      screen.getByRole('contentinfo').querySelector('svg'),
+    ).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  // O rodapé diz "licença MIT": o repo, a extensão e os dois pacotes têm de ser MIT.
+  it('a licença do texto é a de todo LICENSE do repo', () => {
+    const raiz = join(__dirname, '..', '..')
+    for (const pasta of [
+      '.',
+      'extensao',
+      'packages/core',
+      'packages/playwright',
+    ])
+      expect(readFileSync(join(raiz, pasta, 'LICENSE'), 'utf8')).toMatch(
+        /^MIT License\n/,
+      )
+  })
+
+  // O «Suporte» fica na coluna Projeto (o design o tirou; a v1 e os testes o garantem): decisão do dono.
+  it('a coluna Projeto: Docs, GitHub, os dois pacotes do npm e o Suporte', () => {
+    render(<Rodape />)
+    expect(links(screen.getByRole('navigation', { name: 'Projeto' }))).toEqual([
+      ['Docs', URL_DA_DOCUMENTACAO],
+      ['GitHub', REPOSITORIO],
+      [PACOTE_DO_CORE, npmDe(PACOTE_DO_CORE)],
+      [PACOTE_DO_PLAYWRIGHT, npmDe(PACOTE_DO_PLAYWRIGHT)],
+      ['Suporte', MAILTO.suporte],
+    ])
+  })
+
+  it('o Docs abre na mesma aba, e o suporte leva [Botaí] no assunto', () => {
+    render(<Rodape />)
+    expect(screen.getByRole('link', { name: 'Docs' })).not.toHaveAttribute(
+      'target',
+    )
     expect(screen.getByRole('link', { name: 'Suporte' })).toHaveAttribute(
       'href',
       'mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Suporte',
     )
   })
 
-  it('leva à documentação, ao lado do suporte', () => {
+  it('a coluna Legal: termos de uso e política de privacidade', () => {
     render(<Rodape />)
-    const docs = screen.getByRole('link', { name: 'Docs' })
-    expect(docs).toHaveAttribute('href', 'https://docs.botai.pilutech.com.br')
-    expect(docs).not.toHaveAttribute('target')
-    expect(docs.parentElement).toBe(
-      screen.getByRole('link', { name: 'Suporte' }).parentElement,
-    )
+    expect(links(screen.getByRole('navigation', { name: 'Legal' }))).toEqual([
+      ['Termos de uso', '/termos'],
+      ['Política de privacidade', '/privacidade'],
+    ])
+    expect(screen.queryByRole('link', { name: 'Privacidade' })).toBeNull()
   })
 
-  it('leva à política de privacidade e aos termos de uso', () => {
+  // O título visível de cada coluna é o nome dela (WCAG 2.5.3), e não um título de seção.
+  it('cada coluna leva o nome do seu título', () => {
     render(<Rodape />)
-    const documentos = within(
-      screen.getByRole('navigation', { name: 'Documentos' }),
-    )
-    expect(
-      documentos.getByRole('link', { name: 'Privacidade' }),
-    ).toHaveAttribute('href', '/privacidade')
-    expect(
-      documentos.getByRole('link', { name: 'Termos de uso' }),
-    ).toHaveAttribute('href', '/termos')
+    for (const nome of ['Projeto', 'Legal']) {
+      const nav = screen.getByRole('navigation', { name: nome })
+      const titulo = document.getElementById(
+        nav.getAttribute('aria-labelledby') as string,
+      )
+      expect(titulo?.tagName).toBe('P')
+      expect(titulo).toHaveTextContent(nome)
+    }
+    expect(screen.queryAllByRole('heading')).toEqual([])
   })
 })
