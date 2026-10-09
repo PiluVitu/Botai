@@ -54,6 +54,8 @@ const P: Pessoa = {
     mes: '08',
     ano: '28',
     cvv: '430',
+    provedor: 'stripe',
+    cenario: 'aprovado',
   },
 }
 

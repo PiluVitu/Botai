@@ -52,6 +52,9 @@ const FLAG_DA_OPCAO: Record<NomeDaOpcao, string> = {
   uf: '--uf',
   dominioEmail: '--dominio-email',
   n: '-n',
+  cartao: '--cartao',
+  cenario: '--cenario',
+  cenarios: '--cenarios',
 }
 
 const AJUDA = { tipo: 'booleano', curta: 'h' } as const

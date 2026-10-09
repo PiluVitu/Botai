@@ -1,7 +1,15 @@
 import { lerDataISO } from './nascimento'
 import { type UF, UFS } from './uf'
 
-export type NomeDaOpcao = 'semente' | 'hoje' | 'uf' | 'dominioEmail' | 'n'
+export type NomeDaOpcao =
+  | 'semente'
+  | 'hoje'
+  | 'uf'
+  | 'dominioEmail'
+  | 'n'
+  | 'cartao'
+  | 'cenario'
+  | 'cenarios'
 
 export class ErroDeOpcao extends Error {
   readonly opcao: NomeDaOpcao

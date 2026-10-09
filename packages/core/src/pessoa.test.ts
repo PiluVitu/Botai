@@ -9,7 +9,13 @@ import { CODIGO_UF_TITULO, REGIAO_FISCAL_CPF, type UF, UFS } from './uf'
 import { ErroDeOpcao } from './opcoes'
 import { senhaAtendeRegrasComuns } from './senha'
 import { LOGRADOUROS } from './endereco'
-import { luhnValido } from './cartao'
+import {
+  CATALOGO_DE_CARTOES,
+  type Cenario,
+  luhnValido,
+  PROVEDORES,
+  type Provedor,
+} from './cartao'
 import { slugNome } from './nome'
 import { sementes } from './rng-teste'
 
@@ -66,6 +72,8 @@ describe('montarPessoa', () => {
         mes: '08',
         ano: '28',
         cvv: '430',
+        provedor: 'stripe',
+        cenario: 'aprovado',
       },
     })
   })
@@ -176,4 +184,87 @@ describe('montarPessoa com opções', () => {
       ).toThrow(ErroDeOpcao)
     },
   )
+})
+
+describe('montarPessoa com cartão', () => {
+  const DOURADA = () => montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01')
+  const TODOS = PROVEDORES.flatMap((provedor) =>
+    CATALOGO_DE_CARTOES[provedor].map(
+      (c) => [provedor, c.id] as [Provedor, Cenario],
+    ),
+  )
+  const semCartao = ({ cartao: _, ...resto }: ReturnType<typeof DOURADA>) =>
+    resto
+
+  test('cartao vazio ou padrão (stripe, aprovado) não muda a pessoa dourada', () => {
+    for (const cartao of [
+      {},
+      { provedor: 'stripe' as const },
+      { cenario: 'aprovado' as const },
+      { provedor: 'stripe' as const, cenario: 'aprovado' as const },
+    ])
+      expect(montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', { cartao })).toEqual(
+        DOURADA(),
+      )
+  })
+
+  test('pagarme recusado: só o número, a bandeira, o provedor e o cenário mudam', () => {
+    const p = montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {
+      cartao: { provedor: 'pagarme', cenario: 'recusado' },
+    })
+    expect(p.cartao).toEqual({
+      ...DOURADA().cartao,
+      bandeira: 'visa',
+      numero: '4000000000000028',
+      numeroFormatado: '4000 0000 0000 0028',
+      provedor: 'pagarme',
+      cenario: 'recusado',
+    })
+    expect(semCartao(p)).toEqual(semCartao(DOURADA()))
+  })
+
+  // A regra do contrato: a mesma semente gera a mesma pessoa em qualquer cenário.
+  test.each(TODOS)(
+    '%s %s: 200 sementes, todo campo fora do cartão igual ao do padrão',
+    (provedor, cenario) => {
+      for (let i = 0; i < 200; i++) {
+        const semente = [i, i * 7, i * 13 + 1, 0xabcdef ^ i] as const
+        const padrao = montarPessoa(sfc32(...semente), '2026-10-01')
+        const p = montarPessoa(sfc32(...semente), '2026-10-01', {
+          cartao: { provedor, cenario },
+        })
+        expect(semCartao(p)).toEqual(semCartao(padrao))
+        const { numero, numeroFormatado, bandeira, ...resto } = p.cartao
+        const { titular, validade, mes, ano, cvv } = padrao.cartao
+        expect(resto).toEqual({
+          titular,
+          validade,
+          mes,
+          ano,
+          cvv,
+          provedor,
+          cenario,
+        })
+        expect(luhnValido(numero)).toBe(true)
+        expect(numeroFormatado.replace(/ /g, '')).toBe(numero)
+        expect(bandeira).toBe(numero.startsWith('4') ? 'visa' : 'mastercard')
+      }
+    },
+  )
+
+  test('cartão inválido lança ErroDeOpcao com o nome da opção', () => {
+    expect(() =>
+      montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {
+        cartao: { provedor: 'adyen' as Provedor },
+      }),
+    ).toThrow(ErroDeOpcao)
+    try {
+      montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {
+        cartao: { provedor: 'pagarme', cenario: 'recusado-cvc' },
+      })
+    } catch (erro) {
+      expect((erro as ErroDeOpcao).opcao).toBe('cenario')
+    }
+    expect.assertions(2)
+  })
 })
