@@ -96,9 +96,36 @@ describe('lerConsultaDaPessoa', () => {
   })
 
   test('o erro de parâmetro desconhecido lista os aceitos', () => {
-    expect(erroDe(() => lerConsultaDaPessoa(q('x=1')))).toContain(
-      'aceitos: semente, hoje, uf, dominioEmail',
+    expect(erroDe(() => lerConsultaDaPessoa(q('x=1')))).toBe(
+      'parâmetro desconhecido: x (aceitos: semente, hoje, uf, dominioEmail, cartao, cenario)',
     )
+  })
+
+  test('cartao e cenario, lidos como na CLI (qualquer caixa)', () => {
+    expect(
+      lerConsultaDaPessoa(
+        q('semente=1&hoje=2026-10-05&cartao=PagarMe&cenario=recusado'),
+      ).cartao,
+    ).toEqual({ provedor: 'pagarme', cenario: 'recusado' })
+    expect(lerConsultaDaPessoa(q('cenario=recusado-cvc')).cartao).toEqual({
+      provedor: 'stripe',
+      cenario: 'recusado-cvc',
+    })
+  })
+
+  test.each([
+    [
+      'cartao=adyen',
+      'cartao: provedor de cartão desconhecido "adyen" (use stripe, pagarme)',
+    ],
+    [
+      'cartao=pagarme&cenario=recusado-cvc',
+      'cenario: cenário desconhecido "recusado-cvc" para o provedor pagarme (use aprovado, recusado, pendente, pendente-recusado, pendente-cancelado, chargeback)',
+    ],
+    ['cenarios=aprovado:1', 'parâmetro desconhecido: cenarios'],
+    ['cenario=', 'parâmetro vazio: cenario'],
+  ])('%s → %s', (consulta, mensagem) => {
+    expect(erroDe(() => lerConsultaDaPessoa(q(consulta)))).toContain(mensagem)
   })
 })
 
@@ -138,6 +165,41 @@ describe('lerConsultaDasPessoas', () => {
     ).toEqual(['cpf'])
   })
 
+  test('cartao e cenarios: sem n, o n é a soma', () => {
+    const pedido = lerConsultaDasPessoas(
+      q('cartao=pagarme&cenarios=recusado:10,aprovado:2,pendente:1'),
+    )
+    expect(pedido.n).toBe(13)
+    expect(pedido.opcoes.cartao).toEqual({
+      provedor: 'pagarme',
+      cenarios: { recusado: 10, aprovado: 2, pendente: 1 },
+    })
+    expect(lerConsultaDasPessoas(q('n=2&cenarios=recusado:2')).n).toBe(2)
+    expect(
+      lerConsultaDasPessoas(q('n=3&cartao=pagarme')).opcoes.cartao,
+    ).toEqual({
+      provedor: 'pagarme',
+      cenario: 'aprovado',
+    })
+  })
+
+  test(`a soma dos cenários vai até ${LIMITE_DE_PESSOAS}`, () => {
+    expect(
+      lerConsultaDasPessoas(
+        q(`cenarios=aprovado:${LIMITE_DE_PESSOAS - 1},recusado:1`),
+      ).n,
+    ).toBe(LIMITE_DE_PESSOAS)
+    expect(
+      erroDe(() =>
+        lerConsultaDasPessoas(
+          q(`cenarios=aprovado:${LIMITE_DE_PESSOAS},recusado:1`),
+        ),
+      ),
+    ).toBe(
+      `cenarios: a soma dos cenários (${LIMITE_DE_PESSOAS + 1}) passa do limite de ${LIMITE_DE_PESSOAS} pessoas`,
+    )
+  })
+
   test(`n de 1 a ${LIMITE_DE_PESSOAS}`, () => {
     expect(lerConsultaDasPessoas(q('n=1')).n).toBe(1)
     expect(lerConsultaDasPessoas(q(`n=${LIMITE_DE_PESSOAS}`)).n).toBe(
@@ -146,7 +208,26 @@ describe('lerConsultaDasPessoas', () => {
   })
 
   test.each([
-    ['', `falta o n (de 1 a ${LIMITE_DE_PESSOAS})`],
+    ['', `falta o n (de 1 a ${LIMITE_DE_PESSOAS}) ou os cenarios`],
+    [
+      'n=1&x=1',
+      'parâmetro desconhecido: x (aceitos: semente, hoje, uf, dominioEmail, cartao, cenarios, n, formato, dialeto, tabela, campos)',
+    ],
+    ['n=1&cenario=recusado', 'parâmetro desconhecido: cenario'],
+    [
+      'cartao=adyen&cenarios=aprovado:1',
+      'cartao: provedor de cartão desconhecido "adyen"',
+    ],
+    [
+      'cenarios=chargeback:1',
+      'cenarios: cenário desconhecido "chargeback" para o provedor stripe',
+    ],
+    ['cenarios=recusado', 'cenarios: cenarios precisa ser cenario:quantidade'],
+    [
+      'cenarios=recusado:0',
+      'cenarios: quantidade inválida "0" no cenário recusado',
+    ],
+    ['cenarios=a:1,a:2', 'cenarios: cenário repetido "a"'],
     ['n=0', 'n inválido: 0'],
     ['n=-1', 'n inválido: -1'],
     ['n=1.5', 'n inválido: 1.5'],

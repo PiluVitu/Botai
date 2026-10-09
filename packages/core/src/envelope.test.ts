@@ -10,13 +10,13 @@ import { MOTOR } from './versao'
 const HOJE = '2026-10-05'
 
 describe('envelopes', () => {
-  test('FORMATO é 1', () => {
-    expect(FORMATO).toBe(1)
+  test('FORMATO é 2 (o cartão ganhou provedor e cenario na 0.5.0)', () => {
+    expect(FORMATO).toBe(2)
   })
 
   test('envelope da pessoa: formato, motor, semente em texto, hoje e a pessoa', () => {
     expect(gerarEnvelopeDaPessoa({ semente: 42, hoje: HOJE })).toEqual({
-      formato: 1,
+      formato: 2,
       motor: MOTOR,
       semente: '42',
       hoje: HOJE,
@@ -40,7 +40,7 @@ describe('envelopes', () => {
   test('envelope do lote: a semente do lote e as pessoas em ordem', () => {
     expect(gerarEnvelopeDasPessoas(3, { semente: 'lote', hoje: HOJE })).toEqual(
       {
-        formato: 1,
+        formato: 2,
         motor: MOTOR,
         semente: 'lote',
         hoje: HOJE,
@@ -59,7 +59,7 @@ describe('envelopes', () => {
   test('envelopar monta o envelope de uma pessoa do lote', () => {
     const pessoa = gerarPessoa({ semente: 'lote/0', hoje: HOJE })
     expect(envelopar('lote/0', HOJE, pessoa)).toEqual({
-      formato: 1,
+      formato: 2,
       motor: MOTOR,
       semente: 'lote/0',
       hoje: HOJE,

@@ -12,9 +12,9 @@ Esta página junta os limites conhecidos da versão 0.4.1 do core, da 0.1.0 do f
 - **Os nomes repetem**: cerca de 8,6 a 8,7 mil distintos num lote de 10 000. A unicidade vale só para e-mail, CPF e CNPJ, e só dentro do mesmo lote.
 - **Uma UF ou todas.** A distribuição por UF segue a lista de CEPs (SP aparece em cerca de 18%). Não dá para pedir um lote com algumas UFs.
 - **O RG é sempre SSP/SP**, em qualquer UF, e não gera dígito X por padrão.
-- **Cartão**: só os dois de teste da Stripe. Não há Elo, Amex nem Hipercard.
+- **Cartão**: só os números de teste da Stripe e do simulador da Pagar.me ([Cartões de teste](./conceitos/cartoes-de-teste.md)). Não há Elo, Amex nem Hipercard, e o que cada cenário faz no provedor vem da documentação dele (o Botaí não fala com a Stripe nem com a Pagar.me).
 - **Faixas fixas**: a idade vai de 18 a 65; o celular é sempre móvel (não há telefone fixo); a senha tem 12 caracteres (o subpath `/senha` aceita de 12 a 16).
-- **4 opções na raiz**: semente, hoje, UF e domínio do e-mail. Sexo, idade e cidade exigem montar a pessoa à mão pelos subpaths.
+- **5 opções na raiz**: semente, hoje, UF, domínio do e-mail e cartão. Sexo, idade e cidade exigem montar a pessoa à mão pelos subpaths.
 - **DDD**: o `gerarCelular` só confere o formato do DDD; não há lista de DDDs existentes.
 - **CNPJ alfanumérico** (vigente desde julho de 2026): não é gerado, e o `validarCNPJ` o recusa.
 
@@ -85,7 +85,7 @@ A importação no MySQL não foi feita num banco real. O texto do `--dialeto mys
 - **Só GET.** HEAD e OPTIONS dão 405: um health check que use HEAD marca o serviço como fora do ar.
 - **Parâmetros desconhecidos**: o `/saude` os ignora; o `/pessoa` e o `/pessoas` dão 400.
 - **Só IPv4 por padrão.** Um cliente que tente apenas `::1` falha.
-- **Imagem**: não há tag de minor (`:0.4`).
+- **Imagem**: não há tag de minor (`:0.5`).
 - **`install.sh`**: depende de o release do core estar marcado como Latest e não serve no Windows (lá, baixe o `.exe`).
 
 ## Preenchimento {#preenchimento}

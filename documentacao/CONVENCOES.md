@@ -5,6 +5,7 @@ Arquivo interno: o Docusaurus publica só o que está em `docs/`. Vale para toda
 ## 1. De onde vem o conteúdo
 
 - **Só do relatório de capacidades de 2026-10-08** (seções 3 a 6, 8 e 10). Não invente flag, rota, opção, número, mensagem nem integração. O relatório não diz? A página também não diz.
+- **Cartões de teste (core 0.5.0):** o conteúdo vem do código e dos testes do core e da documentação de cada provedor (docs.stripe.com/testing e o simulador da Pagar.me, conferidos em 2026-10-09). O que o provedor faz com cada número é "documentado": ninguém rodou os números contra o sandbox.
 - Saída de exemplo (JSON, CSV, SQL, mensagem de erro) é **colada de uma execução real** do build local desta versão (`node packages/core/dist/bin/botai.js …` na raiz do repo, depois de `make build-core`), nunca escrita à mão.
 - Medida da seção 7 do relatório sai sempre com a data e a máquina: "medido em 2026-10-08, macOS arm64, Node 22.22.3".
 
@@ -16,9 +17,9 @@ A árvore é a da seção 10 do relatório. As pastas já existem, cada uma com 
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | `intro.md` (`slug: /`, a raiz do site)                                                                                                                                      | 1                |
 | `comecar/`: `escolha-sua-porta`, `primeira-pessoa`, `instalacao`                                                                                                            | 1, 2, 3          |
-| `conceitos/`: `a-pessoa`, `semente-e-hoje`, `lote-e-unicidade`, `envelope-e-esquema`, `dados-por-tras`, `versoes-e-dourados`, `uso-responsavel`                             | 1 a 7            |
+| `conceitos/`: `a-pessoa`, `semente-e-hoje`, `lote-e-unicidade`, `envelope-e-esquema`, `dados-por-tras`, `versoes-e-dourados`, `uso-responsavel`, `cartoes-de-teste`         | 1 a 8            |
 | `extensao/`: `instalar`, `preencher-a-pagina`, `inserir-um-campo`, `popup`, `favoritos`, `privacidade-e-permissoes`, `limites`                                              | 1 a 7            |
-| `cli/`: `visao-geral`, `pessoa`, `pessoas`, `geradores-avulsos`, `validar`, `codigos-de-saida`, `receitas-de-banco`                                                         | 1 a 7            |
+| `cli/`: `visao-geral`, `pessoa`, `pessoas`, `geradores-avulsos`, `validar`, `codigos-de-saida`, `receitas-de-banco`, `cartoes`                                              | 1 a 8            |
 | `servidor/`: `botai-serve`, `api-http`, `seguranca-e-limites`                                                                                                               | 1, 2, 3          |
 | `docker/`: `imagem`, `github-actions`, `docker-compose`                                                                                                                     | 1, 2, 3          |
 | `binarios/`: `install-sh`, `download-e-verificacao`                                                                                                                         | 1, 2             |
@@ -100,7 +101,7 @@ Ninguém rodou esta receita com o Selenium. O que foi provado: o motor preenche 
 | 5. versão do esbuild no `CLAUDE.md` do core | não é assunto do leitor: não cite                                                                                                                                                                                      |
 | 6. política de versão                       | a forma completa: mudar a pessoa de uma semente é versão **major**; na série 0.x, é a **minor**                                                                                                                        |
 | 7. `--hoje` com ano muito antigo            | recomende datas reais; não documente faixa de datas aceita                                                                                                                                                             |
-| 8. fixture 0.1.0 com o core 0.4.0           | a pessoa é a mesma e o anexo diz `motor 0.4.0`; escreva "o core 0.4.0", sem o prefixo `@pilutech/botai-core@` (seção 9)                                                                                                |
+| 8. fixture 0.1.0 com o core 0.4.0           | resolvido no fixture 0.2.0, que depende do core 0.5.0 exato; ao citar o 0.1.0, escreva "o core 0.4.0", sem o prefixo `@pilutech/botai-core@` (seção 9)                                                                 |
 | 9. `dist/bin/botai.js` sem bit de execução  | só afeta o repo; o leitor usa `npx`, `npm`, a imagem ou o binário                                                                                                                                                      |
 | 10. dourados SQL sem a linha `-- botai: …`  | ao comparar, tire a 1ª linha do SQL gerado                                                                                                                                                                             |
 
@@ -123,17 +124,17 @@ botai validar cpf 634.132.403-08
 - Cada bloco roda sozinho, com `bash` e `set -eo pipefail` (qualquer comando que falha derruba o bloco), numa pasta temporária vazia (pode criar arquivo ali, nada fora dela), sem stdin e com 60 s de limite. Um bloco não vê o que outro criou.
 - **HTTP:** escreva sempre `http://127.0.0.1:8790` (a porta padrão do `botai serve`). O teste sobe o servidor uma vez, numa porta livre (`botai serve --porta 0`), e troca `127.0.0.1:8790` por ela. Use `curl -fsS` (sai com 22 em HTTP 400 ou mais); para mostrar a resposta de erro, `curl -sS`, que sai com 0.
 - **Proibido em bloco testado** (o teste reprova): rede externa (qualquer URL que não seja `http://127.0.0.1:8790`, inclusive `localhost`), `docker` e `docker-compose`, `npx`, `npm`, `pnpm`, `sudo`, `gh`, clientes de banco (`psql`, `mysql`, `sqlite3`) e `botai serve` (quem sobe é o teste). Também: comando interativo ou que não termina. A regra olha a palavra solta: num bloco testado, `--dialeto mysql` também cai; escreva `--dialeto=mysql`.
-- O que é proibido no teste vai num ` ```bash ` comum, sem `testar`, com a versão exata (seção 9): `npx -y @pilutech/botai-core@0.4.1 …`, `docker run … ghcr.io/piluvitu/botai:0.4.1`, `curl -fsSL …/install.sh | sh`, `… | psql "$DATABASE_URL"`. Se der, mostre ao lado o equivalente testável (o mesmo comando com `botai`).
+- O que é proibido no teste vai num ` ```bash ` comum, sem `testar`, com a versão exata (seção 9): `npx -y @pilutech/botai-core@0.5.0 …`, `docker run … ghcr.io/piluvitu/botai:0.5.0`, `curl -fsSL …/install.sh | sh`, `… | psql "$DATABASE_URL"`. Se der, mostre ao lado o equivalente testável (o mesmo comando com `botai`).
 - Saída mostrada logo depois do comando, num bloco `json`, `text`, `csv` ou `sql` sem `testar`, de uma execução real com `--semente` e `--hoje` fixos (sem eles, a pessoa muda todo dia).
 - Um bloco, uma ideia. Comando longo pode quebrar linha com `\`.
 - Código que não é shell (TS do Playwright, Python, Go, Java) não é executado: siga à risca o que o relatório mostra.
 
 ## 9. Versões
 
-Toda versão citada é a exata do repo: `@pilutech/botai-core@0.4.1`, `ghcr.io/piluvitu/botai:0.4.1`, `@pilutech/botai-playwright@0.1.0`, a tag `core-v0.4.1`, `BOTAI_VERSAO=0.4.1`, e, nas saídas coladas, `"motor": "0.4.1"` e `-- botai: formato 1, motor 0.4.1`. O `scripts/versoes.test.mjs` reprova qualquer outra (inclusive `latest`, `^0.4.1` e `:0.4`). Quando o core ou o plugin subir de versão, o teste aponta cada página a atualizar.
+Toda versão citada é a exata do repo: `@pilutech/botai-core@0.5.0`, `ghcr.io/piluvitu/botai:0.5.0`, `@pilutech/botai-playwright@0.2.0`, a tag `core-v0.5.0`, `BOTAI_VERSAO=0.5.0`, e, nas saídas coladas, `"motor": "0.5.0"` e `-- botai: formato 2, motor 0.5.0`. O `scripts/versoes.test.mjs` reprova qualquer outra (inclusive `latest`, `^0.5.0` e `:0.5`). Quando o core ou o plugin subir de versão, o teste aponta cada página a atualizar.
 
 - Instalar sem versão (`npm i -D @pilutech/botai-playwright`) é aceito; no `npx`, fixe a versão (é a recomendação do relatório, 5.4).
-- Versão antiga se escreve sem o prefixo do pacote: "o core 0.4.0".
+- Versão antiga se escreve sem o prefixo do pacote: "o core 0.4.0". Texto histórico ("desde a 0.4.0", "conferido na 0.4.1") fica como está quando a versão sobe.
 
 ## 10. Antes de entregar
 

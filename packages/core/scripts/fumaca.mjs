@@ -77,7 +77,7 @@ function conferirSha256(binario) {
 async function conferirUrl(base) {
   const saude = await fetch(`${base}/saude`)
   assert.equal(saude.status, 200, '/saude')
-  assert.deepEqual(await saude.json(), { ok: true, formato: 1, motor: VERSAO })
+  assert.deepEqual(await saude.json(), { ok: true, formato: 2, motor: VERSAO })
   for (const item of INDICE) {
     const resposta = await fetch(`${base}${alvoDe(item)}`)
     assert.equal(

@@ -140,7 +140,7 @@ describe('bin botai do build', () => {
     expect(r.codigo).toBe(0)
     const [comentario, ...inserts] = r.stdout.split('\n')
     expect(comentario).toMatch(
-      /^-- botai: formato 1, motor \d+\.\d+\.\d+\S*, semente mil-3, hoje 2026-10-05$/,
+      /^-- botai: formato 2, motor \d+\.\d+\.\d+\S*, semente mil-3, hoje 2026-10-05$/,
     )
     expect(inserts.join('\n')).toBe(paraSql(dourado.pessoas))
     expect(inserts.filter((l) => l.startsWith('INSERT INTO'))).toHaveLength(
@@ -165,6 +165,47 @@ describe('bin botai do build', () => {
       stderr:
         'botai: -n: n precisa ser um inteiro de 0 a 100000, recebido 100001\n',
     })
+  })
+
+  test('cartões: lote de 13 em grupos (recusado, aprovado, pendente) da Pagar.me', () => {
+    const r = botai(
+      'pessoas',
+      '--cartao',
+      'pagarme',
+      '--cenarios',
+      'recusado:10,aprovado:2,pendente:1',
+      '--semente',
+      'cartoes',
+      '--hoje',
+      '2026-10-05',
+      '--formato',
+      'csv',
+      '--campos',
+      'nome,cartao_numero,cartao_provedor,cartao_cenario',
+    )
+    expect([r.codigo, r.stderr]).toEqual([0, ''])
+    const [cabecalho, ...linhas] = r.stdout.trimEnd().split('\r\n')
+    expect(cabecalho).toBe('nome,cartao_numero,cartao_provedor,cartao_cenario')
+    expect(linhas.map((l) => l.split(',').slice(1).join(','))).toEqual([
+      ...Array(10).fill('4000000000000028,pagarme,recusado'),
+      '4000000000000010,pagarme,aprovado',
+      '4000000000000010,pagarme,aprovado',
+      '4000000000000036,pagarme,pendente',
+    ])
+  })
+
+  test('cartões: cenário que o provedor não tem é erro de uso, com a lista dos dele', () => {
+    expect(
+      botai('pessoa', '--cartao', 'pagarme', '--cenario', 'recusado-cvc'),
+    ).toEqual({
+      codigo: 2,
+      stdout: '',
+      stderr:
+        'botai: --cenario: cenário desconhecido "recusado-cvc" para o provedor pagarme (use aprovado, recusado, pendente, pendente-recusado, pendente-cancelado, chargeback)\n',
+    })
+    expect(
+      botai('cartao', '--cartao', 'pagarme', '--cenario', 'chargeback'),
+    ).toEqual({ codigo: 0, stdout: '4000000000000069\n', stderr: '' })
   })
 
   test('validar inválido sai com 1', () => {

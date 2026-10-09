@@ -48,7 +48,7 @@ Com o `ProcessBuilder`, a CLI escreve o envelope no stdout e as mensagens no std
 
 ```java
 Process processo = new ProcessBuilder(
-        "npx", "--yes", "@pilutech/botai-core@0.4.1", "pessoa",
+        "npx", "--yes", "@pilutech/botai-core@0.5.0", "pessoa",
         "--semente", "cadastro-1", "--hoje", "2026-10-05")
     .redirectError(ProcessBuilder.Redirect.INHERIT)
     .start();
@@ -59,7 +59,7 @@ if (codigo != 0) {
 }
 ```
 
-Fixe a versão no `npx`. Com o [binário](../binarios/install-sh.md) instalado, troque `"npx", "--yes", "@pilutech/botai-core@0.4.1"` por `"botai"`. Os códigos de saída estão em [Códigos de saída](../cli/codigos-de-saida.md).
+Fixe a versão no `npx`. Com o [binário](../binarios/install-sh.md) instalado, troque `"npx", "--yes", "@pilutech/botai-core@0.5.0"` por `"botai"`. Os códigos de saída estão em [Códigos de saída](../cli/codigos-de-saida.md).
 
 ## Selenium em Java {#selenium}
 

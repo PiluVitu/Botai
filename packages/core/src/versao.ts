@@ -1,1 +1,1 @@
-export const MOTOR: string = '0.4.1'
+export const MOTOR: string = '0.5.0'

@@ -1,7 +1,9 @@
+import { lerTextosDoCartao } from '../cartao'
 import {
-  type OpcoesDaPessoa,
+  type OpcoesDoLote,
   type OpcoesResolvidas,
   resolverOpcoes,
+  somaDosCenarios,
 } from '../gerar'
 import { ErroDeOpcao, lerDominioEmail, lerUF } from '../opcoes'
 import {
@@ -33,9 +35,11 @@ export interface PedidoDePessoas {
   colunas?: Coluna[]
 }
 
-const DA_PESSOA = ['semente', 'hoje', 'uf', 'dominioEmail'] as const
+const COMUNS = ['semente', 'hoje', 'uf', 'dominioEmail', 'cartao'] as const
+const DA_PESSOA = [...COMUNS, 'cenario'] as const
 const DAS_PESSOAS = [
-  ...DA_PESSOA,
+  ...COMUNS,
+  'cenarios',
   'n',
   'formato',
   'dialeto',
@@ -69,7 +73,7 @@ function lerValores(
 }
 
 function lerOpcoes(valores: Map<string, string>): OpcoesResolvidas {
-  const opcoes: OpcoesDaPessoa = {}
+  const opcoes: OpcoesDoLote = {}
   const semente = valores.get('semente')
   const hoje = valores.get('hoje')
   const uf = valores.get('uf')
@@ -79,7 +83,33 @@ function lerOpcoes(valores: Map<string, string>): OpcoesResolvidas {
   if (uf !== undefined) opcoes.uf = lerUF(uf)
   if (dominioEmail !== undefined)
     opcoes.dominioEmail = lerDominioEmail(dominioEmail)
+  const cartao = lerTextosDoCartao({
+    cartao: valores.get('cartao'),
+    cenario: valores.get('cenario'),
+    cenarios: valores.get('cenarios'),
+  })
+  if (cartao !== undefined) opcoes.cartao = cartao
   return resolverOpcoes(opcoes)
+}
+
+function lerN(n: string | undefined, opcoes: OpcoesResolvidas): number {
+  if (n === undefined) {
+    if (opcoes.cartao?.cenarios === undefined)
+      throw new ErroDeConsulta(
+        `falta o n (de 1 a ${LIMITE_DE_PESSOAS}) ou os cenarios`,
+      )
+    const soma = somaDosCenarios(opcoes.cartao)
+    if (soma > LIMITE_DE_PESSOAS)
+      throw new ErroDeConsulta(
+        `cenarios: a soma dos cenários (${soma}) passa do limite de ${LIMITE_DE_PESSOAS} pessoas`,
+      )
+    return soma
+  }
+  if (!/^\d{1,6}$/.test(n) || Number(n) < 1 || Number(n) > LIMITE_DE_PESSOAS)
+    throw new ErroDeConsulta(
+      `n inválido: ${n} (um inteiro de 1 a ${LIMITE_DE_PESSOAS})`,
+    )
+  return Number(n)
 }
 
 export function lerConsultaDaPessoa(params: URLSearchParams): OpcoesResolvidas {
@@ -90,14 +120,8 @@ export function lerConsultaDasPessoas(
   params: URLSearchParams,
 ): PedidoDePessoas {
   const valores = lerValores(params, DAS_PESSOAS)
-
-  const n = valores.get('n')
-  if (n === undefined)
-    throw new ErroDeConsulta(`falta o n (de 1 a ${LIMITE_DE_PESSOAS})`)
-  if (!/^\d{1,6}$/.test(n) || Number(n) < 1 || Number(n) > LIMITE_DE_PESSOAS)
-    throw new ErroDeConsulta(
-      `n inválido: ${n} (um inteiro de 1 a ${LIMITE_DE_PESSOAS})`,
-    )
+  const opcoes = lerOpcoes(valores)
+  const n = lerN(valores.get('n'), opcoes)
 
   const formato = valores.get('formato') ?? 'json'
   if (!(FORMATOS as readonly string[]).includes(formato))
@@ -112,11 +136,7 @@ export function lerConsultaDasPessoas(
   if (campos !== undefined && formato !== 'csv' && !ehSql)
     throw new ErroDeConsulta('campos só vale com formato=csv ou formato=sql')
 
-  const pedido: PedidoDePessoas = {
-    n: Number(n),
-    opcoes: lerOpcoes(valores),
-    formato: formato as Formato,
-  }
+  const pedido: PedidoDePessoas = { n, opcoes, formato: formato as Formato }
   const dialeto = valores.get('dialeto')
   const tabela = valores.get('tabela')
   if (dialeto !== undefined) pedido.dialeto = lerDialeto(dialeto)

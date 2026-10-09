@@ -1,5 +1,6 @@
 import {
   type OpcoesDaPessoa,
+  type OpcoesDoLote,
   type OpcoesResolvidas,
   pessoaResolvida,
   pessoasDoLote,
@@ -8,10 +9,10 @@ import {
 import type { Pessoa } from './pessoa'
 import { MOTOR } from './versao'
 
-export const FORMATO = 1
+export const FORMATO = 2
 
 export interface EnvelopeDaPessoa {
-  formato: 1
+  formato: 2
   motor: string
   semente: string
   hoje: string
@@ -19,7 +20,7 @@ export interface EnvelopeDaPessoa {
 }
 
 export interface EnvelopeDasPessoas {
-  formato: 1
+  formato: 2
   motor: string
   semente: string
   hoje: string
@@ -61,7 +62,7 @@ export function gerarEnvelopeDaPessoa(
 
 export function gerarEnvelopeDasPessoas(
   n: number,
-  opcoes: OpcoesDaPessoa = {},
+  opcoes: OpcoesDoLote = {},
 ): EnvelopeDasPessoas {
   return envelopeDoLote(n, resolverOpcoes(opcoes))
 }

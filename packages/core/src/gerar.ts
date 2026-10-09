@@ -1,5 +1,13 @@
+import {
+  type Cenario,
+  conferirCenarioOuCenarios,
+  lerCartao,
+  lerDistribuicao,
+  type OpcoesDoCartao,
+  type OpcoesDoCartaoDoLote,
+} from './cartao'
 import { hojeEmSaoPaulo } from './hoje'
-import { lerHoje, lerQuantidade } from './opcoes'
+import { ErroDeOpcao, lerHoje, lerQuantidade } from './opcoes'
 import { type OpcoesDaMontagem, type Pessoa, montarPessoa } from './pessoa'
 import {
   type Semente,
@@ -13,7 +21,14 @@ export interface OpcoesDaPessoa extends OpcoesDaMontagem {
   hoje?: string
 }
 
-export interface OpcoesResolvidas extends OpcoesDaMontagem {
+export interface OpcoesDoLote extends Omit<OpcoesDaPessoa, 'cartao'> {
+  cartao?: OpcoesDoCartaoDoLote
+}
+
+export interface OpcoesResolvidas extends Omit<
+  OpcoesDoLote,
+  'semente' | 'hoje'
+> {
   semente: string
   hoje: string
 }
@@ -23,11 +38,15 @@ export interface PessoaDoLote {
   pessoa: Pessoa
 }
 
-export type Montador = (semente: string, opcoes: OpcoesResolvidas) => Pessoa
+export type Montador = (
+  semente: string,
+  opcoes: OpcoesResolvidas,
+  posicao: number,
+) => Pessoa
 
 export const TENTATIVAS_POR_PESSOA = 1000
 
-export function resolverOpcoes(opcoes: OpcoesDaPessoa = {}): OpcoesResolvidas {
+export function resolverOpcoes(opcoes: OpcoesDoLote = {}): OpcoesResolvidas {
   const { semente, hoje, ...montagem } = opcoes
   return {
     ...montagem,
@@ -37,11 +56,17 @@ export function resolverOpcoes(opcoes: OpcoesDaPessoa = {}): OpcoesResolvidas {
   }
 }
 
-const montarDaSemente: Montador = (semente, opcoes) =>
-  montarPessoa(rngDeSemente(semente), opcoes.hoje, {
+function montarDaSemente(
+  semente: string,
+  opcoes: OpcoesResolvidas,
+  cartao: OpcoesDoCartao | undefined = opcoes.cartao,
+): Pessoa {
+  return montarPessoa(rngDeSemente(semente), opcoes.hoje, {
     uf: opcoes.uf,
     dominioEmail: opcoes.dominioEmail,
+    cartao: cartao && { provedor: cartao.provedor, cenario: cartao.cenario },
   })
+}
 
 export function pessoaResolvida(opcoes: OpcoesResolvidas): Pessoa {
   return montarDaSemente(opcoes.semente, opcoes)
@@ -64,7 +89,7 @@ export function* loteCom(
     for (let k = 1; k <= TENTATIVAS_POR_PESSOA && !escolhida; k++) {
       const semente =
         k === 1 ? `${opcoes.semente}/${i}` : `${opcoes.semente}/${i}/${k}`
-      const pessoa = montar(semente, opcoes)
+      const pessoa = montar(semente, opcoes, i)
       const repete =
         emails.has(pessoa.email.endereco) ||
         cpfs.has(pessoa.cpf) ||
@@ -82,13 +107,45 @@ export function* loteCom(
   }
 }
 
+export function somaDosCenarios(cartao: OpcoesDoCartaoDoLote): number {
+  const { provedor } = lerCartao({ provedor: cartao.provedor })
+  return lerDistribuicao(provedor, cartao.cenarios ?? {}).reduce(
+    (soma, g) => soma + g.quantidade,
+    0,
+  )
+}
+
+function cenarioDaPosicao(
+  quantidade: number,
+  cartao: OpcoesDoCartaoDoLote = {},
+): (posicao: number) => Cenario {
+  const { provedor, cenario } = lerCartao(cartao)
+  if (cartao.cenarios === undefined) return () => cenario
+  conferirCenarioOuCenarios(cartao)
+  const grupos = lerDistribuicao(provedor, cartao.cenarios)
+  const fins: number[] = []
+  for (const { quantidade: q } of grupos) fins.push((fins.at(-1) ?? 0) + q)
+  const soma = fins.at(-1)!
+  if (soma !== quantidade)
+    throw new ErroDeOpcao(
+      'n',
+      `n (${quantidade}) diferente da soma dos cenários (${soma})`,
+    )
+  return (posicao) => grupos[fins.findIndex((fim) => posicao < fim)].cenario
+}
+
 export function pessoasDoLote(
   n: number,
   opcoes: OpcoesResolvidas,
 ): Generator<PessoaDoLote> {
-  return loteCom(lerQuantidade(n), opcoes, montarDaSemente)
+  const quantidade = lerQuantidade(n)
+  const cenarioNa = cenarioDaPosicao(quantidade, opcoes.cartao)
+  const provedor = opcoes.cartao?.provedor
+  return loteCom(quantidade, opcoes, (semente, r, posicao) =>
+    montarDaSemente(semente, r, { provedor, cenario: cenarioNa(posicao) }),
+  )
 }
 
-export function gerarPessoas(n: number, opcoes: OpcoesDaPessoa = {}): Pessoa[] {
+export function gerarPessoas(n: number, opcoes: OpcoesDoLote = {}): Pessoa[] {
   return Array.from(pessoasDoLote(n, resolverOpcoes(opcoes)), (p) => p.pessoa)
 }

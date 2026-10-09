@@ -275,3 +275,48 @@ Plano: `docs/superpowers/plans/2026-10-05-botai-fase1-core-cli.md`.
 - Dourados: `packages/core/dourado/v1/indice.json` (`{ arquivo, n?, compacto?, opcoes, derivados? }[]`) e `pessoa-semente-numero.json`, `pessoa-semente-texto.json`, `pessoa-semente-unicode.json`, `pessoa-uf.json`, `pessoa-dominio-email.json`, `pessoa-29-de-fevereiro.json`, `pessoas-lote.json` (+ `.csv`, `.postgres.sql`, `.mysql.sql`, `.sqlite.sql`), `pessoas-1000.json`. As comparações ignoram `motor`.
 - JSON Schema: `@pilutech/botai-core/esquema/envelope-v1.schema.json`.
 - Ponto de confirmação do dono da fase 1 (fora dos workflows; ponto 9 da lista acima): push da tag `core-v0.2.0`, criada localmente no merge da fase 1, que dispara o `publicar-core.yml` atrás do environment `npm`. A `main` sobe no C5 da fase 0.
+
+## Cartões por provedor e cenário (core 0.5.0, plugin 0.2.0)
+
+Acrescentado pelo PR dos cartões (branch `feat/core-cartoes`, 2026-10-09). Nomes que a extensão usa no PR seguinte.
+
+```ts
+// @pilutech/botai-core/cartao (CATALOGO_DE_CARTOES e os tipos também na raiz)
+export type Bandeira = 'visa' | 'mastercard'
+export interface NumeroDeTeste { readonly bandeira: Bandeira; readonly numero: string }
+export type TipoDoCenario = 'ok' | 'erro' | 'espera'
+export interface CenarioDoCartao<Id extends string = string> {
+  readonly id: Id
+  readonly rotulo: string // "exige 3DS", "pendente → aprova"…
+  readonly tipo: TipoDoCenario
+  readonly descricao: string
+  readonly numeros: readonly NumeroDeTeste[]
+}
+export const CATALOGO_DE_CARTOES: { stripe: readonly CenarioDoCartao[]; pagarme: readonly CenarioDoCartao[] } // as const
+export type Provedor = 'stripe' | 'pagarme'
+export type CenarioDe<P extends Provedor> // os ids do provedor
+export type Cenario = CenarioDe<'stripe'> | CenarioDe<'pagarme'>
+export const PROVEDORES: readonly Provedor[] // ['stripe', 'pagarme']
+export const PROVEDOR_PADRAO: Provedor // 'stripe'
+export const CENARIO_PADRAO: Cenario // 'aprovado'
+export const NOME_DO_PROVEDOR: Record<Provedor, string> // { stripe: 'Stripe', pagarme: 'Pagar.me' }
+export interface OpcoesDoCartao { provedor?: Provedor; cenario?: Cenario }
+export interface OpcoesDoCartaoDoLote extends OpcoesDoCartao { cenarios?: DistribuicaoDeCenarios }
+export type DistribuicaoDeCenarios = Readonly<Partial<Record<Cenario, number>>> // { recusado: 10, aprovado: 2 }
+export interface Cartao { bandeira; numero; numeroFormatado; titular; validade; mes; ano; cvv; provedor: Provedor; cenario: Cenario }
+export function gerarCartao(rng, hojeISO, titular, opcoes?: OpcoesDoCartao): Cartao
+export function escolherNumero(rng?, opcoes?: OpcoesDoCartao): NumeroDeTeste
+export function cenarioDoCartao(provedor, cenario): CenarioDoCartao
+export function lerCartao(opcoes?: OpcoesDoCartao): { provedor: Provedor; cenario: Cenario }
+export function lerCenarios(texto: string): DistribuicaoDeCenarios // "recusado:10,aprovado:2"
+export function lerDistribuicao(provedor, cenarios): { cenario: Cenario; quantidade: number }[]
+export function lerTextosDoCartao(textos: { cartao?; cenario?; cenarios? }): OpcoesDoCartaoDoLote | undefined
+```
+
+- Catálogo: stripe `aprovado` (`4242424242424242` Visa e `5555555555554444` Mastercard), `recusado`, `pendente`, `recusado-saldo`, `recusado-roubado`, `recusado-perdido`, `recusado-expirado`, `recusado-cvc`, `erro-processamento`; pagarme `aprovado`, `recusado`, `pendente`, `pendente-recusado`, `pendente-cancelado`, `chargeback`.
+- `OpcoesDaMontagem` (o `/pessoa`) ganha `cartao?: OpcoesDoCartao`: `montarPessoa(rng, hoje, { cartao: { provedor, cenario } })`. Mesma semente ⇒ mesma pessoa em qualquer cenário; só o cartão muda (o sorteio do número é `rng.int(2)` sempre).
+- Raiz: `gerarPessoa({ …, cartao })`, `gerarPessoas(n, { …, cartao: { provedor, cenarios } })` (`OpcoesDoLote`); `n` tem de ser a soma. `CATALOGO_DE_CARTOES` entra na raiz (`index.test.ts`). `ErroDeOpcao.opcao` ganha `'cartao' | 'cenario' | 'cenarios'`.
+- CLI: `pessoa --cartao P --cenario C`; `pessoas --cartao P --cenarios C:N,C:N` (`-n` opcional, igual à soma); `botai cartao [--cartao P] [--cenario C] [--formatado] [--semente S]`. Servidor: `/pessoa?cartao&cenario`, `/pessoas?cartao&cenarios` (`n` opcional, soma até 10 000).
+- Plano: `cartao_provedor` e `cartao_cenario` no fim de `COLUNAS` (35).
+- Envelope: `FORMATO = 2` (JSON, ndjson, 1ª linha do SQL e `/saude`); esquema `@pilutech/botai-core/esquema/envelope-v2.schema.json`; o v1 continua no pacote, igual, para o formato 1. Dourados regravados em `dourado/v1` (a pasta é o conjunto de sementes, não o formato).
+- Playwright 0.2.0: opção `botaiCartao: OpcoesDoCartao | undefined` (padrão stripe/aprovado); erro de cartão vira `botaiCartao: <mensagem>`; depende do core 0.5.0 exato.

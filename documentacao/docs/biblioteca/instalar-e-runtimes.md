@@ -12,13 +12,13 @@ A biblioteca é o pacote `@pilutech/botai-core` do npm. É o mesmo pacote da CLI
 npm i -D @pilutech/botai-core
 ```
 
-Fixe a versão exata no `package.json` (`"@pilutech/botai-core": "0.4.1"`, sem `^`). Mudar a pessoa de uma semente é versão major; na série 0.x, é a minor. Veja [Versões e dourados](../conceitos/versoes-e-dourados.md).
+Fixe a versão exata no `package.json` (`"@pilutech/botai-core": "0.5.0"`, sem `^`). Mudar a pessoa de uma semente é versão major; na série 0.x, é a minor. Veja [Versões e dourados](../conceitos/versoes-e-dourados.md).
 
 ## O pacote
 
 - Só ESM, com tipos (`.d.ts`).
-- **Nenhuma dependência de runtime.** O pacote da 0.4.1 tem 95 arquivos e 216 339 bytes.
-- 25 entradas em `exports`: 23 módulos (a raiz e 22 subpaths), o esquema JSON do envelope e o `navegador.iife.js`. A lista está em [Referência de subpaths](./referencia-de-subpaths.md).
+- **Nenhuma dependência de runtime.** O pacote da 0.5.0 tem 96 arquivos e 250 334 bytes (medido no `pnpm pack` do repositório, em 2026-10-09).
+- 26 entradas em `exports`: 23 módulos (a raiz e 22 subpaths), os dois esquemas JSON do envelope (o v2 e o v1) e o `navegador.iife.js`. A lista está em [Referência de subpaths](./referencia-de-subpaths.md).
 - O pacote não declara `engines`.
 
 ```js

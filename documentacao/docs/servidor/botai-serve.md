@@ -11,7 +11,7 @@ O `botai serve` sobe um servidor HTTP local com três rotas, todas por GET: `/pe
 Onde houver Node, sem instalar nada:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 serve
+npx -y @pilutech/botai-core@0.5.0 serve
 ```
 
 Com o [binário](../binarios/install-sh.md) instalado:
@@ -23,7 +23,7 @@ botai serve
 Sem Node, pela [imagem Docker](../docker/imagem.md):
 
 ```bash
-docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.5.0
 ```
 
 Ao subir, o servidor escreve uma linha no stderr e fica no ar até você encerrar:
@@ -79,8 +79,8 @@ curl -fsS http://127.0.0.1:8790/saude
 ```json
 {
   "ok": true,
-  "formato": 1,
-  "motor": "0.4.1"
+  "formato": 2,
+  "motor": "0.5.0"
 }
 ```
 

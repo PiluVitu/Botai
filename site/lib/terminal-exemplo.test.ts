@@ -58,7 +58,7 @@ describe('a saída do terminal do hero', () => {
     expect(textoDaSaida(SAIDA_DO_TERMINAL)).toBe(
       [
         '{',
-        '  "formato": 1,',
+        '  "formato": 2,',
         `  "motor": ${j(MOTOR)},`,
         '  "semente": "42",',
         '  "hoje": "2026-10-05",',

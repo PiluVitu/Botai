@@ -37,7 +37,7 @@ test('cadastro', async ({ page, botai }) => {
 Sem opção nenhuma, a semente é o nome do projeto, o arquivo e os títulos do teste: `chromium › cadastro.e2e.ts › cadastro`. Retry e worker não entram, então a nova tentativa preenche com a mesma pessoa. O fixture registra no relatório:
 
 - a anotação `botai-semente` (a semente) e a `botai-hoje` (a data usada);
-- quando o teste falha, o anexo `botai-pessoa.json`, com `{ formato, motor, semente, hoje, pessoa }`.
+- quando o teste falha, o anexo `botai-pessoa.json`, com `{ formato, motor, semente, hoje, pessoa }` (o cartão da pessoa leva o `provedor` e o `cenario`).
 
 Para gerar a mesma pessoa fora do teste (Python, Go, banco de dados…):
 
@@ -55,12 +55,39 @@ A pessoa de uma semente só muda em versão major do `@pilutech/botai-core`. Par
 | `botaiHoje`         | hoje em São Paulo      | `AAAA-MM-DD`; idade, nascimento e validade do cartão contam a partir dela |
 | `botaiUf`           | sorteada               | UF do endereço (e do DDD, do CPF e do título)                             |
 | `botaiDominioEmail` | `tuamaeaquelaursa.com` | domínio do e-mail                                                         |
+| `botaiCartao`       | `stripe`, `aprovado`   | `{ provedor, cenario }` do cartão de teste (veja abaixo)                  |
 
 ```ts
 test.use({ botaiHoje: '2026-10-05', botaiUf: 'PI' })
 ```
 
 Ou para o projeto inteiro, no `playwright.config.ts`: `use: { botaiHoje: '2026-10-05' }`.
+
+## Cartão de teste por cenário
+
+O cartão da pessoa usa só números de teste oficiais, da [Stripe](https://docs.stripe.com/testing) ou do [simulador da Pagar.me](https://docs.pagar.me/docs/simulador-de-cartão-de-crédito). Escolha o provedor e o cenário com `botaiCartao`:
+
+```ts
+test.describe('pagamento recusado', () => {
+  test.use({ botaiCartao: { provedor: 'pagarme', cenario: 'recusado' } })
+
+  test('mostra o erro do cartão', async ({ page, botai }) => {
+    await page.goto('/checkout')
+    await botai.preencher(page) // o número do cartão é 4000 0000 0000 0028
+    await page.getByRole('button', { name: 'Pagar' }).click()
+    await expect(page.getByText('Pagamento recusado')).toBeVisible()
+  })
+})
+```
+
+| Provedor  | Cenários                                                                                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stripe`  | `aprovado`, `recusado`, `pendente` (exige 3DS), `recusado-saldo`, `recusado-roubado`, `recusado-perdido`, `recusado-expirado`, `recusado-cvc`, `erro-processamento` |
+| `pagarme` | `aprovado`, `recusado`, `pendente` (processa e aprova), `pendente-recusado`, `pendente-cancelado`, `chargeback`                                                     |
+
+- O cenário muda só o cartão: com a mesma semente, o resto da pessoa é igual em qualquer cenário. A semente padrão inclui os títulos do teste, então dois `describe` geram pessoas diferentes; para comparar cenários com a mesma pessoa, fixe `botaiSemente`.
+- Cenário que o provedor não tem falha no setup do teste com `botaiCartao: cenário desconhecido "…" para o provedor … (use …)`.
+- Para gerar a mesma pessoa fora do teste: `npx @pilutech/botai-core pessoa --semente "<semente>" --hoje <hoje> --cartao pagarme --cenario recusado`.
 
 ## Resultado
 

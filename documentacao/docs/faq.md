@@ -77,7 +77,7 @@ Mais em [Relógio e 2ª passada](./playwright/relogio-e-segunda-passada.md).
 Todo teste que usa o fixture leva as anotações `botai-semente` e `botai-hoje`, e a falha inesperada anexa o envelope em `botai-pessoa.json`. Com os dois valores, a CLI recria a pessoa fora do Playwright:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 pessoa --semente "<botai-semente>" --hoje <botai-hoje>
+npx -y @pilutech/botai-core@0.5.0 pessoa --semente "<botai-semente>" --hoje <botai-hoje>
 ```
 
 Mais em [Reproduzir uma falha](./playwright/reproduzir-uma-falha.md).

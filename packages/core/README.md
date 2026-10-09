@@ -28,6 +28,17 @@ const lote = gerarPessoas(100, {
   dominioEmail: 'example.com',
 })
 const comSemente = gerarEnvelopeDaPessoa() // { formato, motor, semente, hoje, pessoa }
+const recusada = gerarPessoa({
+  semente: 'checkout-1',
+  cartao: { provedor: 'pagarme', cenario: 'recusado' },
+})
+const checkout = gerarPessoas(13, {
+  semente: 'checkout',
+  cartao: {
+    provedor: 'stripe',
+    cenarios: { recusado: 10, aprovado: 2, pendente: 1 },
+  },
+})
 ```
 
 | Raiz                                                                        | O que faz                                                     |
@@ -39,10 +50,11 @@ const comSemente = gerarEnvelopeDaPessoa() // { formato, motor, semente, hoje, p
 | `sementeAleatoria()`                                                        | 16 dígitos hexadecimais                                       |
 | `hojeEmSaoPaulo(agora?)`                                                    | a data civil de São Paulo (`AAAA-MM-DD`)                      |
 | `FORMATO`, `MOTOR`, `DOMINIO_EMAIL_PADRAO`, `LIMITE_DO_LOTE`, `ErroDeOpcao` | constantes e o erro de opção inválida (`erro.opcao` diz qual) |
+| `CATALOGO_DE_CARTOES`                                                       | os cartões de teste de cada provedor, por cenário             |
 
-Opções: `semente` (número inteiro ou texto de até 256 caracteres), `hoje` (`AAAA-MM-DD`), `uf` (sigla) e `dominioEmail`.
+Opções: `semente` (número inteiro ou texto de até 256 caracteres), `hoje` (`AAAA-MM-DD`), `uf` (sigla), `dominioEmail` e `cartao` (`{ provedor, cenario }`; no lote, `{ provedor, cenarios }`).
 
-Subpaths: `/pessoa` (`montarPessoa(rng, hoje, opcoes?)`), `/plano` (visão plana, CSV e SQL), `/servidor` (o servidor HTTP do `botai serve`, só no Node), `/cpf`, `/cnpj`, `/rg`, `/pis`, `/titulo-eleitor`, `/celular`, `/nascimento`, `/senha`, `/nome`, `/endereco`, `/empresa`, `/cartao`, `/uf`, `/aleatorio`, `/prng`, `/campos`, `/campos-formatar`, `/atalhos` e o esquema `/esquema/envelope-v1.schema.json`.
+Subpaths: `/pessoa` (`montarPessoa(rng, hoje, opcoes?)`), `/plano` (visão plana, CSV e SQL), `/servidor` (o servidor HTTP do `botai serve`, só no Node), `/cpf`, `/cnpj`, `/rg`, `/pis`, `/titulo-eleitor`, `/celular`, `/nascimento`, `/senha`, `/nome`, `/endereco`, `/empresa`, `/cartao`, `/uf`, `/aleatorio`, `/prng`, `/campos`, `/campos-formatar`, `/atalhos` e os esquemas `/esquema/envelope-v2.schema.json` (o atual) e `/esquema/envelope-v1.schema.json` (o de antes da 0.5.0).
 
 ### Reproduzir uma pessoa
 
@@ -51,6 +63,19 @@ Subpaths: `/pessoa` (`montarPessoa(rng, hoje, opcoes?)`), `/plano` (visão plana
 - Fixe a versão do pacote. Mudar a pessoa que uma semente gera é versão major (na série 0.x, a minor).
 - No lote, a pessoa `i` (a partir de 0) vem da semente `S/i`. Se ela repetir o e-mail, o CPF ou o CNPJ de uma anterior, é sorteada de novo com `S/i/2`, `S/i/3`… Na saída `ndjson` da CLI, cada linha traz a semente exata.
 - As primeiras `k` pessoas de um lote de `n` são o lote de `k`.
+
+### Cartões de teste
+
+O cartão da pessoa usa só números de teste oficiais: os da [Stripe](https://docs.stripe.com/testing) e os do [simulador da Pagar.me](https://docs.pagar.me/docs/simulador-de-cartão-de-crédito). Um número aleatório que passa no Luhn não aprova em sandbox e pode ser o de um cartão real. O padrão é `stripe` + `aprovado` (Visa `4242 4242 4242 4242` ou Mastercard `5555 5555 5555 4444`).
+
+| Provedor  | Cenários                                                                                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stripe`  | `aprovado`, `recusado`, `pendente` (exige 3DS), `recusado-saldo`, `recusado-roubado`, `recusado-perdido`, `recusado-expirado`, `recusado-cvc`, `erro-processamento` |
+| `pagarme` | `aprovado`, `recusado`, `pendente` (processa e aprova), `pendente-recusado`, `pendente-cancelado`, `chargeback`                                                     |
+
+- O cenário muda só o cartão: a mesma semente gera a mesma pessoa em qualquer cenário, com a mesma validade e o mesmo CVV. O cartão leva `provedor` e `cenario`.
+- No lote, `cenarios: { recusado: 10, aprovado: 2 }` gera as pessoas em grupos, na ordem dada; `n` é a soma (outro `n` é erro). A pessoa `i` continua sendo a da semente `S/i`.
+- Provedor ou cenário desconhecido (ou que o provedor não tem) lança `ErroDeOpcao` com a lista dos válidos. O `CATALOGO_DE_CARTOES` (também em `/cartao`) traz o número, o rótulo, a descrição e o tipo (`ok`, `erro`, `espera`) de cada cenário.
 
 ### E-mail
 
@@ -62,6 +87,8 @@ O domínio padrão é `tuamaeaquelaursa.com`, uma caixa de entrada **pública**:
 npx @pilutech/botai-core pessoa --semente 42 --hoje 2026-10-05
 npx @pilutech/botai-core pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql > pessoas.sql
 npx @pilutech/botai-core pessoas -n 50 --formato csv --campos nome,cpf,email > pessoas.csv
+npx @pilutech/botai-core pessoas --cartao pagarme --cenarios recusado:10,aprovado:2,pendente:1 --formato csv
+npx @pilutech/botai-core cartao --cartao stripe --cenario recusado-saldo --formatado
 npx @pilutech/botai-core cpf --formatado --uf PI
 npx @pilutech/botai-core validar cnpj 35.728.569/0001-52
 ```
@@ -70,9 +97,11 @@ Instalado no projeto, o binário se chama `botai`.
 
 | Comando                                                                                                                                      | Saída                                                                            |
 | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `botai pessoa [--semente S] [--hoje AAAA-MM-DD] [--uf UF] [--dominio-email D]`                                                               | envelope JSON                                                                    |
+| `botai pessoa [--semente S] [--hoje AAAA-MM-DD] [--uf UF] [--dominio-email D] [--cartao P] [--cenario C]`                                    | envelope JSON                                                                    |
 | `botai pessoas -n N [as mesmas opções] [--formato json\|ndjson\|csv\|sql] [--dialeto postgres\|mysql\|sqlite] [--tabela T] [--campos a,b,c]` | o lote                                                                           |
+| `botai pessoas --cenarios C:N,C:N [--cartao P] [as outras opções]`                                                                           | o lote em grupos por cenário; o `-n`, se vier, tem de ser a soma                 |
 | `botai cpf\|cnpj\|rg\|pis\|titulo\|celular\|cep [--formatado] [--uf UF] [--semente S]`                                                       | um valor (só dígitos sem `--formatado`; `--uf` só em cpf, titulo, celular e cep) |
+| `botai cartao [--cartao stripe\|pagarme] [--cenario C] [--formatado] [--semente S]`                                                          | um número de cartão de teste                                                     |
 | `botai validar cpf\|cnpj\|rg\|pis\|titulo\|cartao <valor>`                                                                                   | `válido` ou `inválido`                                                           |
 | `botai --help`, `botai <comando> --help`, `botai --versao`                                                                                   | ajuda e versão                                                                   |
 
@@ -100,7 +129,8 @@ Instalado no projeto, o binário se chama `botai`.
 | `email_usuario`    | `email.usuario`                     | `cartao_numero`         | `cartao.numero`        |
 | `email_caixa_url`  | `email.caixaUrl` (pode ser nulo)    | `cartao_titular`        | `cartao.titular`       |
 | `senha`            | `senha`                             | `cartao_validade`       | `cartao.validade`      |
-|                    |                                     | `cartao_cvv`            | `cartao.cvv`           |
+| `cartao_provedor`  | `cartao.provedor`                   | `cartao_cvv`            | `cartao.cvv`           |
+| `cartao_cenario`   | `cartao.cenario`                    |                         |                        |
 
 Uma tabela que recebe tudo, no Postgres:
 
@@ -112,7 +142,7 @@ CREATE TABLE pessoas (
   celular text, celular_e164 text, cep text, logradouro text, numero text, complemento text,
   bairro text, cidade text, uf text, empresa_razao_social text, empresa_nome_fantasia text,
   empresa_cnpj text UNIQUE, cartao_bandeira text, cartao_numero text, cartao_titular text,
-  cartao_validade text, cartao_cvv text
+  cartao_validade text, cartao_cvv text, cartao_provedor text, cartao_cenario text
 );
 ```
 
@@ -128,14 +158,14 @@ Python:
 import json, subprocess
 
 saida = subprocess.run(
-    ["npx", "--yes", "@pilutech/botai-core@0.4.1", "pessoas", "-n", "10",
+    ["npx", "--yes", "@pilutech/botai-core@0.5.0", "pessoas", "-n", "10",
      "--semente", "testes", "--hoje", "2026-10-05", "--formato", "ndjson"],
     capture_output=True, text=True, check=True,
 ).stdout
 pessoas = [json.loads(linha)["pessoa"] for linha in saida.splitlines()]
 ```
 
-Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.4.1", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
+Go: `exec.Command("npx", "--yes", "@pilutech/botai-core@0.5.0", "pessoa", "--semente", "x", "--hoje", "2026-10-05").Output()` e `json.Unmarshal` no envelope.
 
 ## Servidor HTTP (`botai serve`)
 
@@ -146,11 +176,11 @@ npx @pilutech/botai-core serve                  # http://127.0.0.1:8790
 npx @pilutech/botai-core serve --porta 9000 --host 0.0.0.0
 ```
 
-| Rota           | Parâmetros (query)                                                                                                                                                                                                                      | Resposta                                    |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `GET /pessoa`  | `semente`, `hoje` (`AAAA-MM-DD`), `uf`, `dominioEmail`                                                                                                                                                                                  | `{ formato, motor, semente, hoje, pessoa }` |
-| `GET /pessoas` | os de `/pessoa` + `n` (1 a 10 000, obrigatório), `formato` (`json`, `ndjson`, `csv`, `sql`), `dialeto` (`postgres`, `mysql`, `sqlite`; só no `sql`), `tabela` (só no `sql`; aceita `esquema.tabela`), `campos` (só no `csv` e no `sql`) | o mesmo texto de `botai pessoas`            |
-| `GET /saude`   | nenhum                                                                                                                                                                                                                                  | `{ ok: true, formato, motor }`              |
+| Rota           | Parâmetros (query)                                                                                                                                                                                                                                                                                                               | Resposta                                    |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `GET /pessoa`  | `semente`, `hoje` (`AAAA-MM-DD`), `uf`, `dominioEmail`, `cartao` (`stripe` ou `pagarme`), `cenario`                                                                                                                                                                                                                              | `{ formato, motor, semente, hoje, pessoa }` |
+| `GET /pessoas` | os de `/pessoa` menos `cenario` + `cenarios` (`recusado:10,aprovado:2`), `n` (1 a 10 000; sem `cenarios`, obrigatório; com eles, a soma), `formato` (`json`, `ndjson`, `csv`, `sql`), `dialeto` (`postgres`, `mysql`, `sqlite`; só no `sql`), `tabela` (só no `sql`; aceita `esquema.tabela`), `campos` (só no `csv` e no `sql`) | o mesmo texto de `botai pessoas`            |
+| `GET /saude`   | nenhum                                                                                                                                                                                                                                                                                                                           | `{ ok: true, formato, motor }`              |
 
 - Os nomes são os das flags da CLI em camelCase, e os valores valem o mesmo que na CLI (`uf` e `dominioEmail` em qualquer caixa; semente de até 256 caracteres). Parâmetro desconhecido, repetido ou vazio, ou valor inválido, dá **400** com `{ "erro": "…" }`, que diz qual parâmetro (e, no desconhecido, lista os aceitos).
 - Sem `semente`, o servidor sorteia uma e a devolve no envelope; sem `hoje`, usa o dia de São Paulo, então a mesma semente gera outra pessoa no dia seguinte. Para reproduzir, passe os dois.
@@ -173,8 +203,8 @@ with urllib.request.urlopen("http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-1
 ## Docker
 
 ```bash
-docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1          # o servidor
-docker run --rm ghcr.io/piluvitu/botai:0.4.1 pessoa --semente 42    # a CLI
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.5.0          # o servidor
+docker run --rm ghcr.io/piluvitu/botai:0.5.0 pessoa --semente 42    # a CLI
 ```
 
 A imagem roda como usuário sem privilégio, escuta em `0.0.0.0:8790` e tem `HEALTHCHECK` em `/saude`. Para outra porta, mapeie com `-p 9000:8790` em vez de mudar a interna (o `HEALTHCHECK` olha a 8790).
@@ -184,7 +214,7 @@ No GitHub Actions, como service:
 ```yaml
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.4.1
+    image: ghcr.io/piluvitu/botai:0.5.0
     ports: ['8790:8790']
 ```
 
@@ -193,7 +223,7 @@ No docker compose:
 ```yaml
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.4.1
+    image: ghcr.io/piluvitu/botai:0.5.0
     ports: ['8790:8790']
 ```
 
@@ -206,7 +236,7 @@ curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh
 ```
 
 - Detecta o sistema e a arquitetura (num terminal sob Rosetta, instala o arm64), confere o SHA256 e instala em `~/.local/bin/botai`.
-- `BOTAI_VERSAO=0.4.1` fixa a versão; `BOTAI_DESTINO=/outra/pasta` muda o destino.
+- `BOTAI_VERSAO=0.5.0` fixa a versão; `BOTAI_DESTINO=/outra/pasta` muda o destino.
 - Alpine e outros Linux com musl não têm binário: use a imagem ou o npm.
 
 Conferir à mão: `shasum -a 256 -c --ignore-missing SHA256SUMS` (macOS) ou `sha256sum -c --ignore-missing SHA256SUMS` (Linux); no Windows, `Get-FileHash .\botai-windows-x64.exe -Algorithm SHA256` (ou o `botai-windows-arm64.exe`) e compare com a linha do `SHA256SUMS`.
@@ -241,7 +271,8 @@ const resultado = await preencherNaPagina(document, pessoa, hoje, {
 
 ## Contrato
 
-- `esquema/envelope-v1.schema.json` (JSON Schema 2020-12) descreve o envelope. `formato` muda quando a forma muda; `motor` é a versão do pacote que gerou os dados.
+- `esquema/envelope-v2.schema.json` (JSON Schema 2020-12) descreve o envelope. `formato` muda quando a forma muda; `motor` é a versão do pacote que gerou os dados.
+- Desde a 0.5.0, `formato` é `2`: o cartão ganhou `provedor` e `cenario`, e o esquema 1 recusa campo a mais. O `esquema/envelope-v1.schema.json` continua no pacote para os envelopes de formato 1 (motor 0.2.0 a 0.4.1).
 - O repositório guarda arquivos dourados (`packages/core/dourado/v1`): as pessoas esperadas para sementes e datas fixas, conferidas pela biblioteca, pela CLI, pelo servidor, pela imagem, pelos binários e pela extensão a cada mudança.
 
 ## Licença

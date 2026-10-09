@@ -11,7 +11,7 @@ Cada porta se instala de um jeito. Fixe sempre a versão exata: mudar a pessoa d
 Onde houver Node, o `npx` baixa e roda a CLI:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 pessoa --semente 42 --hoje 2026-10-05
+npx -y @pilutech/botai-core@0.5.0 pessoa --semente 42 --hoje 2026-10-05
 ```
 
 O pacote publicado gera exatamente o mesmo que o build local. Foram testados o Node 22 e o 24; o pacote não declara `engines`.
@@ -21,7 +21,7 @@ O pacote publicado gera exatamente o mesmo que o build local. Foram testados o N
 No projeto JS ou TS:
 
 ```bash
-npm install --save-dev --save-exact @pilutech/botai-core@0.4.1
+npm install --save-dev --save-exact @pilutech/botai-core@0.5.0
 ```
 
 O pacote é ESM, não tem nenhuma dependência e roda no Node, no Bun, no Deno e no navegador (com bundler). Os runtimes e os subpaths estão em [Instalar e runtimes](../biblioteca/instalar-e-runtimes.md).
@@ -29,25 +29,25 @@ O pacote é ESM, não tem nenhuma dependência e roda no Node, no Bun, no Deno e
 ## Fixture do Playwright {#playwright}
 
 ```bash
-npm install --save-dev --save-exact @pilutech/botai-playwright@0.1.0
+npm install --save-dev --save-exact @pilutech/botai-playwright@0.2.0
 ```
 
 - Só ESM, Node `^20.19.0 || >=22.12.0` e o `@playwright/test` ^1.59.1 como peer (provado na 1.63.0).
 - O projeto precisa de uma cópia só do `@playwright/test`, e o E2E precisa dos navegadores da versão exata do Playwright (`playwright install`).
-- O 0.1.0 publicado depende do core 0.4.0 exato. A pessoa é a mesma da 0.4.1; só o anexo `botai-pessoa.json` diz `motor 0.4.0`.
+- O 0.2.0 depende do core 0.5.0 exato.
 
 Detalhes em [Instalar o fixture](../playwright/instalar.md).
 
 ## Imagem Docker {#imagem}
 
 ```bash
-docker pull ghcr.io/piluvitu/botai:0.4.1
+docker pull ghcr.io/piluvitu/botai:0.5.0
 ```
 
-A imagem é multiarquitetura (linux/amd64 e linux/arm64) e roda sem root. Não existe tag de minor (`:0.4`): use a tag da versão exata. Sem argumentos, ela sobe o servidor na porta 8790; com argumentos, roda a CLI:
+A imagem é multiarquitetura (linux/amd64 e linux/arm64) e roda sem root. Não existe tag de minor (`:0.5`): use a tag da versão exata. Sem argumentos, ela sobe o servidor na porta 8790; com argumentos, roda a CLI:
 
 ```bash
-docker run --rm ghcr.io/piluvitu/botai:0.4.1 pessoa --semente 42 --hoje 2026-10-05
+docker run --rm ghcr.io/piluvitu/botai:0.5.0 pessoa --semente 42 --hoje 2026-10-05
 ```
 
 Mais em [A imagem](../docker/imagem.md).
@@ -63,12 +63,12 @@ curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh
 Para fixar a versão, passe `BOTAI_VERSAO`:
 
 ```bash
-curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | BOTAI_VERSAO=0.4.1 sh
+curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | BOTAI_VERSAO=0.5.0 sh
 ```
 
 | Variável         | O que muda                                      |
 | ---------------- | ----------------------------------------------- |
-| `BOTAI_VERSAO`   | a versão instalada, como `0.4.1`                |
+| `BOTAI_VERSAO`   | a versão instalada, como `0.5.0`                |
 | `BOTAI_DESTINO`  | a pasta de destino, em vez de `~/.local/bin`    |
 | `BOTAI_RELEASES` | a raiz dos releases de onde o binário é baixado |
 
@@ -81,7 +81,7 @@ botai --versao
 ```
 
 ```text
-0.4.1
+0.5.0
 ```
 
 :::note[Documentado]
@@ -94,10 +94,10 @@ Mais em [O install.sh](../binarios/install-sh.md).
 
 ## Download manual {#download-manual}
 
-Os binários, o `install.sh` e o `SHA256SUMS` ficam no GitHub Release `core-v0.4.1`:
+Os binários, o `install.sh` e o `SHA256SUMS` ficam no GitHub Release `core-v0.5.0`:
 
 ```bash
-gh release download core-v0.4.1 --repo PiluVitu/Botai
+gh release download core-v0.5.0 --repo PiluVitu/Botai
 shasum -a 256 -c --ignore-missing SHA256SUMS
 ```
 
@@ -129,7 +129,7 @@ Os exemplos escrevem `botai`, como fica depois do `install.sh`. Com outra porta,
 
 | Porta  | Em vez de `botai pessoa …`                              |
 | ------ | ------------------------------------------------------- |
-| npx    | `npx -y @pilutech/botai-core@0.4.1 pessoa …`            |
-| imagem | `docker run --rm ghcr.io/piluvitu/botai:0.4.1 pessoa …` |
+| npx    | `npx -y @pilutech/botai-core@0.5.0 pessoa …`            |
+| imagem | `docker run --rm ghcr.io/piluvitu/botai:0.5.0 pessoa …` |
 
-O servidor é a exceção. Pela imagem, suba-o sem argumentos e publique a porta: `docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1`. Ele já escuta em `0.0.0.0:8790` dentro do contêiner.
+O servidor é a exceção. Pela imagem, suba-o sem argumentos e publique a porta: `docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.5.0`. Ele já escuta em `0.0.0.0:8790` dentro do contêiner.

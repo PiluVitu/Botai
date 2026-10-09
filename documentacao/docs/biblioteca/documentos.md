@@ -85,11 +85,11 @@ Passe sempre uma das 27 siglas, em maiúsculas (a lista é `UFS`, do subpath `/u
 
 ## Contato, endereço e cartão
 
-| Subpath     | Exporta                                                             | Observação                                                                                          |
-| ----------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `/celular`  | `gerarCelular(rng?, ddd = '11')`                                    | sempre celular (sem fixo); confere só o formato do DDD, sem lista de DDDs que existem               |
-| `/endereco` | `gerarEndereco(rng?, uf?)`, `LOGRADOUROS`                           | um dos 34 CEPs reais, com o número dentro da faixa e do lado da rua                                 |
-| `/cartao`   | `gerarCartao(rng, hojeISO, titular)`, `luhnValido`, `CARTOES_TESTE` | só os dois cartões de teste da Stripe; validade de 12 a 59 meses depois de `hoje`; CVV de 100 a 999 |
+| Subpath     | Exporta                                                                                                            | Observação                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/celular`  | `gerarCelular(rng?, ddd = '11')`                                                                                   | sempre celular (sem fixo); confere só o formato do DDD, sem lista de DDDs que existem                                                                 |
+| `/endereco` | `gerarEndereco(rng?, uf?)`, `LOGRADOUROS`                                                                          | um dos 34 CEPs reais, com o número dentro da faixa e do lado da rua                                                                                   |
+| `/cartao`   | `gerarCartao(rng, hojeISO, titular, { provedor, cenario }?)`, `luhnValido`, `CATALOGO_DE_CARTOES`, `CARTOES_TESTE` | só números de teste da Stripe e da Pagar.me, por cenário (padrão: o aprovado da Stripe); validade de 12 a 59 meses depois de `hoje`; CVV de 100 a 999 |
 
 ```js
 import { rngDeSemente } from '@pilutech/botai-core'
@@ -130,11 +130,47 @@ console.log(cartao, luhnValido(cartao.numero), CARTOES_TESTE.length)
   validade: '03/28',
   mes: '03',
   ano: '28',
-  cvv: '606'
+  cvv: '606',
+  provedor: 'stripe',
+  cenario: 'aprovado'
 } true 2
 ```
 
-O DDD do celular de uma pessoa é o do CEP: para manter a coerência numa pessoa montada à mão, passe `endereco.ddd` ao `gerarCelular`, como acima. Os cartões são o Visa `4242424242424242` e o Mastercard `5555555555554444`; não há Elo, Amex nem Hipercard.
+O DDD do celular de uma pessoa é o do CEP: para manter a coerência numa pessoa montada à mão, passe `endereco.ddd` ao `gerarCelular`, como acima. Sem o 4º argumento, o cartão é o aprovado da Stripe: o Visa `4242424242424242` ou o Mastercard `5555555555554444`. Não há Elo, Amex nem Hipercard.
+
+### O catálogo de cartões {#cartao}
+
+O 4º argumento do `gerarCartao` escolhe o provedor e o cenário. Com o mesmo `rng`, a validade e o CVV são os mesmos do padrão; só o número muda. `CATALOGO_DE_CARTOES` (também na raiz) traz, por provedor, cada cenário com o `id`, o `rotulo`, a `descricao`, o `tipo` (`ok`, `erro` ou `espera`) e os `numeros`:
+
+```js
+import { CATALOGO_DE_CARTOES, rngDeSemente } from '@pilutech/botai-core'
+import { gerarCartao } from '@pilutech/botai-core/cartao'
+
+const cartao = gerarCartao(
+  rngDeSemente('documentos'),
+  '2026-10-05',
+  'FULANO DE TAL',
+  {
+    provedor: 'pagarme',
+    cenario: 'chargeback',
+  },
+)
+console.log(cartao.numero, cartao.bandeira, cartao.provedor, cartao.cenario)
+for (const c of CATALOGO_DE_CARTOES.pagarme)
+  console.log(c.id, c.numeros[0].numero, c.tipo, c.rotulo)
+```
+
+```text
+4000000000000069 visa pagarme chargeback
+aprovado 4000000000000010 ok aprovado
+recusado 4000000000000028 erro recusado
+pendente 4000000000000036 espera pendente → aprova
+pendente-recusado 4000000000000044 espera pendente → recusa
+pendente-cancelado 4000000000000051 espera pendente → cancela
+chargeback 4000000000000069 erro chargeback
+```
+
+Provedor ou cenário desconhecido lança `ErroDeOpcao`, com a lista dos válidos. Os cenários e as fontes estão em [Cartões de teste](../conceitos/cartoes-de-teste.md).
 
 ## Nome, nascimento, senha e empresa
 

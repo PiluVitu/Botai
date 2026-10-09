@@ -11,6 +11,16 @@ test('falha na primeira tentativa e passa na segunda', ({
 })
 
 test.describe(() => {
+  test.use({ botaiCartao: { provedor: 'pagarme', cenario: 'recusado-cvc' } })
+
+  test('botaiCartao com cenário que o provedor não tem falha com mensagem clara', ({
+    botai,
+  }) => {
+    expect(botai.pessoa).toBeDefined()
+  })
+})
+
+test.describe(() => {
   test.use({ botaiHoje: '05/10/2026' })
 
   test('botaiHoje fora do formato falha com mensagem clara', ({ botai }) => {

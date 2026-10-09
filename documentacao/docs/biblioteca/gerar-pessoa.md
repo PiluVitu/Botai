@@ -1,6 +1,6 @@
 ---
 title: Gerar uma pessoa
-description: gerarPessoa e as quatro opções da raiz (semente, hoje, uf e dominioEmail), o ErroDeOpcao, os envelopes e o hojeEmSaoPaulo.
+description: gerarPessoa e as opções da raiz (semente, hoje, uf, dominioEmail e cartao), o ErroDeOpcao, os envelopes e o hojeEmSaoPaulo.
 sidebar_position: 2
 ---
 
@@ -27,7 +27,7 @@ Os campos, os formatos e o exemplo completo da semente 42 estão em [A pessoa](.
 
 ## As opções {#opcoes}
 
-Na raiz há só quatro opções, todas opcionais:
+Na raiz há cinco opções, todas opcionais:
 
 | Opção          | Valor                                                                                          | Sem ela                               |
 | -------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------- |
@@ -35,6 +35,7 @@ Na raiz há só quatro opções, todas opcionais:
 | `hoje`         | uma data `AAAA-MM-DD` que existe                                                               | a data de hoje em São Paulo           |
 | `uf`           | uma das 27 siglas, em qualquer caixa                                                           | a UF sai do endereço sorteado         |
 | `dominioEmail` | um domínio, como `example.com`                                                                 | `tuamaeaquelaursa.com`, caixa pública |
+| `cartao`       | `{ provedor, cenario }`: `stripe` ou `pagarme`, e um cenário do provedor                       | `stripe` e `aprovado`                 |
 
 - `42` e `'42'` são a mesma semente. Um texto em NFC e o mesmo texto em NFD também.
 - Não há opção de sexo, idade ou cidade. Para isso, monte a pessoa à mão pelos subpaths ([Documentos e geradores avulsos](./documentos.md)).
@@ -84,9 +85,41 @@ RS 634.132.400-64 Porto Alegre 51 5022 4149 0477
 - **`dominioEmail`** muda só `email.endereco` e `email.caixaUrl`, que vira `null`. O domínio sai em minúsculas.
 - **`hoje`** mantém a idade e muda a data de nascimento e a validade do cartão.
 
+### Cartão {#cartao}
+
+`cartao: { provedor, cenario }` escolhe o cartão de teste. Muda só o número, a bandeira, o `provedor` e o `cenario` do cartão; a validade, o CVV e o resto da pessoa ficam:
+
+```js
+import { gerarPessoa } from '@pilutech/botai-core'
+
+for (const cartao of [
+  undefined,
+  { provedor: 'pagarme', cenario: 'recusado' },
+  { cenario: 'recusado-saldo' },
+]) {
+  const p = gerarPessoa({ semente: 42, hoje: '2026-10-05', cartao })
+  console.log(
+    p.cpf,
+    p.cartao.numero,
+    p.cartao.provedor,
+    p.cartao.cenario,
+    p.cartao.validade,
+    p.cartao.cvv,
+  )
+}
+```
+
+```text
+634.132.403-07 5555555555554444 stripe aprovado 11/28 388
+634.132.403-07 4000000000000028 pagarme recusado 11/28 388
+634.132.403-07 4000000000009995 stripe recusado-saldo 11/28 388
+```
+
+Sem `provedor`, vale a `stripe`. Os provedores, os cenários e o que cada um faz estão em [Cartões de teste](../conceitos/cartoes-de-teste.md); a raiz exporta o catálogo como `CATALOGO_DE_CARTOES` ([Documentos](./documentos.md#cartao)).
+
 ## Opção inválida: `ErroDeOpcao` {#erro-de-opcao}
 
-Uma opção inválida lança `ErroDeOpcao`. O campo `opcao` diz qual: `'semente'`, `'hoje'`, `'uf'`, `'dominioEmail'` ou `'n'` (o tamanho do lote).
+Uma opção inválida lança `ErroDeOpcao`. O campo `opcao` diz qual: `'semente'`, `'hoje'`, `'uf'`, `'dominioEmail'`, `'cartao'` (o provedor), `'cenario'`, `'cenarios'` ou `'n'` (os dois últimos, no lote).
 
 ```js
 import { ErroDeOpcao, gerarPessoa } from '@pilutech/botai-core'
@@ -112,6 +145,8 @@ semente → semente vazia
 semente → semente com mais de 256 caracteres
 semente → semente com caractere de controle
 dominioEmail → domínio de e-mail inválido "localhost" (ex.: example.com)
+cartao → provedor de cartão desconhecido "adyen" (use stripe, pagarme)
+cenario → cenário desconhecido "recusado-cvc" para o provedor pagarme (use aprovado, recusado, pendente, pendente-recusado, pendente-cancelado, chargeback)
 ```
 
 ## Envelopes {#envelopes}
@@ -127,7 +162,7 @@ console.log(envelope.pessoa.cpf)
 ```
 
 ```text
-1 0.4.1 42 2026-10-05
+2 0.5.0 42 2026-10-05
 634.132.403-07
 ```
 

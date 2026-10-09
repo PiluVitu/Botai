@@ -15,7 +15,7 @@ npm i -D @pilutech/botai-playwright
 Mudar a pessoa de uma semente é versão major; na série 0.x, é a minor. Para que ela não mude sem você saber, fixe a versão exata:
 
 ```bash
-npm i -D --save-exact @pilutech/botai-playwright@0.1.0
+npm i -D --save-exact @pilutech/botai-playwright@0.2.0
 ```
 
 ## O que o projeto precisa ter
@@ -35,7 +35,7 @@ Chromium 153, Firefox 155 e WebKit 26.6, com o Playwright 1.63.0, tanto com o pa
 
 ## A versão do core
 
-O 0.1.0 depende do core 0.4.0, na versão exata. A pessoa é a mesma que o core 0.4.1 gera, e o anexo `botai-pessoa.json` diz `motor` 0.4.0. Mais sobre versões em [versões e dourados](../conceitos/versoes-e-dourados.md).
+O 0.2.0 depende do core 0.5.0, na versão exata: a pessoa e o `motor` do anexo `botai-pessoa.json` são os do core 0.5.0. O 0.1.0 dependia do core 0.4.0. Mais sobre versões em [versões e dourados](../conceitos/versoes-e-dourados.md).
 
 ## Sem o fixture
 

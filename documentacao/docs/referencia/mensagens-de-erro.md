@@ -22,7 +22,7 @@ Toda mensagem da CLI vai para o stderr e começa com `botai:`. Num erro de uso, 
 
 | Mensagem no stderr                                                   | Quando                                        |
 | -------------------------------------------------------------------- | --------------------------------------------- |
-| `botai: -n é obrigatório`                                            | `botai pessoas` sem `-n`                      |
+| `botai: -n é obrigatório sem --cenarios`                             | `botai pessoas` sem `-n` e sem `--cenarios`   |
 | `botai: -n precisa ser um inteiro, recebido "abc"`                   | o `-n` não é um inteiro (também `-1` e `1.5`) |
 | `botai: -n: n precisa ser um inteiro de 0 a 100000, recebido 100001` | o `-n` passou de 100 000                      |
 
@@ -46,6 +46,22 @@ botai pessoas -n 100001
 botai pessoa --hoje 05/10/2026
 ```
 
+### Cartões {#cli-cartoes}
+
+| Mensagem no stderr                                                                                                                                                    | Quando                                                         |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `botai: --cartao: provedor de cartão desconhecido "adyen" (use stripe, pagarme)`                                                                                      | o provedor não é `stripe` nem `pagarme`                        |
+| `botai: --cenario: cenário desconhecido "recusado-cvc" para o provedor pagarme (use aprovado, recusado, pendente, pendente-recusado, pendente-cancelado, chargeback)` | o provedor não tem o cenário (sem `--cartao`, vale a `stripe`) |
+| `botai: --cenarios: cenarios precisa ser cenario:quantidade, separados por vírgula (ex.: recusado:10,aprovado:2), recebido "recusado"`                                | faltou a quantidade, ou há vírgula sobrando                    |
+| `botai: --cenarios: quantidade inválida "0" no cenário recusado (um inteiro de 1 em diante)`                                                                          | a quantidade não é um inteiro de 1 em diante                   |
+| `botai: --cenarios: cenário repetido "aprovado"`                                                                                                                      | o mesmo cenário duas vezes                                     |
+| `botai: --cenarios: a soma dos cenários (100001) passa do limite de 100000 pessoas`                                                                                   | a soma passou de 100 000                                       |
+| `botai: -n: n (5) diferente da soma dos cenários (10)`                                                                                                                | o `-n` veio e não é a soma                                     |
+
+```bash testar=2
+botai pessoa --cartao pagarme --cenario recusado-cvc
+```
+
 ### Formatos {#cli-formatos}
 
 | Mensagem no stderr                                                                                       | Quando                                                                 |
@@ -59,7 +75,7 @@ botai pessoa --hoje 05/10/2026
 | `botai: campos: lista vazia ou com vírgula sobrando`                                                     | `--campos ''` ou uma vírgula a mais                                    |
 | `botai: campos: coluna repetida "nome"`                                                                  | a mesma coluna duas vezes                                              |
 
-Coluna que não existe também sai com 2. A mensagem começa com `botai: campos: coluna desconhecida "xyz"` e lista as 33 colunas aceitas (estão em [Colunas](./colunas.md)).
+Coluna que não existe também sai com 2. A mensagem começa com `botai: campos: coluna desconhecida "xyz"` e lista as 35 colunas aceitas (estão em [Colunas](./colunas.md)).
 
 ```bash testar=2
 botai pessoas -n 10 --formato sql --tabela 'x;drop'
@@ -118,27 +134,30 @@ Toda resposta de erro é JSON, com `Content-Type: application/json; charset=utf-
 
 A mensagem diz qual parâmetro está errado. Os exemplos abaixo são as respostas reais aos pedidos da coluna "Pedido".
 
-| Status | Pedido                                   | `erro`                                                                                                      |
-| ------ | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| 400    | `/pessoa?dominio-email=example.com`      | `parâmetro desconhecido: dominio-email (aceitos: semente, hoje, uf, dominioEmail)`                          |
-| 400    | `/pessoas?n=2&x=1`                       | `parâmetro desconhecido: x (aceitos: semente, hoje, uf, dominioEmail, n, formato, dialeto, tabela, campos)` |
-| 400    | `/pessoa?semente=1&semente=2`            | `parâmetro repetido: semente`                                                                               |
-| 400    | `/pessoa?semente=`                       | `parâmetro vazio: semente`                                                                                  |
-| 400    | `/pessoas?semente=x`                     | `falta o n (de 1 a 10000)`                                                                                  |
-| 400    | `/pessoas?n=10001`                       | `n inválido: 10001 (um inteiro de 1 a 10000)`                                                               |
-| 400    | `/pessoas?n=2&formato=xml`               | `formato inválido: xml (use json, ndjson, csv, sql)`                                                        |
-| 400    | `/pessoas?n=2&dialeto=mysql`             | `dialeto só vale com formato=sql`                                                                           |
-| 400    | `/pessoas?n=2&formato=csv&tabela=x`      | `tabela só vale com formato=sql`                                                                            |
-| 400    | `/pessoas?n=2&campos=nome`               | `campos só vale com formato=csv ou formato=sql`                                                             |
-| 400    | `/pessoas?n=2&formato=sql&dialeto=MySQL` | `dialeto desconhecido "MySQL" (use postgres, mysql, sqlite)`                                                |
-| 400    | `/pessoas?n=2&formato=sql&tabela=a.b.c`  | `tabela inválida "a.b.c" (letras, dígitos e _, até 63 caracteres; opcionalmente esquema.tabela)`            |
-| 400    | `/pessoa?uf=XX`                          | `uf: uf desconhecida "XX" (use uma das 27 siglas, ex.: SP)`                                                 |
-| 400    | `/pessoa?hoje=05/10/2026`                | `hoje: hoje precisa ser uma data AAAA-MM-DD que existe, recebido "05/10/2026"`                              |
-| 400    | `/pessoa?dominioEmail=nao%20dominio`     | `dominioEmail: domínio de e-mail inválido "nao dominio" (ex.: example.com)`                                 |
-| 404    | `/nada`                                  | `rota desconhecida: /nada (rotas: /pessoa, /pessoas, /saude)`                                               |
-| 405    | `POST /pessoa`                           | `método POST não aceito: use GET`, com o cabeçalho `Allow: GET`                                             |
+| Status | Pedido                                        | `erro`                                                                                                                                                       |
+| ------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 400    | `/pessoa?dominio-email=example.com`           | `parâmetro desconhecido: dominio-email (aceitos: semente, hoje, uf, dominioEmail, cartao, cenario)`                                                          |
+| 400    | `/pessoas?n=2&x=1`                            | `parâmetro desconhecido: x (aceitos: semente, hoje, uf, dominioEmail, cartao, cenarios, n, formato, dialeto, tabela, campos)`                                |
+| 400    | `/pessoa?semente=1&semente=2`                 | `parâmetro repetido: semente`                                                                                                                                |
+| 400    | `/pessoa?semente=`                            | `parâmetro vazio: semente`                                                                                                                                   |
+| 400    | `/pessoas?semente=x`                          | `falta o n (de 1 a 10000) ou os cenarios`                                                                                                                    |
+| 400    | `/pessoas?n=10001`                            | `n inválido: 10001 (um inteiro de 1 a 10000)`                                                                                                                |
+| 400    | `/pessoas?n=2&formato=xml`                    | `formato inválido: xml (use json, ndjson, csv, sql)`                                                                                                         |
+| 400    | `/pessoas?n=2&dialeto=mysql`                  | `dialeto só vale com formato=sql`                                                                                                                            |
+| 400    | `/pessoas?n=2&formato=csv&tabela=x`           | `tabela só vale com formato=sql`                                                                                                                             |
+| 400    | `/pessoas?n=2&campos=nome`                    | `campos só vale com formato=csv ou formato=sql`                                                                                                              |
+| 400    | `/pessoas?n=2&formato=sql&dialeto=MySQL`      | `dialeto desconhecido "MySQL" (use postgres, mysql, sqlite)`                                                                                                 |
+| 400    | `/pessoas?n=2&formato=sql&tabela=a.b.c`       | `tabela inválida "a.b.c" (letras, dígitos e _, até 63 caracteres; opcionalmente esquema.tabela)`                                                             |
+| 400    | `/pessoa?uf=XX`                               | `uf: uf desconhecida "XX" (use uma das 27 siglas, ex.: SP)`                                                                                                  |
+| 400    | `/pessoa?hoje=05/10/2026`                     | `hoje: hoje precisa ser uma data AAAA-MM-DD que existe, recebido "05/10/2026"`                                                                               |
+| 400    | `/pessoa?dominioEmail=nao%20dominio`          | `dominioEmail: domínio de e-mail inválido "nao dominio" (ex.: example.com)`                                                                                  |
+| 400    | `/pessoa?cartao=pagarme&cenario=recusado-cvc` | `cenario: cenário desconhecido "recusado-cvc" para o provedor pagarme (use aprovado, recusado, pendente, pendente-recusado, pendente-cancelado, chargeback)` |
+| 400    | `/pessoas?n=5&cenarios=recusado:10`           | `n: n (5) diferente da soma dos cenários (10)`                                                                                                               |
+| 400    | `/pessoas?cenarios=aprovado:10001`            | `cenarios: a soma dos cenários (10001) passa do limite de 10000 pessoas`                                                                                     |
+| 404    | `/nada`                                       | `rota desconhecida: /nada (rotas: /pessoa, /pessoas, /saude)`                                                                                                |
+| 405    | `POST /pessoa`                                | `método POST não aceito: use GET`, com o cabeçalho `Allow: GET`                                                                                              |
 
-- Coluna desconhecida em `campos` também dá 400. A mensagem começa com `campos: coluna desconhecida "xyz"` e lista as 33 colunas aceitas (estão em [Colunas](./colunas.md)).
+- Coluna desconhecida em `campos` também dá 400. A mensagem começa com `campos: coluna desconhecida "xyz"` e lista as 35 colunas aceitas (estão em [Colunas](./colunas.md)).
 - HEAD e OPTIONS também dão 405 com `Allow: GET`. Na resposta a HEAD não vem corpo.
 - O `/saude` ignora parâmetros que não conhece e responde 200.
 

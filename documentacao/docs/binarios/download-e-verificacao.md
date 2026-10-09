@@ -1,6 +1,6 @@
 ---
 title: Download e verificação
-description: Baixar à mão o binário do release core-v0.4.1, conferir o SHA256SUMS e rodar, inclusive no Windows, onde o install.sh não serve.
+description: Baixar à mão o binário do release core-v0.5.0, conferir o SHA256SUMS e rodar, inclusive no Windows, onde o install.sh não serve.
 sidebar_position: 2
 ---
 
@@ -8,7 +8,7 @@ Cada versão do core tem um release no GitHub com seis binários sem Node, o `in
 
 ## Os arquivos do release {#arquivos}
 
-O release da versão atual é o [`core-v0.4.1`](https://github.com/PiluVitu/Botai/releases/tag/core-v0.4.1).
+O release da versão atual é o [`core-v0.5.0`](https://github.com/PiluVitu/Botai/releases/tag/core-v0.5.0).
 
 | Arquivo                   | Para                             |
 | ------------------------- | -------------------------------- |
@@ -34,7 +34,7 @@ Só o `botai-darwin-arm64` foi rodado nas provas de 2026-10-08. Os outros cinco 
 Com o GitHub CLI, os oito arquivos de uma vez:
 
 ```bash
-gh release download core-v0.4.1 --repo PiluVitu/Botai
+gh release download core-v0.5.0 --repo PiluVitu/Botai
 ```
 
 Ou baixe pelo navegador, na página do release, só o binário do seu sistema e o `SHA256SUMS`.

@@ -11,7 +11,7 @@ O SQL traz só os INSERTs, sem `CREATE TABLE`: crie a tabela antes.
 
 ## A tabela {#a-tabela}
 
-O README do core traz esta tabela para o Postgres. Ela recebe as 33 colunas, na ordem do CSV e do SQL, com UNIQUE no CPF, no e-mail e no CNPJ:
+O README do core traz esta tabela para o Postgres. Ela recebe as 35 colunas, na ordem do CSV e do SQL, com UNIQUE no CPF, no e-mail e no CNPJ:
 
 ```sql
 CREATE TABLE pessoas (
@@ -21,7 +21,7 @@ CREATE TABLE pessoas (
   celular text, celular_e164 text, cep text, logradouro text, numero text, complemento text,
   bairro text, cidade text, uf text, empresa_razao_social text, empresa_nome_fantasia text,
   empresa_cnpj text UNIQUE, cartao_bandeira text, cartao_numero text, cartao_titular text,
-  cartao_validade text, cartao_cvv text
+  cartao_validade text, cartao_cvv text, cartao_provedor text, cartao_cenario text
 );
 ```
 
@@ -47,7 +47,7 @@ botai pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato csv \
 Onde houver Node e nada instalado, o mesmo pelo `npx`, com a versão fixa:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql | psql "$DATABASE_URL"
+npx -y @pilutech/botai-core@0.5.0 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql | psql "$DATABASE_URL"
 ```
 
 Para conferir o arquivo antes de importar, gere-o e conte os INSERTs:
@@ -70,7 +70,7 @@ botai pessoas -n 2 --semente demo --hoje 2026-10-08 --formato sql --tabela app.c
 ```
 
 ```sql
--- botai: formato 1, motor 0.4.1, semente demo, hoje 2026-10-08
+-- botai: formato 2, motor 0.5.0, semente demo, hoje 2026-10-08
 INSERT INTO "app"."clientes" ("nome", "cpf", "email") VALUES ('Isabela Freitas Santos', '550.160.642-96', 'isabela-santos-7825@tuamaeaquelaursa.com');
 INSERT INTO "app"."clientes" ("nome", "cpf", "email") VALUES ('Vitória Alves Carvalho', '843.495.439-70', 'vitoria-carvalho-1721@tuamaeaquelaursa.com');
 ```

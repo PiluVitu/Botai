@@ -1,6 +1,11 @@
 import type { Rng } from './aleatorio'
 import { type Celular, gerarCelular } from './celular'
-import { type Cartao, gerarCartao } from './cartao'
+import {
+  type Cartao,
+  gerarCartao,
+  lerCartao,
+  type OpcoesDoCartao,
+} from './cartao'
 import { gerarCPF } from './cpf'
 import { type Empresa, gerarEmpresa } from './empresa'
 import { type Endereco, gerarEndereco } from './endereco'
@@ -31,6 +36,7 @@ export interface Pessoa {
 export interface OpcoesDaMontagem {
   uf?: UF
   dominioEmail?: string
+  cartao?: OpcoesDoCartao
 }
 
 // A ordem das chamadas a rng é parte do contrato: mudar a ordem muda a pessoa de uma semente.
@@ -44,6 +50,7 @@ export function montarPessoa(
     opcoes.dominioEmail === undefined
       ? undefined
       : lerDominioEmail(opcoes.dominioEmail)
+  const cartao = lerCartao(opcoes.cartao)
   const nome = gerarNome(rng)
   const endereco = gerarEndereco(rng, uf)
   const nascimento = gerarNascimento(rng, hojeISO)
@@ -59,6 +66,6 @@ export function montarPessoa(
     senha: gerarSenha(rng),
     endereco,
     empresa: gerarEmpresa(rng, nome.sobrenomes),
-    cartao: gerarCartao(rng, hojeISO, nome.noCartao),
+    cartao: gerarCartao(rng, hojeISO, nome.noCartao, cartao),
   }
 }

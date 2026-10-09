@@ -13,7 +13,7 @@ O bloco abaixo vem do README do core. Ninguém o rodou num docker compose na aud
 ```yaml title="compose.yaml"
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.4.1
+    image: ghcr.io/piluvitu/botai:0.5.0
     ports: ['8790:8790']
 ```
 
@@ -34,7 +34,7 @@ Num serviço do mesmo compose, o nome do serviço vira o host: os testes chamam 
 ```yaml title="compose.yaml"
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.4.1
+    image: ghcr.io/piluvitu/botai:0.5.0
   testes:
     build: .
     depends_on:

@@ -16,7 +16,7 @@ curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh
 Para fixar a versão, que é o recomendado:
 
 ```bash
-curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | BOTAI_VERSAO=0.4.1 sh
+curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | BOTAI_VERSAO=0.5.0 sh
 ```
 
 No fim, ele escreve `botai instalado em <destino>/botai (botai-darwin-arm64)`, com a pasta e o binário que escolheu. Se a pasta não está no `PATH`, ele avisa no stderr e mostra a linha para o perfil do seu shell:
@@ -32,7 +32,7 @@ botai --versao
 ```
 
 ```text
-0.4.1
+0.5.0
 ```
 
 ## Variáveis {#variaveis}
@@ -46,7 +46,7 @@ botai --versao
 As variáveis vão antes do `sh`, do lado direito do pipe:
 
 ```bash
-curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | BOTAI_VERSAO=0.4.1 BOTAI_DESTINO="$HOME/bin" sh
+curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | BOTAI_VERSAO=0.5.0 BOTAI_DESTINO="$HOME/bin" sh
 ```
 
 Com `BOTAI_RELEASES`, o script procura os arquivos em `<raiz>/latest/download/` ou, com `BOTAI_VERSAO`, em `<raiz>/download/core-v<versão>/`, como no GitHub. Serve para um espelho dos releases.

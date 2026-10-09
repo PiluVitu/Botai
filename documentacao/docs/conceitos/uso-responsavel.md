@@ -10,7 +10,7 @@ O Botaí gera dados de teste. Eles são fictícios, mas passam em todo validador
 
 - **Documentos podem existir.** O CPF, o CNPJ e o celular gerados têm dígitos verificadores e formato válidos, e podem pertencer a uma pessoa ou a uma empresa real.
 - **Nunca em produção.** Não use o Botaí para criar contas reais nem para preencher formulários de sistemas em produção.
-- **O cartão é de teste.** Sai sempre um dos dois números de teste da Stripe (`4242424242424242` ou `5555555555554444`).
+- **O cartão é de teste.** Sai sempre um número de teste oficial da Stripe ou da Pagar.me ([Cartões de teste](./cartoes-de-teste.md)); o padrão é `4242424242424242` ou `5555555555554444`.
 
 ## A caixa de e-mail é pública {#email-publico}
 

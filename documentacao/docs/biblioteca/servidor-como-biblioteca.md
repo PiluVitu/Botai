@@ -65,7 +65,7 @@ for (const [metodo, alvo] of [
 405 GET método POST não aceito: use GET
 404 - rota desconhecida: /nada (rotas: /pessoa, /pessoas, /saude)
 400 - n inválido: 10001 (um inteiro de 1 a 10000)
-400 - parâmetro desconhecido: dominio-email (aceitos: semente, hoje, uf, dominioEmail)
+400 - parâmetro desconhecido: dominio-email (aceitos: semente, hoje, uf, dominioEmail, cartao, cenario)
 ```
 
 ## `iniciarServidor`: o servidor no ar
@@ -82,7 +82,7 @@ await encerrar()
 ```
 
 ```text
-200 { ok: true, formato: 1, motor: '0.4.1' }
+200 { ok: true, formato: 2, motor: '0.5.0' }
 ```
 
 É o que o `botai serve` faz. Pelo terminal, a mesma rota responde igual:

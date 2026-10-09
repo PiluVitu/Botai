@@ -11,7 +11,7 @@ A semente `42` com o hoje `2026-10-05` gera sempre a mesma pessoa: Márcio Carva
 Onde houver Node, sem instalar nada:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 pessoa --semente 42 --hoje 2026-10-05
+npx -y @pilutech/botai-core@0.5.0 pessoa --semente 42 --hoje 2026-10-05
 ```
 
 Com o `botai` no PATH (pelo [binário](./instalacao.md#binario)), o comando fica mais curto:
@@ -25,8 +25,8 @@ A saída é um envelope com a pessoa:
 <!-- prettier-ignore -->
 ```json
 {
-  "formato": 1,
-  "motor": "0.4.1",
+  "formato": 2,
+  "motor": "0.5.0",
   "semente": "42",
   "hoje": "2026-10-05",
   "pessoa": {
@@ -89,7 +89,9 @@ A saída é um envelope com a pessoa:
       "validade": "11/28",
       "mes": "11",
       "ano": "28",
-      "cvv": "388"
+      "cvv": "388",
+      "provedor": "stripe",
+      "cenario": "aprovado"
     }
   }
 }
@@ -102,7 +104,7 @@ Repare na coerência: o 9º dígito do CPF (3) é a região fiscal do Maranhão,
 Suba o servidor num terminal. Ele escuta em `127.0.0.1:8790` e avisa no stderr:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 serve
+npx -y @pilutech/botai-core@0.5.0 serve
 ```
 
 ```text
@@ -134,13 +136,13 @@ As rotas e os parâmetros estão em [API HTTP](../servidor/api-http.md).
 Sem Node, a imagem roda a CLI inteira:
 
 ```bash
-docker run --rm ghcr.io/piluvitu/botai:0.4.1 pessoa --semente 42 --hoje 2026-10-05
+docker run --rm ghcr.io/piluvitu/botai:0.5.0 pessoa --semente 42 --hoje 2026-10-05
 ```
 
 Sem argumentos, ela sobe o servidor na porta 8790, e o mesmo `curl` de cima funciona:
 
 ```bash
-docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.5.0
 ```
 
 Mais em [A imagem](../docker/imagem.md).
@@ -150,7 +152,7 @@ Mais em [A imagem](../docker/imagem.md).
 No seu projeto JS ou TS, instale o pacote com a versão exata:
 
 ```bash
-npm install --save-dev --save-exact @pilutech/botai-core@0.4.1
+npm install --save-dev --save-exact @pilutech/botai-core@0.5.0
 ```
 
 E gere a pessoa no código:

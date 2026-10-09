@@ -70,7 +70,7 @@ export const RECURSOS: Recurso[] = [
 
 export const PACOTE_DO_CORE = '@pilutech/botai-core'
 export const PACOTE_DO_PLAYWRIGHT = '@pilutech/botai-playwright'
-export const IMAGEM_DO_SERVIDOR = 'ghcr.io/piluvitu/botai:0.4.1'
+export const IMAGEM_DO_SERVIDOR = 'ghcr.io/piluvitu/botai:0.5.0'
 
 export function npmDe(pacote: string): string {
   return `https://www.npmjs.com/package/${pacote}`

@@ -169,11 +169,81 @@ describe('responder: o mesmo texto da CLI', () => {
   })
 })
 
+describe('responder: cartões', () => {
+  test('/pessoas com cartao e cenarios é o stdout de botai pessoas, sem n', () => {
+    const r = responder(
+      'GET',
+      '/pessoas?cartao=pagarme&cenarios=recusado:10,aprovado:2,pendente:1&semente=s&hoje=2026-10-05&formato=csv&campos=nome,cartao_numero,cartao_provedor,cartao_cenario',
+    )
+    expect(r.status).toBe(200)
+    expect(r.corpo).toBe(
+      cli(
+        'pessoas',
+        '--cartao',
+        'pagarme',
+        '--cenarios',
+        'recusado:10,aprovado:2,pendente:1',
+        '--semente',
+        's',
+        '--hoje',
+        '2026-10-05',
+        '--formato',
+        'csv',
+        '--campos',
+        'nome,cartao_numero,cartao_provedor,cartao_cenario',
+      ),
+    )
+    expect(r.corpo.trimEnd().split('\r\n')).toHaveLength(14)
+  })
+
+  test('/pessoa com cartao e cenario é o stdout de botai pessoa', () => {
+    const r = responder(
+      'GET',
+      '/pessoa?semente=7&hoje=2026-10-05&cartao=pagarme&cenario=chargeback',
+    )
+    expect(r.corpo).toBe(
+      cli(
+        'pessoa',
+        '--semente',
+        '7',
+        '--hoje',
+        '2026-10-05',
+        '--cartao',
+        'pagarme',
+        '--cenario',
+        'chargeback',
+      ),
+    )
+    expect((JSON.parse(r.corpo) as EnvelopeDaPessoa).pessoa.cartao.numero).toBe(
+      '4000000000000069',
+    )
+  })
+
+  test.each([
+    [
+      '/pessoas?n=5&cenarios=recusado:10',
+      'n: n (5) diferente da soma dos cenários (10)',
+    ],
+    [
+      '/pessoa?cenario=chargeback',
+      'cenario: cenário desconhecido "chargeback" para o provedor stripe',
+    ],
+    [
+      '/pessoas?cartao=visa',
+      'cartao: provedor de cartão desconhecido "visa" (use stripe, pagarme)',
+    ],
+  ])('%s → 400 com a mensagem de uso', (alvo, mensagem) => {
+    const { status, corpo } = json(alvo)
+    expect(status).toBe(400)
+    expect(corpo.erro).toContain(mensagem)
+  })
+})
+
 describe('responder', () => {
   test('/saude diz o formato e o motor', () => {
     expect(json('/saude')).toEqual({
       status: 200,
-      corpo: { ok: true, formato: 1, motor: MOTOR },
+      corpo: { ok: true, formato: 2, motor: MOTOR },
     })
   })
 

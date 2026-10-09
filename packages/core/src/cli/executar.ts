@@ -1,10 +1,18 @@
 import { somenteDigitos } from '../aleatorio'
+import {
+  escolherNumero,
+  formatarNumeroCartao,
+  lerCartao,
+  lerTextosDoCartao,
+  type OpcoesDoCartaoDoLote,
+} from '../cartao'
 import { envelopar } from '../envelope'
 import {
-  type OpcoesDaPessoa,
+  type OpcoesDoLote,
   type OpcoesResolvidas,
   pessoaResolvida,
   resolverOpcoes,
+  somaDosCenarios,
 } from '../gerar'
 import { textoDoLote } from '../lote'
 import {
@@ -26,6 +34,7 @@ import { rngDeSemente, sementeAleatoria } from '../semente'
 import { MOTOR } from '../versao'
 import {
   AJUDA_AVULSO,
+  AJUDA_CARTAO,
   AJUDA_GERAL,
   AJUDA_PESSOA,
   AJUDA_PESSOAS,
@@ -52,25 +61,43 @@ const FLAG_DA_OPCAO: Record<NomeDaOpcao, string> = {
   uf: '--uf',
   dominioEmail: '--dominio-email',
   n: '-n',
+  cartao: '--cartao',
+  cenario: '--cenario',
+  cenarios: '--cenarios',
 }
 
 const AJUDA = { tipo: 'booleano', curta: 'h' } as const
 
-const OPCOES_DA_PESSOA = {
+const OPCOES_COMUNS = {
   semente: { tipo: 'texto' },
   hoje: { tipo: 'texto' },
   uf: { tipo: 'texto' },
   'dominio-email': { tipo: 'texto' },
+  cartao: { tipo: 'texto' },
   help: AJUDA,
 } as const satisfies DefinicaoDeOpcoes
 
+const OPCOES_DA_PESSOA = {
+  ...OPCOES_COMUNS,
+  cenario: { tipo: 'texto' },
+} as const satisfies DefinicaoDeOpcoes
+
 const OPCOES_DAS_PESSOAS = {
-  ...OPCOES_DA_PESSOA,
+  ...OPCOES_COMUNS,
   n: { tipo: 'texto', curta: 'n' },
+  cenarios: { tipo: 'texto' },
   formato: { tipo: 'texto' },
   dialeto: { tipo: 'texto' },
   tabela: { tipo: 'texto' },
   campos: { tipo: 'texto' },
+} as const satisfies DefinicaoDeOpcoes
+
+const OPCOES_DO_CARTAO = {
+  cartao: { tipo: 'texto' },
+  cenario: { tipo: 'texto' },
+  formatado: { tipo: 'booleano' },
+  semente: { tipo: 'texto' },
+  help: AJUDA,
 } as const satisfies DefinicaoDeOpcoes
 
 const OPCOES_DO_AVULSO = {
@@ -90,8 +117,16 @@ function semPosicionais(lidos: ArgumentosLidos): void {
     throw new ErroDeUso(`argumento inesperado: ${lidos.posicionais[0]}`)
 }
 
+function cartaoDe(lidos: ArgumentosLidos): OpcoesDoCartaoDoLote | undefined {
+  return lerTextosDoCartao({
+    cartao: texto(lidos, 'cartao'),
+    cenario: texto(lidos, 'cenario'),
+    cenarios: texto(lidos, 'cenarios'),
+  })
+}
+
 function opcoesDaPessoa(lidos: ArgumentosLidos): OpcoesResolvidas {
-  const opcoes: OpcoesDaPessoa = {}
+  const opcoes: OpcoesDoLote = {}
   const semente = texto(lidos, 'semente')
   const hoje = texto(lidos, 'hoje')
   const uf = texto(lidos, 'uf')
@@ -101,6 +136,8 @@ function opcoesDaPessoa(lidos: ArgumentosLidos): OpcoesResolvidas {
   if (uf !== undefined) opcoes.uf = lerUF(uf)
   if (dominioEmail !== undefined)
     opcoes.dominioEmail = lerDominioEmail(dominioEmail)
+  const cartao = cartaoDe(lidos)
+  if (cartao !== undefined) opcoes.cartao = cartao
   return resolverOpcoes(opcoes)
 }
 
@@ -118,8 +155,14 @@ function comandoPessoa(argv: readonly string[], saida: Saida): number {
   return SAIDA.ok
 }
 
-function lerN(valor: string | undefined): number {
-  if (valor === undefined) throw new ErroDeUso('-n é obrigatório')
+function lerN(
+  valor: string | undefined,
+  cartao: OpcoesDoCartaoDoLote | undefined,
+): number {
+  if (valor === undefined) {
+    if (cartao?.cenarios !== undefined) return somaDosCenarios(cartao)
+    throw new ErroDeUso('-n é obrigatório sem --cenarios')
+  }
   if (!/^\d+$/.test(valor))
     throw new ErroDeUso(`-n precisa ser um inteiro, recebido "${valor}"`)
   return Number(valor)
@@ -141,7 +184,7 @@ function comandoPessoas(argv: readonly string[], saida: Saida): number {
     return SAIDA.ok
   }
   semPosicionais(lidos)
-  const n = lerN(texto(lidos, 'n'))
+  const n = lerN(texto(lidos, 'n'), cartaoDe(lidos))
   const formato = lerFormato(texto(lidos, 'formato'))
   const ehSql = formato === 'sql'
   for (const nome of ['dialeto', 'tabela'])
@@ -182,6 +225,22 @@ function comandoAvulso(
   return SAIDA.ok
 }
 
+function comandoCartao(argv: readonly string[], saida: Saida): number {
+  const lidos = lerArgumentos(argv, OPCOES_DO_CARTAO)
+  if (lidos.opcoes.help) {
+    saida.dados(AJUDA_CARTAO)
+    return SAIDA.ok
+  }
+  semPosicionais(lidos)
+  const escolhido = lerCartao(cartaoDe(lidos))
+  const rng = rngDeSemente(texto(lidos, 'semente') ?? sementeAleatoria())
+  const { numero } = escolherNumero(rng, escolhido)
+  saida.dados(
+    `${lidos.opcoes.formatado ? formatarNumeroCartao(numero) : numero}\n`,
+  )
+  return SAIDA.ok
+}
+
 function comandoValidar(argv: readonly string[], saida: Saida): number {
   const lidos = lerArgumentos(argv, { help: AJUDA })
   if (lidos.opcoes.help) {
@@ -217,6 +276,7 @@ function despachar(argv: readonly string[], saida: Saida): number {
   if (comando === 'pessoa') return comandoPessoa(resto, saida)
   if (comando === 'pessoas') return comandoPessoas(resto, saida)
   if (comando === 'validar') return comandoValidar(resto, saida)
+  if (comando === 'cartao') return comandoCartao(resto, saida)
   if (Object.prototype.hasOwnProperty.call(AVULSOS, comando))
     return comandoAvulso(comando, resto, saida)
   throw new ErroDeUso(`comando desconhecido "${comando}" (veja botai --help)`)

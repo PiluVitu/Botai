@@ -4,7 +4,7 @@ description: gerarPessoas(n, opcoes) gera até 100 000 pessoas sem CPF, e-mail o
 sidebar_position: 3
 ---
 
-`gerarPessoas(n, opcoes?)` devolve um array de `n` pessoas. As opções são as mesmas de `gerarPessoa`: `semente`, `hoje`, `uf` e `dominioEmail` ([as opções](./gerar-pessoa.md#opcoes)).
+`gerarPessoas(n, opcoes?)` devolve um array de `n` pessoas. As opções são as mesmas de `gerarPessoa`: `semente`, `hoje`, `uf`, `dominioEmail` e `cartao` ([as opções](./gerar-pessoa.md#opcoes)). No lote, o `cartao` aceita também `cenarios` ([Cenários de cartão](#cenarios)).
 
 ```js
 import { gerarPessoas } from '@pilutech/botai-core'
@@ -48,6 +48,45 @@ try {
 n → n precisa ser um inteiro de 0 a 100000, recebido 100001
 ```
 
+## Cenários de cartão {#cenarios}
+
+`cartao: { provedor, cenarios }` diz quantas pessoas saem em cada cenário do cartão. Elas saem em grupos, na ordem das chaves do objeto, e o `n` tem de ser a soma:
+
+```js
+import { gerarPessoas } from '@pilutech/botai-core'
+
+const lote = gerarPessoas(13, {
+  semente: 'checkout',
+  hoje: '2026-10-05',
+  cartao: {
+    provedor: 'pagarme',
+    cenarios: { recusado: 10, aprovado: 2, pendente: 1 },
+  },
+})
+console.log(lote.map((p) => p.cartao.cenario).join(' '))
+console.log(
+  lote[0].cartao.numero,
+  lote[10].cartao.numero,
+  lote[12].cartao.numero,
+)
+const sem = gerarPessoas(13, { semente: 'checkout', hoje: '2026-10-05' })
+console.log(lote.every((p, i) => p.cpf === sem[i].cpf))
+```
+
+```text
+recusado recusado recusado recusado recusado recusado recusado recusado recusado recusado aprovado aprovado pendente
+4000000000000028 4000000000000010 4000000000000036
+true
+```
+
+- As pessoas são as mesmas do lote sem cenários: a pessoa `i` continua sendo a da semente `S/i`, e e-mail, CPF e CNPJ não se repetem no lote inteiro. Só o cartão muda.
+- `cartao: { provedor }` sem `cenarios` deixa todas no `aprovado`; `cartao: { cenario }` põe todas no mesmo cenário. `cenario` e `cenarios` juntos lançam `ErroDeOpcao` com `opcao` `'cenarios'`.
+- Quantidade é um inteiro de 1 em diante, sem cenário repetido. Um `n` diferente da soma lança `ErroDeOpcao` com `opcao` `'n'`:
+
+```text
+n → n (12) diferente da soma dos cenários (13)
+```
+
 ## A semente de cada pessoa {#semente-de-cada-pessoa}
 
 A pessoa `i` do lote (a partir de 0) vem da semente `S/i`. Se ela repetir o CPF, o e-mail ou o CNPJ de uma anterior, é sorteada de novo com `S/i/2`, `S/i/3`… Em 100 000 pessoas houve 524 novos sorteios (0,52%), com no máximo 3 tentativas.
@@ -71,7 +110,7 @@ botai pessoas -n 1000 --semente mil-3 --hoje 2026-10-05 --formato ndjson | sed -
 ```
 
 ```text
-{"formato":1,"motor":"0.4.1","semente":"mil-3/971/2","hoje":"2026-10-05","pessoa
+{"formato":2,"motor":"0.5.0","semente":"mil-3/971/2","hoje":"2026-10-05","pessoa
 ```
 
 A pessoa 971 do lote `mil-3` precisou de um segundo sorteio. Com essa semente, `gerarPessoa({ semente: 'mil-3/971/2', hoje: '2026-10-05' })` recria só ela.

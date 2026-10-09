@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Envelope do Botaí, formato 2",
+  "description": "Saída de @pilutech/botai-core: uma pessoa (pessoa) ou um lote (pessoas), com a semente e o hoje que a reproduzem. formato muda quando a forma muda (o 2, desde a 0.5.0, acrescenta provedor e cenario ao cartão); motor é a versão do pacote que gerou os dados.",
+  "oneOf": [
+    { "$ref": "#/$defs/envelopeDaPessoa" },
+    { "$ref": "#/$defs/envelopeDasPessoas" }
+  ],
+  "$defs": {
+    "envelopeDaPessoa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formato", "motor", "semente", "hoje", "pessoa"],
+      "properties": {
+        "formato": { "const": 2 },
+        "motor": { "$ref": "#/$defs/versao" },
+        "semente": { "$ref": "#/$defs/semente" },
+        "hoje": { "$ref": "#/$defs/dataIso" },
+        "pessoa": { "$ref": "#/$defs/pessoa" }
+      }
+    },
+    "envelopeDasPessoas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formato", "motor", "semente", "hoje", "pessoas"],
+      "properties": {
+        "formato": { "const": 2 },
+        "motor": { "$ref": "#/$defs/versao" },
+        "semente": { "$ref": "#/$defs/semente" },
+        "hoje": { "$ref": "#/$defs/dataIso" },
+        "pessoas": { "type": "array", "items": { "$ref": "#/$defs/pessoa" } }
+      }
+    },
+    "versao": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+    "semente": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "dataIso": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "uf": {
+      "enum": [
+        "AC",
+        "AL",
+        "AP",
+        "AM",
+        "BA",
+        "CE",
+        "DF",
+        "ES",
+        "GO",
+        "MA",
+        "MT",
+        "MS",
+        "MG",
+        "PA",
+        "PB",
+        "PR",
+        "PE",
+        "PI",
+        "RJ",
+        "RN",
+        "RS",
+        "RO",
+        "RR",
+        "SC",
+        "SP",
+        "SE",
+        "TO"
+      ]
+    },
+    "texto": { "type": "string", "minLength": 1 },
+    "pessoa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nome",
+        "nascimento",
+        "cpf",
+        "rg",
+        "pis",
+        "tituloEleitor",
+        "celular",
+        "email",
+        "senha",
+        "endereco",
+        "empresa",
+        "cartao"
+      ],
+      "properties": {
+        "nome": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sexo", "prenome", "sobrenomes", "completo", "noCartao"],
+          "properties": {
+            "sexo": { "enum": ["F", "M"] },
+            "prenome": { "$ref": "#/$defs/texto" },
+            "sobrenomes": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/texto" },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "completo": { "$ref": "#/$defs/texto" },
+            "noCartao": { "type": "string", "pattern": "^[A-Z ]{1,26}$" }
+          }
+        },
+        "nascimento": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["iso", "br", "idade"],
+          "properties": {
+            "iso": { "$ref": "#/$defs/dataIso" },
+            "br": { "type": "string", "pattern": "^\\d{2}/\\d{2}/\\d{4}$" },
+            "idade": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "cpf": {
+          "type": "string",
+          "pattern": "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$"
+        },
+        "rg": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["numero", "orgaoEmissor", "uf"],
+          "properties": {
+            "numero": {
+              "type": "string",
+              "pattern": "^\\d{2}\\.\\d{3}\\.\\d{3}-[\\dX]$"
+            },
+            "orgaoEmissor": { "const": "SSP" },
+            "uf": { "const": "SP" }
+          }
+        },
+        "pis": {
+          "type": "string",
+          "pattern": "^\\d{3}\\.\\d{5}\\.\\d{2}-\\d$"
+        },
+        "tituloEleitor": {
+          "type": "string",
+          "pattern": "^\\d{4} \\d{4} \\d{4}$"
+        },
+        "celular": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ddd", "numero", "formatado", "digitos", "e164"],
+          "properties": {
+            "ddd": { "type": "string", "pattern": "^[1-9]{2}$" },
+            "numero": { "type": "string", "pattern": "^9\\d{4}-\\d{4}$" },
+            "formatado": {
+              "type": "string",
+              "pattern": "^\\(\\d{2}\\) 9\\d{4}-\\d{4}$"
+            },
+            "digitos": { "type": "string", "pattern": "^\\d{11}$" },
+            "e164": { "type": "string", "pattern": "^\\+55\\d{11}$" }
+          }
+        },
+        "email": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["usuario", "endereco", "caixaUrl"],
+          "properties": {
+            "usuario": {
+              "type": "string",
+              "pattern": "^[a-z]+-[a-z]+-\\d{4}$"
+            },
+            "endereco": {
+              "type": "string",
+              "pattern": "^[a-z]+-[a-z]+-\\d{4}@[a-z0-9.-]+$"
+            },
+            "caixaUrl": { "type": ["string", "null"], "pattern": "^https://" }
+          }
+        },
+        "senha": { "type": "string", "minLength": 12, "maxLength": 16 },
+        "endereco": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cep",
+            "logradouro",
+            "bairro",
+            "cidade",
+            "uf",
+            "ddd",
+            "numero",
+            "complemento"
+          ],
+          "properties": {
+            "cep": { "type": "string", "pattern": "^\\d{5}-\\d{3}$" },
+            "logradouro": { "$ref": "#/$defs/texto" },
+            "bairro": { "$ref": "#/$defs/texto" },
+            "cidade": { "$ref": "#/$defs/texto" },
+            "uf": { "$ref": "#/$defs/uf" },
+            "ddd": { "type": "string", "pattern": "^[1-9]{2}$" },
+            "numero": { "type": "string", "pattern": "^\\d+$" },
+            "complemento": { "type": "string" }
+          }
+        },
+        "empresa": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["razaoSocial", "nomeFantasia", "cnpj"],
+          "properties": {
+            "razaoSocial": { "$ref": "#/$defs/texto" },
+            "nomeFantasia": { "$ref": "#/$defs/texto" },
+            "cnpj": {
+              "type": "string",
+              "pattern": "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$"
+            }
+          }
+        },
+        "cartao": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "bandeira",
+            "numero",
+            "numeroFormatado",
+            "titular",
+            "validade",
+            "mes",
+            "ano",
+            "cvv",
+            "provedor",
+            "cenario"
+          ],
+          "properties": {
+            "bandeira": { "enum": ["visa", "mastercard"] },
+            "numero": { "type": "string", "pattern": "^\\d{16}$" },
+            "numeroFormatado": {
+              "type": "string",
+              "pattern": "^\\d{4} \\d{4} \\d{4} \\d{4}$"
+            },
+            "titular": { "type": "string", "pattern": "^[A-Z ]{1,26}$" },
+            "validade": { "type": "string", "pattern": "^\\d{2}/\\d{2}$" },
+            "mes": { "type": "string", "pattern": "^(0[1-9]|1[0-2])$" },
+            "ano": { "type": "string", "pattern": "^\\d{2}$" },
+            "cvv": { "type": "string", "pattern": "^\\d{3}$" },
+            "provedor": { "enum": ["stripe", "pagarme"] },
+            "cenario": { "type": "string" }
+          },
+          "oneOf": [
+            {
+              "properties": {
+                "provedor": { "const": "stripe" },
+                "cenario": {
+                  "enum": [
+                    "aprovado",
+                    "recusado",
+                    "pendente",
+                    "recusado-saldo",
+                    "recusado-roubado",
+                    "recusado-perdido",
+                    "recusado-expirado",
+                    "recusado-cvc",
+                    "erro-processamento"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "provedor": { "const": "pagarme" },
+                "cenario": {
+                  "enum": [
+                    "aprovado",
+                    "recusado",
+                    "pendente",
+                    "pendente-recusado",
+                    "pendente-cancelado",
+                    "chargeback"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

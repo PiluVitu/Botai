@@ -6,23 +6,26 @@ sidebar_position: 3
 
 ```text
 botai pessoas -n N [--semente S] [--hoje AAAA-MM-DD] [--uf UF] [--dominio-email D]
+              [--cartao stripe|pagarme] [--cenarios C:N,C:N]
               [--formato json|ndjson|csv|sql] [--dialeto postgres|mysql|sqlite]
               [--tabela T] [--campos a,b,c]
 ```
 
-| Opção               | O que faz                                                                |
-| ------------------- | ------------------------------------------------------------------------ |
-| `-n N`              | quantas pessoas, de 0 a 100 000; obrigatório                             |
-| `--semente S`       | a pessoa `i` do lote usa a semente `S/i`                                 |
-| `--hoje AAAA-MM-DD` | data de referência                                                       |
-| `--uf UF`           | sigla da UF de todos os endereços                                        |
-| `--dominio-email D` | domínio dos e-mails                                                      |
-| `--formato F`       | `json` (padrão), `ndjson`, `csv` ou `sql`                                |
-| `--dialeto D`       | `postgres` (padrão), `mysql` ou `sqlite`; só com `--formato sql`         |
-| `--tabela T`        | tabela do INSERT (padrão `pessoas`; aceita `esquema.tabela`); só com sql |
-| `--campos a,b,c`    | colunas do csv e do sql, nesta ordem                                     |
+| Opção                | O que faz                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| `-n N`               | quantas pessoas, de 0 a 100 000; obrigatório sem `--cenarios`                               |
+| `--semente S`        | a pessoa `i` do lote usa a semente `S/i`                                                    |
+| `--hoje AAAA-MM-DD`  | data de referência                                                                          |
+| `--uf UF`            | sigla da UF de todos os endereços                                                           |
+| `--dominio-email D`  | domínio dos e-mails                                                                         |
+| `--cartao P`         | provedor do cartão de teste: `stripe` (padrão) ou `pagarme`                                 |
+| `--cenarios C:N,C:N` | quantas pessoas em cada cenário do cartão, em grupos nesta ordem; o `-n`, se vier, é a soma |
+| `--formato F`        | `json` (padrão), `ndjson`, `csv` ou `sql`                                                   |
+| `--dialeto D`        | `postgres` (padrão), `mysql` ou `sqlite`; só com `--formato sql`                            |
+| `--tabela T`         | tabela do INSERT (padrão `pessoas`; aceita `esquema.tabela`); só com sql                    |
+| `--campos a,b,c`     | colunas do csv e do sql, nesta ordem                                                        |
 
-`--semente`, `--hoje`, `--uf` e `--dominio-email` funcionam como no [`botai pessoa`](./pessoa.md).
+`--semente`, `--hoje`, `--uf` e `--dominio-email` funcionam como no [`botai pessoa`](./pessoa.md). O `--cartao` e o `--cenarios` estão em [Cartões de teste](./cartoes.md#cenarios).
 
 ## Sem repetição, com prefixo estável
 
@@ -62,8 +65,8 @@ botai pessoas -n 3 --semente demo --hoje 2026-10-08 | head -n 12
 
 ```json
 {
-  "formato": 1,
-  "motor": "0.4.1",
+  "formato": 2,
+  "motor": "0.5.0",
   "semente": "demo",
   "hoje": "2026-10-08",
   "pessoas": [
@@ -135,7 +138,7 @@ botai pessoas -n 2 --semente demo --hoje 2026-10-08 --formato sql --campos nome,
 ```
 
 ```sql
--- botai: formato 1, motor 0.4.1, semente demo, hoje 2026-10-08
+-- botai: formato 2, motor 0.5.0, semente demo, hoje 2026-10-08
 INSERT INTO "pessoas" ("nome", "cpf", "idade") VALUES ('Isabela Freitas Santos', '550.160.642-96', 50);
 INSERT INTO "pessoas" ("nome", "cpf", "idade") VALUES ('Vitória Alves Carvalho', '843.495.439-70', 58);
 ```
@@ -158,7 +161,7 @@ botai pessoas -n 2 --semente demo --hoje 2026-10-08 --formato sql --dialeto=mysq
 ```
 
 ```sql
--- botai: formato 1, motor 0.4.1, semente demo, hoje 2026-10-08
+-- botai: formato 2, motor 0.5.0, semente demo, hoje 2026-10-08
 INSERT INTO `pessoas` (`nome`, `cpf`, `idade`) VALUES ('Isabela Freitas Santos', '550.160.642-96', 50);
 INSERT INTO `pessoas` (`nome`, `cpf`, `idade`) VALUES ('Vitória Alves Carvalho', '843.495.439-70', 58);
 ```
@@ -174,7 +177,7 @@ botai pessoas -n 2 --semente demo --hoje 2026-10-08 --formato sql --tabela app.c
 ```
 
 ```sql
--- botai: formato 1, motor 0.4.1, semente demo, hoje 2026-10-08
+-- botai: formato 2, motor 0.5.0, semente demo, hoje 2026-10-08
 INSERT INTO "app"."clientes" ("nome", "cpf", "idade") VALUES ('Isabela Freitas Santos', '550.160.642-96', 50);
 INSERT INTO "app"."clientes" ("nome", "cpf", "idade") VALUES ('Vitória Alves Carvalho', '843.495.439-70', 58);
 ```
@@ -193,7 +196,7 @@ botai: tabela inválida "x;drop" (letras, dígitos e _, até 63 caracteres; opci
 
 ## `--campos` {#campos}
 
-Escolhe e ordena as colunas do csv e do sql. São 33 colunas; sem `--campos`, saem todas, na ordem da [referência de colunas](../referencia/colunas.md). Em json e ndjson, `--campos` é erro de uso: lá sai a pessoa inteira.
+Escolhe e ordena as colunas do csv e do sql. São 35 colunas; sem `--campos`, saem todas, na ordem da [referência de colunas](../referencia/colunas.md). Em json e ndjson, `--campos` é erro de uso: lá sai a pessoa inteira.
 
 ```bash testar=2
 botai pessoas -n 10 --campos nome
