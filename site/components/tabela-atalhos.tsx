@@ -1,19 +1,12 @@
-import { ATALHOS, type Loja, type Sistema } from '@pilutech/botai-core/atalhos'
+import { cn } from '@piluvitu/ui/cn'
+import { ATALHOS_POR_SISTEMA, INSERIR_UM_CAMPO } from '@/lib/extensao'
+import { CARTAO } from './cartao'
 
-const NAVEGADORES: { loja: Loja; nome: string }[] = [
-  { loja: 'chrome', nome: 'Chrome' },
-  { loja: 'edge', nome: 'Edge' },
-  { loja: 'opera', nome: 'Opera' },
-  { loja: 'firefox', nome: 'Firefox' },
-]
-
-const SISTEMAS: { sistema: Sistema; nome: string }[] = [
-  { sistema: 'windows', nome: 'Windows' },
-  { sistema: 'mac', nome: 'macOS' },
-  { sistema: 'linux', nome: 'Linux' },
-]
-
-const LEGENDA = 'tabela-atalhos-legenda'
+const LEGENDA = 'atalhos-legenda'
+const CELULA = 'px-[18px] py-3 text-left'
+const CABECALHO = cn(CELULA, 'font-semibold')
+const TECLA =
+  'border-border bg-muted rounded-[6px] border px-2 py-0.5 font-mono text-[13px] whitespace-nowrap'
 
 export function TabelaAtalhos() {
   return (
@@ -21,43 +14,59 @@ export function TabelaAtalhos() {
       role="region"
       aria-labelledby={LEGENDA}
       tabIndex={0}
-      className="bg-card border-border focus-visible:ring-ring overflow-x-auto rounded-lg border outline-none focus-visible:ring-2"
+      className={cn(
+        CARTAO,
+        'focus-visible:ring-ring overflow-x-auto outline-none focus-visible:ring-2',
+      )}
     >
       <table className="w-full border-collapse text-sm">
-        <caption id={LEGENDA} className="sr-only">
-          Atalho para preencher a página, por navegador e sistema
+        <caption
+          id={LEGENDA}
+          className="text-muted-foreground px-[18px] pt-3.5 text-left font-mono text-[11px] tracking-[0.2em] uppercase"
+        >
+          Atalhos por sistema
         </caption>
         <thead>
-          <tr className="text-muted-foreground font-mono text-xs uppercase">
-            <th scope="col" className="px-4 py-3 text-left font-semibold">
-              Navegador
+          <tr className="text-muted-foreground font-mono text-xs">
+            <th scope="col" className={CABECALHO}>
+              Sistema
             </th>
-            {SISTEMAS.map(({ sistema, nome }) => (
-              <th
-                key={sistema}
-                scope="col"
-                className="px-4 py-3 text-left font-semibold"
-              >
-                {nome}
-              </th>
-            ))}
+            <th scope="col" className={CABECALHO}>
+              Preencher a página
+            </th>
           </tr>
         </thead>
         <tbody>
-          {NAVEGADORES.map(({ loja, nome }) => (
-            <tr key={loja} className="border-border border-t">
-              <th scope="row" className="px-4 py-3 text-left font-medium">
-                {nome}
+          {ATALHOS_POR_SISTEMA.map(({ sistema, tecla, excecoes }) => (
+            <tr key={sistema} className="border-border border-t">
+              <th scope="row" className={CABECALHO}>
+                {sistema}
               </th>
-              {SISTEMAS.map(({ sistema }) => (
-                <td key={sistema} className="px-4 py-3">
-                  <kbd className="bg-muted rounded-[6px] px-1.5 py-0.5 font-mono text-xs">
-                    {ATALHOS[loja][sistema]}
-                  </kbd>
-                </td>
-              ))}
+              <td className={cn(CELULA, 'leading-[1.9]')}>
+                <kbd className={TECLA}>{tecla}</kbd>
+                {excecoes.map((excecao) => (
+                  <span
+                    key={excecao.navegador}
+                    className="text-muted-foreground"
+                  >
+                    {' · '}
+                    <kbd className={cn(TECLA, 'text-foreground')}>
+                      {excecao.tecla}
+                    </kbd>{' '}
+                    no {excecao.navegador}
+                  </span>
+                ))}
+              </td>
             </tr>
           ))}
+          <tr className="border-border border-t">
+            <th scope="row" className={CABECALHO}>
+              Um campo só
+            </th>
+            <td className={cn(CELULA, 'font-mono text-[13px]')}>
+              {INSERIR_UM_CAMPO}
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

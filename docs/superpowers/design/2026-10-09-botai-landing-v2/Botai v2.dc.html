@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/piluvitu-design-system-c5cbccd6-fba7-4d67-9f03-d4819fa56130/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.460.0/font/lucide.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/fontawesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/brands.min.css">
+<script src="_ds/piluvitu-design-system-c5cbccd6-fba7-4d67-9f03-d4819fa56130/_ds_bundle.js"></script>
+<title>Botaí · Dados de teste brasileiros em todo lugar que o seu teste roda</title>
+<style>html{scroll-behavior:smooth}body{margin:0;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline;text-underline-offset:3px}code,kbd,pre{font-family:var(--font-mono)}:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}</style>
+</helmet>
+<div ref="{{ raizRef }}" class="{{ temaClasse }}" style="min-height:100vh;background:hsl(var(--background));color:hsl(var(--foreground));font-family:var(--font-sans);overflow-x:clip">
+<div style="margin:0 auto;max-width:1264px;padding:0 clamp(16px,4vw,32px)">
+
+<header style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;border-bottom:1px solid hsl(var(--border))">
+<a href="#topo" aria-label="Botaí, início" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none">
+<svg viewBox="0 0 16 16" width="26" height="26" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="#38bdf8"></rect><rect x="3" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="3" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="4.6" y="3" width="1.3" height="4.5" rx="0.3" fill="#0a0f1a"></rect></svg>
+<span style="font-size:20px;font-weight:800;letter-spacing:-0.03em">Botaí</span>
+</a>
+<sc-if value="{{ largo }}" hint-placeholder-val="{{ true }}">
+<nav aria-label="Seções" style="display:flex;align-items:center;gap:4px">
+<a href="#portas" style="color:hsl(var(--muted-foreground));padding:8px 10px;font-family:var(--font-mono);font-size:13px">Portas</a>
+<a href="#mesma-pessoa" style="color:hsl(var(--muted-foreground));padding:8px 10px;font-family:var(--font-mono);font-size:13px">Mesma pessoa</a>
+<a href="#para-quem" style="color:hsl(var(--muted-foreground));padding:8px 10px;font-family:var(--font-mono);font-size:13px">Para quem</a>
+<a href="#extensao" style="color:hsl(var(--muted-foreground));padding:8px 10px;font-family:var(--font-mono);font-size:13px">Extensão</a>
+</nav>
+</sc-if>
+<div style="display:flex;align-items:center;gap:8px">
+<x-import component-from-global-scope="PiluVituDesignSystem_c5cbcc.Button" as="a" href="https://docs.botai.pilutech.com.br" style="padding:0 14px;font-weight:600;text-decoration:none" hint-size="88px,36px"><i class="icon-book-open" aria-hidden="true" style="font-size:15px"></i>Docs</x-import>
+<a href="https://github.com/PiluVitu/Botai" aria-label="Código no GitHub" style="display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;border-radius:var(--radius-md);border:1px solid hsl(var(--input));color:hsl(var(--foreground));text-decoration:none"><i class="icon-github" aria-hidden="true" style="font-size:16px"></i></a>
+<button type="button" aria-label="{{ rotuloTema }}" onClick="{{ alternarTema }}" style="display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;border-radius:var(--radius-md);border:1px solid hsl(var(--input));background:transparent;color:hsl(var(--foreground));cursor:pointer" style-hover="background:hsl(var(--accent))"><i class="{{ iconeTema }}" aria-hidden="true" style="font-size:16px"></i></button>
+<sc-if value="{{ estreito }}" hint-placeholder-val="{{ false }}">
+<button type="button" aria-label="Abrir menu" aria-expanded="{{ menuAberto }}" onClick="{{ alternarMenu }}" style="display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;border-radius:var(--radius-md);border:1px solid hsl(var(--input));background:transparent;color:hsl(var(--foreground));cursor:pointer"><i class="{{ iconeMenu }}" aria-hidden="true" style="font-size:16px"></i></button>
+</sc-if>
+</div>
+<sc-if value="{{ mostrarMenu }}" hint-placeholder-val="{{ false }}">
+<nav aria-label="Seções" style="position:absolute;z-index:10;top:calc(100% + 8px);left:0;right:0;display:flex;flex-direction:column;padding:8px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<a href="#portas" onClick="{{ fecharMenu }}" style="padding:14px 12px;font-family:var(--font-mono);font-size:14px">Portas</a>
+<a href="#mesma-pessoa" onClick="{{ fecharMenu }}" style="padding:14px 12px;font-family:var(--font-mono);font-size:14px">Mesma pessoa</a>
+<a href="#para-quem" onClick="{{ fecharMenu }}" style="padding:14px 12px;font-family:var(--font-mono);font-size:14px">Para quem</a>
+<a href="#extensao" onClick="{{ fecharMenu }}" style="padding:14px 12px;font-family:var(--font-mono);font-size:14px">Extensão</a>
+</nav>
+</sc-if>
+</header>
+
+<main id="topo">
+<section aria-labelledby="hero-titulo" style="padding:clamp(48px,8vw,96px) 0 0;display:flex;flex-direction:column;gap:28px">
+<p style="margin:0;color:hsl(var(--primary));font-family:var(--font-mono);font-size:14px">~/pilulabs/botai</p>
+<h1 id="hero-titulo" style="margin:0;max-width:980px;font-size:clamp(38px,6vw,76px);line-height:1.02;font-weight:800;letter-spacing:-0.04em;text-wrap:balance">Dados de teste brasileiros em todo lugar que o seu teste roda.</h1>
+<p style="margin:0;max-width:720px;color:hsl(var(--muted-foreground));font-size:clamp(17px,1.6vw,20px);line-height:1.55;text-wrap:pretty">O Botaí gera uma pessoa brasileira fictícia e coerente, com CPF, CEP, celular e empresa que batem entre si, e preenche formulários com ela. Um motor só, com oito portas: extensão, CLI, biblioteca, HTTP, Docker, binários, Playwright e o motor direto na página.</p>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:4px">
+<x-import component-from-global-scope="PiluVituDesignSystem_c5cbcc.Button" size="lg" as="a" href="https://docs.botai.pilutech.com.br" style="padding:0 22px;height:48px;font-size:15px;font-weight:600;text-decoration:none" hint-size="220px,48px"><i class="icon-book-open" aria-hidden="true" style="font-size:16px"></i>Ler a documentação</x-import>
+<x-import component-from-global-scope="PiluVituDesignSystem_c5cbcc.Button" size="lg" variant="outline" as="a" href="#extensao" style="padding:0 20px;height:48px;font-size:15px;font-weight:600;text-decoration:none" hint-size="260px,48px"><i class="fa-brands fa-chrome" aria-hidden="true"></i><i class="fa-brands fa-firefox-browser" aria-hidden="true"></i>Instalar a extensão</x-import>
+</div>
+<div style="display:flex;align-items:center;gap:10px;max-width:560px;padding:6px 6px 6px 16px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-md);font-family:var(--font-mono);font-size:14px">
+<span aria-hidden="true" style="color:hsl(var(--primary));user-select:none">$</span>
+<code style="flex:1;min-width:0;overflow-wrap:anywhere;font-size:14px">npx @pilutech/botai-core pessoa --semente 42</code>
+<button type="button" aria-label="Copiar comando: npx @pilutech/botai-core pessoa --semente 42" onClick="{{ copiarHero }}" style="flex:none;display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;border-radius:10px;border:1px solid hsl(var(--border));background:hsl(var(--muted));color:hsl(var(--foreground));cursor:pointer" style-hover="background:hsl(var(--accent))"><i class="{{ iconeHero }}" aria-hidden="true" style="font-size:15px"></i></button>
+</div>
+
+<div style="position:relative;margin-top:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px">
+<div style="min-width:0;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg);overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid hsl(var(--border));font-family:var(--font-mono);font-size:12px;color:hsl(var(--muted-foreground))"><span style="display:inline-flex;align-items:center;gap:8px"><i class="icon-terminal" aria-hidden="true" style="font-size:14px;color:hsl(var(--primary))"></i>~/pilulabs/botai</span><span>terminal</span></div>
+<pre style="margin:0;padding:18px;font-size:13px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere"><span style="color:hsl(var(--primary))">$ </span>npx @pilutech/botai-core pessoa --semente 42
+<span style="color:hsl(var(--muted-foreground))">{</span>
+<span style="color:hsl(var(--muted-foreground))">  "nome":</span> "Márcio Carvalho Rodrigues",
+<span style="color:hsl(var(--muted-foreground))">  "nascimento":</span> "26/02/1970",
+<span style="color:hsl(var(--muted-foreground))">  "cpf":</span> "634.132.403-07",
+<span style="color:hsl(var(--muted-foreground))">  "celular":</span> "(98) 97702-9128",
+<span style="color:hsl(var(--muted-foreground))">  "email":</span> "marcio-rodrigues-0337@tuamaeaquelaursa.com",
+<span style="color:hsl(var(--muted-foreground))">  "cep":</span> "65071-377",
+<span style="color:hsl(var(--muted-foreground))">  "cidade":</span> "São Luís", <span style="color:hsl(var(--muted-foreground))">"uf":</span> "MA",
+<span style="color:hsl(var(--muted-foreground))">  "cnpj":</span> "90.849.558/0001-39",
+<span style="color:hsl(var(--muted-foreground))">  …
+}</span></pre>
+</div>
+<div style="min-width:0;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg);overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid hsl(var(--border));font-family:var(--font-mono);font-size:12px;color:hsl(var(--muted-foreground))"><span style="display:inline-flex;align-items:center;gap:8px"><i class="icon-app-window" aria-hidden="true" style="font-size:14px;color:hsl(var(--primary))"></i>localhost:3000/cadastro</span><span style="display:inline-flex;align-items:center;gap:6px"><kbd style="border:1px solid hsl(var(--border));background:hsl(var(--muted));color:hsl(var(--foreground));border-radius:6px;padding:1px 6px;font-size:11px">⌥⇧P</kbd></span></div>
+<div style="padding:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 12px">
+<p style="grid-column:1 / -1;margin:0 0 2px;font-size:18px;font-weight:700;letter-spacing:-0.01em">Criar conta</p>
+<div style="grid-column:1 / -1;display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:hsl(var(--muted-foreground))">Nome completo</span><span style="display:block;padding:9px 12px;border:1.5px solid hsl(var(--primary));border-radius:10px;background:hsl(var(--background));font-size:14px;overflow-wrap:anywhere">Márcio Carvalho Rodrigues</span></div>
+<div style="grid-column:1 / -1;display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:hsl(var(--muted-foreground))">E-mail</span><span style="display:block;padding:9px 12px;border:1.5px solid hsl(var(--primary));border-radius:10px;background:hsl(var(--background));font-size:14px;overflow-wrap:anywhere">marcio-rodrigues-0337@tuamaeaquelaursa.com</span></div>
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:12px;color:hsl(var(--muted-foreground))">CPF</span><span style="display:block;padding:9px 12px;border:1.5px solid hsl(var(--primary));border-radius:10px;background:hsl(var(--background));font-size:14px;overflow-wrap:anywhere">634.132.403-07</span></div>
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:12px;color:hsl(var(--muted-foreground))">Celular</span><span style="display:block;padding:9px 12px;border:1.5px solid hsl(var(--primary));border-radius:10px;background:hsl(var(--background));font-size:14px;overflow-wrap:anywhere">(98) 97702-9128</span></div>
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:12px;color:hsl(var(--muted-foreground))">CEP</span><span style="display:block;padding:9px 12px;border:1.5px solid hsl(var(--primary));border-radius:10px;background:hsl(var(--background));font-size:14px;overflow-wrap:anywhere">65071-377</span></div>
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font-size:12px;color:hsl(var(--muted-foreground))">Cidade</span><span style="display:block;padding:9px 12px;border:1.5px solid hsl(var(--primary));border-radius:10px;background:hsl(var(--background));font-size:14px;overflow-wrap:anywhere">São Luís · MA</span></div>
+<p style="grid-column:1 / -1;margin:4px 0 0;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;color:hsl(var(--ok))"><i class="icon-circle-check" aria-hidden="true" style="font-size:14px"></i>6 de 6 campos · semente 42</p>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-label="Números" style="margin-top:clamp(56px,8vw,96px);border-top:1px solid hsl(var(--border));border-bottom:1px solid hsl(var(--border));display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))">
+<sc-for list="{{ numeros }}" as="n" hint-placeholder-count="6">
+<div style="padding:28px 20px 28px 0;display:flex;flex-direction:column;gap:8px">
+<p style="margin:0;font-size:clamp(30px,3vw,38px);line-height:1;font-weight:800;letter-spacing:-0.03em">{{ n.valor }}</p>
+<p style="margin:0;font-size:14px;line-height:1.45;color:hsl(var(--muted-foreground));text-wrap:pretty">{{ n.texto }}</p>
+</div>
+</sc-for>
+</section>
+<p style="margin:12px 0 0;font-family:var(--font-mono);font-size:12px;color:hsl(var(--muted-foreground))">medido em 08/10/2026 · código aberto, licença MIT</p>
+
+<section id="portas" aria-labelledby="portas-titulo" style="margin-top:clamp(80px,11vw,140px);scroll-margin-top:24px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:12px"><p style="margin:0;color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">Portas</p><span style="color:hsl(var(--primary));font-family:var(--font-mono);font-size:12px">01</span><span aria-hidden="true" style="background:hsl(var(--border));height:1px;flex:1"></span></div>
+<div style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px 48px">
+<h2 id="portas-titulo" style="margin:0;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em">Um motor, oito portas.</h2>
+<p style="margin:0;max-width:520px;color:hsl(var(--muted-foreground));font-size:17px;line-height:1.55;text-wrap:pretty">Todas usam o mesmo gerador, e as que preenchem formulário usam o mesmo motor. Escolha a que cabe no seu teste.</p>
+</div>
+
+<sc-if value="{{ emGrade }}" hint-placeholder-val="{{ true }}">
+<ul style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:16px">
+<sc-for list="{{ portas }}" as="p" hint-placeholder-count="8">
+<li style="min-width:0;display:flex;flex-direction:column;gap:14px;padding:22px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="display:inline-flex;flex:none;width:40px;height:40px;align-items:center;justify-content:center;border-radius:14px;background:var(--accent-soft);color:hsl(var(--primary))"><i class="{{ p.icone }}" aria-hidden="true" style="font-size:18px"></i></span>
+<div style="min-width:0"><h3 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-0.01em">{{ p.nome }}</h3><p style="margin:2px 0 0;font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em;color:hsl(var(--muted-foreground))">{{ p.numero }}</p></div>
+</div>
+<p style="margin:0;font-size:14px;line-height:1.55;text-wrap:pretty">{{ p.linha }}</p>
+<p style="margin:0;font-size:13px;line-height:1.5;color:hsl(var(--muted-foreground));text-wrap:pretty">{{ p.onde }}</p>
+<div style="margin-top:auto;display:flex;align-items:flex-start;gap:8px;padding:8px 8px 8px 12px;background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:12px">
+<code style="flex:1;min-width:0;padding:5px 0;font-size:12.5px;line-height:1.55;overflow-wrap:anywhere;white-space:pre-wrap">{{ p.cmd }}</code>
+<sc-if value="{{ p.copiavel }}" hint-placeholder-val="{{ true }}">
+<button type="button" aria-label="{{ p.rotuloCopia }}" onClick="{{ p.aoCopiar }}" style="flex:none;display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:8px;border:1px solid hsl(var(--border));background:hsl(var(--muted));color:hsl(var(--foreground));cursor:pointer" style-hover="background:hsl(var(--accent))"><i class="{{ p.iconeCopia }}" aria-hidden="true" style="font-size:14px"></i></button>
+</sc-if>
+</div>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+
+<sc-if value="{{ emAbas }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div role="tablist" aria-label="Portas" style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ portas }}" as="p" hint-placeholder-count="8">
+<button type="button" role="tab" aria-selected="{{ p.ativa }}" onClick="{{ p.aoSelecionar }}" style="{{ p.estiloAba }}"><i class="{{ p.icone }}" aria-hidden="true" style="font-size:15px"></i>{{ p.nome }}</button>
+</sc-for>
+</div>
+<div role="tabpanel" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:32px;padding:clamp(22px,3vw,36px);background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;flex-direction:column;gap:14px">
+<span style="display:inline-flex;width:48px;height:48px;align-items:center;justify-content:center;border-radius:16px;background:var(--accent-soft);color:hsl(var(--primary))"><i class="{{ ativa.icone }}" aria-hidden="true" style="font-size:22px"></i></span>
+<p style="margin:0;font-family:var(--font-mono);font-size:12px;color:hsl(var(--primary))">{{ ativa.numero }}</p>
+<h3 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.03em">{{ ativa.nome }}</h3>
+<p style="margin:0;font-size:17px;line-height:1.55;text-wrap:pretty">{{ ativa.linha }}</p>
+<p style="margin:0;font-size:14px;line-height:1.55;color:hsl(var(--muted-foreground))">{{ ativa.onde }}</p>
+</div>
+<div style="display:flex;flex-direction:column;justify-content:center;gap:12px;min-width:0">
+<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 10px 10px 16px;background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:14px">
+<code style="flex:1;min-width:0;padding:6px 0;font-size:14px;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap">{{ ativa.cmd }}</code>
+<sc-if value="{{ ativa.copiavel }}" hint-placeholder-val="{{ true }}">
+<button type="button" aria-label="{{ ativa.rotuloCopia }}" onClick="{{ ativa.aoCopiar }}" style="flex:none;display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;border-radius:10px;border:1px solid hsl(var(--border));background:hsl(var(--muted));color:hsl(var(--foreground));cursor:pointer"><i class="{{ ativa.iconeCopia }}" aria-hidden="true" style="font-size:15px"></i></button>
+</sc-if>
+</div>
+<a href="https://docs.botai.pilutech.com.br" style="display:inline-flex;align-items:center;gap:6px;color:hsl(var(--primary));font-family:var(--font-mono);font-size:13px">guia na documentação <i class="icon-arrow-right" aria-hidden="true" style="font-size:13px"></i></a>
+</div>
+</div>
+</div>
+</sc-if>
+<p style="margin:0;font-size:14px;color:hsl(var(--muted-foreground))">Saída em JSON, NDJSON, CSV e SQL para Postgres, MySQL e SQLite. Importação provada no Postgres 16 e no SQLite.</p>
+</section>
+
+<section id="mesma-pessoa" aria-labelledby="semente-titulo" style="margin-top:clamp(80px,11vw,140px);scroll-margin-top:24px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:12px"><p style="margin:0;color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">Mesma pessoa</p><span style="color:hsl(var(--primary));font-family:var(--font-mono);font-size:12px">02</span><span aria-hidden="true" style="background:hsl(var(--border));height:1px;flex:1"></span></div>
+<div style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px 48px">
+<h2 id="semente-titulo" style="margin:0;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em">Mesma semente, mesma pessoa.</h2>
+<p style="margin:0;max-width:520px;color:hsl(var(--muted-foreground));font-size:17px;line-height:1.55;text-wrap:pretty">Com a mesma semente e o mesmo <code style="color:hsl(var(--foreground));font-size:15px">hoje</code>, todas as portas devolvem a mesma pessoa. O teste que falhou no CI roda na sua máquina com os mesmos dados.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));align-items:center;gap:0;padding:clamp(20px,3vw,36px);background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;flex-direction:column;gap:12px;padding:16px 0">
+<p style="margin:0;font-family:var(--font-mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Entrada</p>
+<div style="display:flex;flex-direction:column;gap:8px;padding:18px;border:1.5px solid hsl(var(--primary));border-radius:14px;background:hsl(var(--background));font-family:var(--font-mono);font-size:15px">
+<span><span style="color:hsl(var(--muted-foreground))">semente:</span> <span style="color:hsl(var(--primary))">42</span></span>
+<span><span style="color:hsl(var(--muted-foreground))">hoje:</span> '2026-10-05'</span>
+</div>
+<p style="margin:0;font-size:13px;line-height:1.5;color:hsl(var(--muted-foreground))">No Playwright, a semente é o nome do teste.</p>
+</div>
+<ul aria-label="Portas" style="list-style:none;margin:0;padding:16px 0;display:flex;flex-direction:column;gap:6px">
+<sc-for list="{{ portas }}" as="p" hint-placeholder-count="8">
+<li style="display:flex;align-items:center;gap:0">
+<span aria-hidden="true" style="flex:1;height:1px;background:hsl(var(--primary) / 0.45)"></span>
+<span style="flex:none;display:inline-flex;align-items:center;gap:8px;min-width:150px;padding:6px 12px;border:1px solid hsl(var(--border));border-radius:999px;background:hsl(var(--muted));font-family:var(--font-mono);font-size:12.5px"><i class="{{ p.icone }}" aria-hidden="true" style="font-size:13px;color:hsl(var(--primary))"></i>{{ p.nome }}</span>
+<span aria-hidden="true" style="flex:1;height:1px;background:hsl(var(--primary) / 0.45)"></span>
+</li>
+</sc-for>
+</ul>
+<div style="display:flex;flex-direction:column;gap:12px;padding:16px 0">
+<p style="margin:0;font-family:var(--font-mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Saída</p>
+<div style="display:flex;flex-direction:column;padding:6px 18px;border:1.5px solid hsl(var(--primary));border-radius:14px;background:hsl(var(--background))">
+<sc-for list="{{ camposSaida }}" as="c" hint-placeholder-count="6">
+<div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid hsl(var(--border));font-size:13.5px"><span style="color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px">{{ c.k }}</span><span style="text-align:right;overflow-wrap:anywhere">{{ c.v }}</span></div>
+</sc-for>
+<p style="margin:0;padding:10px 0 8px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;color:hsl(var(--ok))"><i class="icon-circle-check" aria-hidden="true" style="font-size:14px"></i>43 de 43 campos iguais em 15 saídas</p>
+</div>
+</div>
+</div>
+
+<ol style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px">
+<li style="display:flex;flex-direction:column;gap:10px;padding:22px;border:1px solid hsl(var(--border));border-radius:var(--radius-lg)"><span style="font-family:var(--font-mono);font-size:12px;color:hsl(var(--primary))">01 · no CI</span><p style="margin:0;font-size:15px;line-height:1.55;text-wrap:pretty">O teste falha e o relatório leva a pessoa que foi usada, com a semente.</p></li>
+<li style="display:flex;flex-direction:column;gap:10px;padding:22px;border:1px solid hsl(var(--border));border-radius:var(--radius-lg)"><span style="font-family:var(--font-mono);font-size:12px;color:hsl(var(--primary))">02 · na sua máquina</span><p style="margin:0;font-size:15px;line-height:1.55;text-wrap:pretty">A mesma semente no terminal devolve a mesma pessoa, campo por campo.</p></li>
+<li style="display:flex;flex-direction:column;gap:10px;padding:22px;border:1px solid hsl(var(--border));border-radius:var(--radius-lg)"><span style="font-family:var(--font-mono);font-size:12px;color:hsl(var(--primary))">03 · entre versões</span><p style="margin:0;font-size:15px;line-height:1.55;text-wrap:pretty">Arquivos dourados guardam a pessoa esperada de cada semente e são conferidos a cada PR. Os 12 não mudaram da 0.2.0 à 0.4.1. Fixe a versão do pacote.</p></li>
+</ol>
+</section>
+
+<section aria-labelledby="pessoa-titulo" style="margin-top:clamp(80px,11vw,140px);display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:12px"><p style="margin:0;color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">A pessoa</p><span style="color:hsl(var(--primary));font-family:var(--font-mono);font-size:12px">03</span><span aria-hidden="true" style="background:hsl(var(--border));height:1px;flex:1"></span></div>
+<div style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px 48px">
+<h2 id="pessoa-titulo" style="margin:0;max-width:640px;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em;text-wrap:balance">Uma pessoa onde tudo bate.</h2>
+<p style="margin:0;max-width:520px;color:hsl(var(--muted-foreground));font-size:17px;line-height:1.55;text-wrap:pretty">O endereço decide o resto. Todos os documentos passam no dígito verificador.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:16px">
+<div style="min-width:0;padding:clamp(20px,3vw,32px);background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg);display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px">
+<div><p style="margin:0;font-size:24px;font-weight:800;letter-spacing:-0.02em">Márcio Carvalho Rodrigues</p><p style="margin:4px 0 0;font-size:14px;color:hsl(var(--muted-foreground))">26/02/1970 · 56 anos</p></div>
+<span style="font-family:var(--font-mono);font-size:12px;padding:5px 10px;border:1px solid var(--accent-line);background:var(--accent-soft);color:hsl(var(--primary));border-radius:999px">semente 42</span>
+</div>
+<dl style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:18px 24px">
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">CEP</dt><dd style="margin:4px 0 0;font-family:var(--font-mono);font-size:15px">65071-377</dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Endereço</dt><dd style="margin:4px 0 0;font-size:14px;line-height:1.45">Avenida Litorânea, 199, Apto 171 · Calhau · São Luís, <span style="color:hsl(var(--warn));font-weight:700">MA</span></dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">CPF</dt><dd style="margin:4px 0 0;font-family:var(--font-mono);font-size:15px">634.132.40<span style="color:hsl(var(--warn));font-weight:700">3</span>-07</dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Celular</dt><dd style="margin:4px 0 0;font-family:var(--font-mono);font-size:15px">(<span style="color:hsl(var(--warn));font-weight:700">98</span>) 97702-9128</dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Título de eleitor</dt><dd style="margin:4px 0 0;font-family:var(--font-mono);font-size:15px">5022 4149 <span style="color:hsl(var(--warn));font-weight:700">11</span>71</dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">RG · PIS</dt><dd style="margin:4px 0 0;font-family:var(--font-mono);font-size:15px">92.957.904-5 · 166.24491.26-5</dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">E-mail</dt><dd style="margin:4px 0 0;font-size:14px;overflow-wrap:anywhere">marcio-rodrigues-0337@tuamaeaquelaursa.com</dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Empresa</dt><dd style="margin:4px 0 0;font-size:14px;line-height:1.45">Carvalho &amp; Rodrigues Engenharia Ltda · Rodrigues Store · <span style="font-family:var(--font-mono)">90.849.558/0001-39</span></dd></div>
+<div style="min-width:0"><dt style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Cartão de teste Stripe</dt><dd style="margin:4px 0 0;font-family:var(--font-mono);font-size:15px">5555 5555 5555 4444 · 11/28</dd></div>
+</dl>
+</div>
+<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ regras }}" as="r" hint-placeholder-count="5">
+<li style="display:flex;gap:16px;align-items:flex-start;padding:18px 20px;border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<span style="flex:none;min-width:64px;text-align:center;font-family:var(--font-mono);font-size:13px;font-weight:700;padding:5px 8px;border-radius:8px;border:1px solid hsl(var(--warn) / 0.5);color:hsl(var(--warn))">{{ r.chip }}</span>
+<div style="min-width:0"><p style="margin:0;font-size:15px;font-weight:700">{{ r.titulo }}</p><p style="margin:4px 0 0;font-size:14px;line-height:1.5;color:hsl(var(--muted-foreground));text-wrap:pretty">{{ r.texto }}</p></div>
+</li>
+</sc-for>
+</ul>
+</div>
+</section>
+
+<section id="para-quem" aria-labelledby="quem-titulo" style="margin-top:clamp(80px,11vw,140px);scroll-margin-top:24px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:12px"><p style="margin:0;color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">Para quem</p><span style="color:hsl(var(--primary));font-family:var(--font-mono);font-size:12px">04</span><span aria-hidden="true" style="background:hsl(var(--border));height:1px;flex:1"></span></div>
+<h2 id="quem-titulo" style="margin:0;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em">Cada um entra pela sua porta.</h2>
+<ul style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px">
+<li style="display:flex;flex-direction:column;gap:14px;padding:24px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h3 style="margin:0;font-size:19px;font-weight:800;letter-spacing:-0.02em">QA manual</h3><i class="icon-mouse-pointer-click" aria-hidden="true" style="font-size:18px;color:hsl(var(--primary))"></i></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px"><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">extensão</span></div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.55;color:hsl(var(--muted-foreground))"><li>Um atalho preenche o cadastro inteiro, e a mesma pessoa fica guardada entre as etapas de um fluxo.</li><li><span style="font-family:var(--font-mono);font-size:13px;color:hsl(var(--foreground))">Botão direito › Botaí › Inserir</span> põe CPF, e-mail, CEP e mais 20 tipos num campo só.</li><li>“Abrir caixa de entrada” mostra o e-mail de confirmação.</li></ul>
+</li>
+<li style="display:flex;flex-direction:column;gap:14px;padding:24px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h3 style="margin:0;font-size:19px;font-weight:800;letter-spacing:-0.02em">Dev frontend</h3><i class="icon-code" aria-hidden="true" style="font-size:18px;color:hsl(var(--primary))"></i></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px"><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">extensão</span><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">biblioteca</span></div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.55;color:hsl(var(--muted-foreground))"><li>Funciona com React, Vue e máscaras (imask, jQuery Mask, react-number-format).</li><li>O popup lista os campos que não reconheceu.</li><li>A biblioteca traz validadores de CPF, CNPJ, RG, PIS e título.</li></ul>
+</li>
+<li style="display:flex;flex-direction:column;gap:14px;padding:24px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h3 style="margin:0;font-size:19px;font-weight:800;letter-spacing:-0.02em">QA de automação</h3><i class="icon-drama" aria-hidden="true" style="font-size:18px;color:hsl(var(--primary))"></i></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px"><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">playwright</span><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">motor</span></div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.55;color:hsl(var(--muted-foreground))"><li><code style="font-size:13px;color:hsl(var(--foreground))">botai.preencher(page)</code> em cadastro, checkout e onboarding, em todos os frames.</li><li>A falha do CI é reproduzida com a mesma pessoa no terminal.</li></ul>
+</li>
+<li style="display:flex;flex-direction:column;gap:14px;padding:24px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h3 style="margin:0;font-size:19px;font-weight:800;letter-spacing:-0.02em">Backend semeando banco</h3><i class="icon-database" aria-hidden="true" style="font-size:18px;color:hsl(var(--primary))"></i></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px"><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">cli</span><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">sql</span><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">csv</span></div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.55;color:hsl(var(--muted-foreground))"><li>Mil INSERTs iguais em qualquer máquina, compatíveis com colunas UNIQUE.</li><li><code style="font-size:13px;color:hsl(var(--foreground))">--uf PI</code> amarra o CEP, o DDD, a região do CPF e o código do título.</li></ul>
+</li>
+<li style="display:flex;flex-direction:column;gap:14px;padding:24px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h3 style="margin:0;font-size:19px;font-weight:800;letter-spacing:-0.02em">CI</h3><i class="icon-workflow" aria-hidden="true" style="font-size:18px;color:hsl(var(--primary))"></i></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px"><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">npx com versão fixa</span><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">imagem</span><span style="font-family:var(--font-mono);font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--accent-line);color:hsl(var(--primary))">binário</span></div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.55;color:hsl(var(--muted-foreground))"><li>O seed de banco num passo do workflow.</li><li>A imagem entra como service container.</li></ul>
+</li>
+<li style="display:flex;flex-direction:column;justify-content:space-between;gap:20px;padding:24px;border:1px dashed hsl(var(--border));border-radius:var(--radius-lg)">
+<p style="margin:0;font-size:19px;font-weight:800;letter-spacing:-0.02em;line-height:1.25;text-wrap:balance">Não sabe por onde começar?</p>
+<p style="margin:0;font-size:14.5px;line-height:1.55;color:hsl(var(--muted-foreground))">A documentação tem um guia por porta e as integrações por linguagem.</p>
+<a href="https://docs.botai.pilutech.com.br" style="display:inline-flex;align-items:center;gap:6px;color:hsl(var(--primary));font-family:var(--font-mono);font-size:13px">docs.botai.pilutech.com.br <i class="icon-arrow-right" aria-hidden="true" style="font-size:13px"></i></a>
+</li>
+</ul>
+</section>
+
+<section aria-labelledby="integracoes-titulo" style="margin-top:clamp(80px,11vw,140px);display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:12px"><p style="margin:0;color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">Integrações</p><span style="color:hsl(var(--primary));font-family:var(--font-mono);font-size:12px">05</span><span aria-hidden="true" style="background:hsl(var(--border));height:1px;flex:1"></span></div>
+<div style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px 48px">
+<h2 id="integracoes-titulo" style="margin:0;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em">O que foi testado, e o que só roda.</h2>
+<p style="margin:0;max-width:520px;color:hsl(var(--muted-foreground));font-size:17px;line-height:1.55;text-wrap:pretty">O motor roda em qualquer ferramenta que execute JS na página, e o servidor atende qualquer linguagem que fale HTTP. O selo diz o que já tem teste.</p>
+</div>
+<ul style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:12px">
+<sc-for list="{{ integracoes }}" as="i" hint-placeholder-count="13">
+<li style="display:flex;flex-direction:column;gap:12px;padding:18px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-md)">
+<p style="margin:0;font-size:16px;font-weight:700">{{ i.nome }}</p>
+<span style="{{ i.estiloSelo }}"><i class="{{ i.iconeSelo }}" aria-hidden="true" style="font-size:12px"></i>{{ i.selo }}</span>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<section id="extensao" aria-labelledby="extensao-titulo" style="margin-top:clamp(80px,11vw,140px);scroll-margin-top:24px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:12px"><p style="margin:0;color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">Extensão</p><span style="color:hsl(var(--primary));font-family:var(--font-mono);font-size:12px">06</span><span aria-hidden="true" style="background:hsl(var(--border));height:1px;flex:1"></span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:clamp(28px,4vw,56px);align-items:start">
+<div style="display:flex;flex-direction:column;gap:22px">
+<h2 id="extensao-titulo" style="margin:0;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em">Bota aí no navegador.</h2>
+<p style="margin:0;color:hsl(var(--muted-foreground));font-size:17px;line-height:1.55;text-wrap:pretty">Um atalho preenche a página inteira. O botão direito põe um dado num campo só. A mesma pessoa fica guardada até você pedir outra.</p>
+<ul aria-label="Instalar pela loja" style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px">
+<li><x-import component-from-global-scope="PiluVituDesignSystem_c5cbcc.Button" size="lg" as="a" href="https://chromewebstore.google.com/detail/bota%C3%AD/mblmjomopainbcdjipkdmioglamdinnc" target="_blank" rel="noopener noreferrer" style="padding:0 20px;height:44px;font-weight:600;text-decoration:none" hint-size="200px,44px"><i class="fa-brands fa-chrome" aria-hidden="true"></i>Chrome Web Store</x-import></li>
+<li><x-import component-from-global-scope="PiluVituDesignSystem_c5cbcc.Button" size="lg" as="a" href="https://addons.mozilla.org/pt-BR/firefox/addon/bota%C3%AD/" target="_blank" rel="noopener noreferrer" style="padding:0 20px;height:44px;font-weight:600;text-decoration:none" hint-size="190px,44px"><i class="fa-brands fa-firefox-browser" aria-hidden="true"></i>Firefox Add-ons</x-import></li>
+<li><span style="display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:1px dashed hsl(var(--border));border-radius:var(--radius-md);font-size:14px;color:hsl(var(--muted-foreground))"><i class="fa-brands fa-opera" aria-hidden="true"></i>Opera <span style="font-family:var(--font-mono);font-size:12px;color:hsl(var(--warn))">em revisão</span></span></li>
+</ul>
+<p style="margin:0;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:hsl(var(--muted-foreground))">Chrome 123+ e Edge pela Chrome Web Store · Firefox 153+</p>
+<div role="region" aria-labelledby="atalhos-legenda" tabindex="0" style="overflow-x:auto;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<table style="width:100%;border-collapse:collapse;font-size:14px">
+<caption id="atalhos-legenda" style="text-align:left;padding:14px 18px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Atalhos por sistema</caption>
+<thead><tr><th scope="col" style="text-align:left;padding:12px 18px;font-family:var(--font-mono);font-size:12px;font-weight:600;color:hsl(var(--muted-foreground))">Sistema</th><th scope="col" style="text-align:left;padding:12px 18px;font-family:var(--font-mono);font-size:12px;font-weight:600;color:hsl(var(--muted-foreground))">Preencher a página</th></tr></thead>
+<tbody>
+<tr style="border-top:1px solid hsl(var(--border))"><th scope="row" style="text-align:left;padding:12px 18px;font-weight:600">macOS</th><td style="padding:12px 18px"><kbd style="border:1px solid hsl(var(--border));background:hsl(var(--muted));border-radius:6px;padding:2px 8px;font-size:13px">⌥⇧P</kbd></td></tr>
+<tr style="border-top:1px solid hsl(var(--border))"><th scope="row" style="text-align:left;padding:12px 18px;font-weight:600">Windows</th><td style="padding:12px 18px"><kbd style="border:1px solid hsl(var(--border));background:hsl(var(--muted));border-radius:6px;padding:2px 8px;font-size:13px">Ctrl+Shift+Y</kbd></td></tr>
+<tr style="border-top:1px solid hsl(var(--border))"><th scope="row" style="text-align:left;padding:12px 18px;font-weight:600">Linux</th><td style="padding:12px 18px"><kbd style="border:1px solid hsl(var(--border));background:hsl(var(--muted));border-radius:6px;padding:2px 8px;font-size:13px">Ctrl+Shift+Y</kbd></td></tr>
+<tr style="border-top:1px solid hsl(var(--border))"><th scope="row" style="text-align:left;padding:12px 18px;font-weight:600">Um campo só</th><td style="padding:12px 18px;font-family:var(--font-mono);font-size:13px">botão direito › Botaí › Inserir</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<figure style="margin:0;display:flex;flex-direction:column;gap:12px">
+<div style="overflow:hidden;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)"><sc-if value="{{ ehEscuro }}" hint-placeholder-val="{{ true }}"><img src="site/public/capturas/01-pagina-preenchida-escuro.png" alt="Formulário de cadastro preenchido pelo Botaí, com o popup mostrando 12 de 14 campos preenchidos (tema escuro)" width="1280" height="800" style="display:block;width:100%;height:auto"></sc-if><sc-if value="{{ ehClaro }}" hint-placeholder-val="{{ false }}"><img src="site/public/capturas/02-pagina-preenchida-claro.png" alt="Formulário de cadastro preenchido pelo Botaí, com o popup mostrando 12 de 14 campos preenchidos (tema claro)" width="1280" height="800" style="display:block;width:100%;height:auto"></sc-if></div>
+<figcaption style="font-family:var(--font-mono);font-size:12px;color:hsl(var(--muted-foreground))">O popup mostra quantos campos entraram e lista os que ficaram de fora.</figcaption>
+</figure>
+</div>
+</section>
+
+<section aria-labelledby="cuidados-titulo" style="margin-top:clamp(80px,11vw,140px);display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:12px"><p style="margin:0;color:hsl(var(--muted-foreground));font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">Privacidade e cuidados</p><span style="color:hsl(var(--primary));font-family:var(--font-mono);font-size:12px">07</span><span aria-hidden="true" style="background:hsl(var(--border));height:1px;flex:1"></span></div>
+<h2 id="cuidados-titulo" style="margin:0;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em">Fictício, mas com cuidado.</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px">
+<div style="display:flex;flex-direction:column;gap:14px;padding:26px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;gap:10px"><i class="icon-shield" aria-hidden="true" style="font-size:18px;color:hsl(var(--primary))"></i><h3 style="margin:0;font-size:18px;font-weight:800">Privacidade</h3></div>
+<p style="margin:0;font-size:15px;line-height:1.6;text-wrap:pretty">A extensão não tem servidor nem analytics e só age na aba em que você a aciona.</p>
+<a href="/privacidade" style="margin-top:auto;display:inline-flex;align-items:center;gap:6px;color:hsl(var(--primary));font-size:14px">Política de privacidade <i class="icon-arrow-right" aria-hidden="true" style="font-size:13px"></i></a>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;padding:26px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius-lg)">
+<div style="display:flex;align-items:center;gap:10px"><i class="icon-triangle-alert" aria-hidden="true" style="font-size:18px;color:hsl(var(--warn))"></i><h3 style="margin:0;font-size:18px;font-weight:800">Cuidados</h3></div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.55;text-wrap:pretty">
+<li>Os dados são fictícios, mas um CPF, CNPJ ou celular gerado pode pertencer a alguém de verdade.</li>
+<li>A caixa de e-mail é pública: quem souber o endereço lê as mensagens.</li>
+<li>Use só em localhost e em ambiente de teste.</li>
+</ul>
+<a href="/termos" style="margin-top:auto;display:inline-flex;align-items:center;gap:6px;color:hsl(var(--primary));font-size:14px">Termos de uso <i class="icon-arrow-right" aria-hidden="true" style="font-size:13px"></i></a>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="final-titulo" style="margin-top:clamp(80px,11vw,140px);display:flex;flex-direction:column;align-items:center;gap:22px;padding:clamp(40px,6vw,72px) clamp(20px,4vw,48px);text-align:center;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:32px">
+<svg viewBox="0 0 16 16" width="56" height="56" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="#38bdf8"></rect><rect x="3" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="3" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="4.6" y="3" width="1.3" height="4.5" rx="0.3" fill="#0a0f1a"></rect></svg>
+<h2 id="final-titulo" style="margin:0;font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800;letter-spacing:-0.035em;text-wrap:balance">Botaí no seu teste.</h2>
+<p style="margin:0;max-width:540px;color:hsl(var(--muted-foreground));font-size:17px;line-height:1.55;text-wrap:pretty">Comece pela porta que você já usa. A documentação tem o guia de cada uma.</p>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px">
+<x-import component-from-global-scope="PiluVituDesignSystem_c5cbcc.Button" size="lg" as="a" href="https://docs.botai.pilutech.com.br" style="padding:0 22px;height:48px;font-size:15px;font-weight:600;text-decoration:none" hint-size="220px,48px"><i class="icon-book-open" aria-hidden="true" style="font-size:16px"></i>Ler a documentação</x-import>
+<x-import component-from-global-scope="PiluVituDesignSystem_c5cbcc.Button" size="lg" variant="outline" as="a" href="https://github.com/PiluVitu/Botai" style="padding:0 20px;height:48px;font-size:15px;font-weight:600;text-decoration:none" hint-size="200px,48px"><i class="icon-github" aria-hidden="true" style="font-size:16px"></i>Código no GitHub</x-import>
+</div>
+</section>
+</main>
+
+<footer style="margin-top:72px;padding:32px 0 40px;border-top:1px solid hsl(var(--border));display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;max-width:320px">
+<div style="display:flex;align-items:center;gap:10px"><svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="#38bdf8"></rect><rect x="3" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="8.5" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="8.5" y="3" width="4.5" height="4.5" rx="0.9" fill="#0a0f1a"></rect><rect x="4.6" y="3" width="1.3" height="4.5" rx="0.3" fill="#0a0f1a"></rect></svg><span style="font-size:18px;font-weight:800;letter-spacing:-0.03em">Botaí</span></div>
+<p style="margin:0;font-size:14px;line-height:1.55;color:hsl(var(--muted-foreground))">Dados de teste brasileiros. Código aberto, licença MIT.</p>
+<a href="https://pilutech.com.br" style="font-family:var(--font-mono);font-size:12px;color:hsl(var(--muted-foreground));padding:6px 0">Powered by PiluTech</a>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:40px">
+<nav aria-label="Projeto" style="display:flex;flex-direction:column;gap:2px">
+<p style="margin:0 0 6px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Projeto</p>
+<a href="https://docs.botai.pilutech.com.br" style="font-size:14px;padding:6px 0">Docs</a>
+<a href="https://github.com/PiluVitu/Botai" style="font-size:14px;padding:6px 0">GitHub</a>
+<a href="https://www.npmjs.com/package/@pilutech/botai-core" style="font-family:var(--font-mono);font-size:13px;padding:6px 0">@pilutech/botai-core</a>
+<a href="https://www.npmjs.com/package/@pilutech/botai-playwright" style="font-family:var(--font-mono);font-size:13px;padding:6px 0">@pilutech/botai-playwright</a>
+</nav>
+<nav aria-label="Documentos" style="display:flex;flex-direction:column;gap:2px">
+<p style="margin:0 0 6px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:hsl(var(--muted-foreground))">Legal</p>
+<a href="/termos" style="font-size:14px;padding:6px 0">Termos de uso</a>
+<a href="/privacidade" style="font-size:14px;padding:6px 0">Política de privacidade</a>
+</nav>
+</div>
+</footer>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;tema&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;escuro&quot;,&quot;claro&quot;],&quot;default&quot;:&quot;escuro&quot;,&quot;tsType&quot;:&quot;'escuro' | 'claro'&quot;},&quot;layoutPortas&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grade&quot;,&quot;abas&quot;],&quot;default&quot;:&quot;grade&quot;,&quot;tsType&quot;:&quot;'grade' | 'abas'&quot;}}">
+const PORTAS = [
+  { id: 'extensao', nome: 'Extensão', icone: 'icon-puzzle', linha: 'Preenche o formulário da aba num atalho, ou um campo só pelo botão direito.', onde: 'Chrome 123+ e Edge pela Chrome Web Store, Firefox 153+ pela Firefox Add-ons. Opera em revisão.', cmd: '⌥⇧P no Mac · Ctrl+Shift+Y no Windows e no Linux', copiavel: false },
+  { id: 'cli', nome: 'CLI', icone: 'icon-terminal', linha: 'Uma pessoa ou um lote em JSON, NDJSON, CSV ou SQL, direto no banco.', onde: 'Onde houver Node.', cmd: 'npx @pilutech/botai-core pessoas -n 1000 --semente carga --formato sql | psql "$DATABASE_URL"', copiavel: true },
+  { id: 'http', nome: 'HTTP', icone: 'icon-server', linha: 'Python, Go, Java ou qualquer linguagem que fale HTTP pede uma pessoa.', onde: 'Node, imagem ou binário.', cmd: "curl 'http://127.0.0.1:8790/pessoa?semente=42'", copiavel: true },
+  { id: 'docker', nome: 'Docker', icone: 'icon-container', linha: 'O servidor numa imagem, que entra como service no CI.', onde: 'linux/amd64 e linux/arm64.', cmd: 'docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1', copiavel: true },
+  { id: 'binarios', nome: 'Binários', icone: 'icon-cpu', linha: 'A CLI e o servidor sem instalar Node.', onde: 'macOS, Linux e Windows, x64 e arm64.', cmd: 'curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | sh', copiavel: true },
+  { id: 'biblioteca', nome: 'Biblioteca', icone: 'icon-braces', linha: 'O mesmo gerador no seu código JS ou TS, sem nenhuma dependência.', onde: 'Node, Bun, Deno e navegador.', cmd: "gerarPessoa({ semente: 42, hoje: '2026-10-05' })", copiavel: true },
+  { id: 'playwright', nome: 'Playwright', icone: 'icon-drama', linha: 'A semente é o nome do teste: o retry usa a mesma pessoa e a falha leva a pessoa no relatório.', onde: 'Chromium, Firefox e WebKit.', cmd: 'await botai.preencher(page)', copiavel: true },
+  { id: 'motor', nome: 'Motor', icone: 'icon-app-window', linha: 'Um script de 40 KB que preenche o formulário da página.', onde: 'Qualquer ferramenta que execute JS na página. Testado com Playwright e CDP.', cmd: '[TRECHO DE USO DO MOTOR]', copiavel: false },
+];
+const NUMEROS = [
+  { valor: '43/43', texto: 'campos iguais em 15 saídas com a mesma semente' },
+  { valor: '~2 s', texto: 'para 100 mil pessoas, sem repetir CPF, e-mail nem CNPJ' },
+  { valor: '1.454', texto: 'testes automatizados passando' },
+  { valor: '12', texto: 'arquivos dourados iguais da 0.2.0 à 0.4.1' },
+  { valor: '0,8 ms', texto: 'para preencher 21 campos (mediana)' },
+  { valor: '0', texto: 'dependências no core' },
+];
+const REGRAS = [
+  { chip: 'MA', titulo: 'CEP real', texto: 'O CEP existe, e a rua, o bairro e a cidade batem com ele. A UF do endereço amarra o resto.' },
+  { chip: '…3-07', titulo: 'CPF da região fiscal', texto: 'O nono dígito é o da região fiscal da UF: 3 cobre CE, MA e PI.' },
+  { chip: '(98)', titulo: 'DDD do CEP', texto: 'O celular usa o DDD daquele CEP.' },
+  { chip: '…11..', titulo: 'Título com o código da UF', texto: 'O título de eleitor traz o código da UF, 11 para o Maranhão. RG e PIS também passam no dígito.' },
+  { chip: '@', titulo: 'E-mail do nome', texto: 'Derivado do nome, com caixa de entrada pública para ler a confirmação.' },
+];
+const INTEG = [
+  ['Playwright', 1], ['Postgres', 1], ['SQLite', 1], ['Python', 1, 'Testado via HTTP'], ['Node', 1], ['Bun', 1], ['Deno', 1],
+  ['Cypress', 0, 'Roda via JS'], ['Selenium', 0, 'Roda via JS'], ['Puppeteer', 0, 'Roda via JS'], ['WebdriverIO', 0, 'Roda via JS'], ['Go', 0, 'Roda via HTTP'], ['Java', 0, 'Roda via HTTP'],
+];
+class Component extends DCLogic {
+  state = { escuro: null, largura: 1440, menu: false, copiado: null, aba: 'cli' };
+  raizRef = React.createRef();
+  componentDidMount() {
+    const el = this.raizRef.current;
+    if (el && window.ResizeObserver) {
+      this.ro = new ResizeObserver(([e]) => this.setState({ largura: e.contentRect.width }));
+      this.ro.observe(el);
+    }
+  }
+  componentWillUnmount() { this.ro && this.ro.disconnect(); clearTimeout(this.t); }
+  escuro() {
+    if (this.state.escuro !== null) return this.state.escuro;
+    const q = new URLSearchParams(location.search).get('tema');
+    if (q) return q !== 'claro';
+    return (this.props.tema ?? 'escuro') !== 'claro';
+  }
+  copiar(chave, texto) {
+    try { navigator.clipboard && navigator.clipboard.writeText(texto); } catch (e) {}
+    this.setState({ copiado: chave });
+    clearTimeout(this.t);
+    this.t = setTimeout(() => this.setState({ copiado: null }), 1600);
+  }
+  renderVals() {
+    const e = this.escuro();
+    const { largura, menu, copiado, aba } = this.state;
+    const estreito = largura < 900;
+    const layout = this.props.layoutPortas ?? 'grade';
+    const portas = PORTAS.map((p, i) => {
+      const ativa = p.id === aba;
+      return {
+        ...p,
+        numero: 'porta ' + String(i + 1).padStart(2, '0'),
+        iconeCopia: copiado === p.id ? 'icon-check' : 'icon-copy',
+        rotuloCopia: 'Copiar comando da porta ' + p.nome,
+        aoCopiar: () => this.copiar(p.id, p.cmd),
+        ativa,
+        aoSelecionar: () => this.setState({ aba: p.id }),
+        estiloAba: { display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 14px', borderRadius: 999, cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 13, border: ativa ? '1px solid var(--accent-line)' : '1px solid hsl(var(--border))', background: ativa ? 'var(--accent-soft)' : 'transparent', color: ativa ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))' },
+      };
+    });
+    const selo = (ok) => ({ display: 'inline-flex', alignSelf: 'flex-start', alignItems: 'center', gap: 6, padding: '3px 9px', borderRadius: 999, fontFamily: 'var(--font-mono)', fontSize: 11.5, border: ok ? '1px solid hsl(var(--ok) / 0.5)' : '1px solid hsl(var(--border))', color: ok ? 'hsl(var(--ok))' : 'hsl(var(--muted-foreground))' });
+    return {
+      raizRef: this.raizRef,
+      temaClasse: e ? 'dark' : '',
+      iconeTema: e ? 'icon-sun' : 'icon-moon',
+      rotuloTema: e ? 'Mudar para o tema claro' : 'Mudar para o tema escuro',
+      alternarTema: () => this.setState({ escuro: !e }),
+      largo: !estreito,
+      estreito,
+      menuAberto: menu,
+      mostrarMenu: estreito && menu,
+      iconeMenu: menu ? 'icon-x' : 'icon-menu',
+      alternarMenu: () => this.setState({ menu: !menu }),
+      fecharMenu: () => this.setState({ menu: false }),
+      iconeHero: copiado === 'hero' ? 'icon-check' : 'icon-copy',
+      copiarHero: () => this.copiar('hero', 'npx @pilutech/botai-core pessoa --semente 42'),
+      numeros: NUMEROS,
+      portas,
+      emGrade: layout !== 'abas',
+      emAbas: layout === 'abas',
+      ativa: portas.find((p) => p.ativa) || portas[0],
+      camposSaida: [
+        { k: 'nome', v: 'Márcio Carvalho Rodrigues' },
+        { k: 'cpf', v: '634.132.403-07' },
+        { k: 'celular', v: '(98) 97702-9128' },
+        { k: 'cep', v: '65071-377 · São Luís, MA' },
+        { k: 'cnpj', v: '90.849.558/0001-39' },
+        { k: 'cartão', v: '5555 5555 5555 4444' },
+      ],
+      regras: REGRAS,
+      integracoes: INTEG.map(([nome, ok, rot]) => ({ nome, selo: rot || 'Testado', iconeSelo: ok ? 'icon-circle-check' : 'icon-plug', estiloSelo: selo(ok) })),
+      ehEscuro: e,
+      ehClaro: !e,
+      capturaSrc: e ? 'site/public/capturas/01-pagina-preenchida-escuro.png' : 'site/public/capturas/02-pagina-preenchida-claro.png',
+    };
+  }
+}
+</script>
+</body>
+</html>

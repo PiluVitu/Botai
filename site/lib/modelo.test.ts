@@ -1,4 +1,4 @@
-import { botoesDasLojas, modeloDaLanding, notaDasLojas } from './modelo'
+import { botoesDasLojas, modeloDaLanding } from './modelo'
 
 const SEM_LOJA = { chromeUrl: '', firefoxUrl: '', edgeUrl: '', operaUrl: '' }
 const URL_CHROME = 'https://chromewebstore.google.com/detail/botai/abc'
@@ -50,52 +50,16 @@ describe('botoesDasLojas', () => {
   })
 })
 
-describe('notaDasLojas', () => {
-  it('sem loja: a promessa, sem dizer que saiu', () => {
-    expect(notaDasLojas([])).toBe(
-      'Chegando às lojas do Chrome, do Firefox, do Edge e do Opera',
-    )
-  })
-
-  it('nas quatro', () => {
-    expect(notaDasLojas(['chrome', 'firefox', 'edge', 'opera'])).toBe(
-      'Chrome, Firefox, Edge e Opera · grátis e de código aberto',
-    )
-  })
-
-  // As aprovações chegam em datas diferentes: a nota só cita as que saíram.
-  it('só as publicadas', () => {
-    expect(notaDasLojas(['firefox'])).toBe(
-      'Firefox · grátis e de código aberto',
-    )
-    expect(notaDasLojas(['chrome', 'edge'])).toBe(
-      'Chrome e Edge · grátis e de código aberto',
-    )
-  })
-})
-
+// A v2 não tem selo de fase nem nota das lojas: a página só precisa dos botões.
 describe('modeloDaLanding', () => {
-  it('em breve', () => {
+  it('só as lojas', () => {
     expect(modeloDaLanding(SEM_LOJA)).toEqual({
-      fase: 'em-breve',
       lojas: botoesDasLojas(SEM_LOJA),
-      notaDasLojas:
-        'Chegando às lojas do Chrome, do Firefox, do Edge e do Opera',
     })
   })
 
   it('com o Chrome publicado', () => {
     const urls = { ...SEM_LOJA, chromeUrl: URL_CHROME }
-    expect(modeloDaLanding(urls)).toEqual({
-      fase: 'disponivel',
-      lojas: botoesDasLojas(urls),
-      notaDasLojas: 'Chrome · grátis e de código aberto',
-    })
-  })
-
-  it('URL errada não muda a fase', () => {
-    expect(modeloDaLanding({ ...SEM_LOJA, chromeUrl: URL_FIREFOX }).fase).toBe(
-      'em-breve',
-    )
+    expect(modeloDaLanding(urls)).toEqual({ lojas: botoesDasLojas(urls) })
   })
 })

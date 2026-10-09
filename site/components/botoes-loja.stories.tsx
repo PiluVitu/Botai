@@ -9,6 +9,11 @@ const NAS_QUATRO = {
   edgeUrl: 'https://microsoftedge.microsoft.com/addons/detail/botai/xyz',
   operaUrl: 'https://addons.opera.com/pt-br/extensions/details/botai/',
 }
+const NO_AR = {
+  ...SEM_LOJA,
+  chromeUrl: NAS_QUATRO.chromeUrl,
+  firefoxUrl: NAS_QUATRO.firefoxUrl,
+}
 
 const meta = {
   title: 'Landing/BotoesLoja',
@@ -19,13 +24,22 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const EmBreve: Story = { args: { lojas: botoesDasLojas(SEM_LOJA) } }
-export const SoFirefox: Story = {
-  args: {
-    lojas: botoesDasLojas({ ...SEM_LOJA, firefoxUrl: NAS_QUATRO.firefoxUrl }),
-  },
+// Chrome e Firefox no ar, Opera em revisão e o Edge de fora (o lojas.json de 2026-10-08).
+export const NoAr: Story = { args: { lojas: botoesDasLojas(NO_AR) } }
+export const NoArClaro: Story = {
+  args: NoAr.args,
+  globals: { tema: 'claro' },
 }
+export const SemLoja: Story = { args: { lojas: botoesDasLojas(SEM_LOJA) } }
 export const NasQuatro: Story = { args: { lojas: botoesDasLojas(NAS_QUATRO) } }
-export const Outline: Story = {
-  args: { lojas: botoesDasLojas(NAS_QUATRO), variante: 'outline' },
+// A coluna útil de uma tela de 320 px (gutter de 16 px): os itens descem de linha.
+export const NasQuatroA320px: Story = {
+  args: NasQuatro.args,
+  decorators: [
+    (Story) => (
+      <div className="max-w-[288px]">
+        <Story />
+      </div>
+    ),
+  ],
 }

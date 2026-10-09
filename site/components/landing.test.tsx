@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/react'
+import { ANCORAS_DA_LANDING } from '@/lib/conteudo'
 import { modeloDaLanding } from '@/lib/modelo'
 import { Landing } from './landing'
 
@@ -10,47 +11,95 @@ function renderizar(urls = SEM_LOJA) {
 }
 
 describe('Landing', () => {
-  // Um h1 com o nome e a proposta; o nome grande do design não é título.
-  it('um único h1, com o nome e a proposta', () => {
+  it('um único h1, com o nome e o posicionamento', () => {
     renderizar()
     const [h1, ...outros] = screen.getAllByRole('heading', { level: 1 })
     expect(outros).toEqual([])
     expect(h1).toHaveTextContent(
-      'Botaí: Gerador de dados fake para formulários (CPF, CNPJ, CEP)',
+      'Botaí: Dados de teste brasileiros em todo lugar que o seu teste roda.',
     )
   })
 
-  it('as seções na ordem do design', () => {
+  it('as seções da v2, na ordem do design', () => {
     renderizar()
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent),
     ).toEqual([
-      'Por que existe',
-      'O que ele bota',
-      'Capturas',
-      'Como usar',
-      'Para devs',
-      'Privacidade',
-      'Cuidados',
-      'Bota aí no seu navegador',
+      'Um motor, oito portas.',
+      'Mesma semente, mesma pessoa.',
+      'Uma pessoa onde tudo bate.',
+      'Cada um entra pela sua porta.',
+      'O que foi testado, e o que ainda não.',
+      'Bota aí no navegador.',
+      'Fictício, mas com cuidado.',
+      'Botaí no seu teste.',
     ])
+    expect(screen.getByRole('region', { name: 'Números' })).toBeInTheDocument()
   })
 
-  it('as âncoras do topo levam a seções que existem', () => {
+  it('as âncoras do cabeçalho levam a seções que existem, na ordem da página', () => {
     renderizar()
-    const ancoras = within(screen.getByRole('navigation', { name: 'Topo' }))
+    const ancoras = within(screen.getByRole('banner'))
       .getAllByRole('link')
       .map((a) => a.getAttribute('href') as string)
-      .filter((href) => href.startsWith('#'))
-    expect(ancoras).toEqual(['#como-usar', '#capturas', '#para-devs'])
-    for (const alvo of ancoras)
-      expect(document.getElementById(alvo.slice(1))).not.toBeNull()
+      .filter((href) => href.startsWith('#') && href !== '#topo')
+    expect(ancoras).toEqual(ANCORAS_DA_LANDING.map(({ id }) => `#${id}`))
+    const secoes = ancoras.map((alvo) => document.getElementById(alvo.slice(1)))
+    for (const secao of secoes) expect(secao?.tagName).toBe('SECTION')
+    for (let i = 1; i < secoes.length; i++)
+      expect(
+        (secoes[i - 1] as Node).compareDocumentPosition(secoes[i] as Node) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
   })
 
-  it('o topo e o rodapé levam à documentação', () => {
+  // O main é a coluna: o hero e as 10 seções; cabeçalho e rodapé ficam fora dele.
+  it('o main tem o hero, os números e as seções; o cabeçalho e o rodapé ficam fora', () => {
+    renderizar()
+    const main = screen.getByRole('main')
+    expect(
+      [...main.children].map(
+        (secao) =>
+          secao.getAttribute('aria-labelledby') ??
+          secao.getAttribute('aria-label'),
+      ),
+    ).toEqual([
+      'hero-titulo',
+      'Números',
+      'portas-titulo',
+      'semente-titulo',
+      'pessoa-titulo',
+      'quem-titulo',
+      'integracoes-titulo',
+      'extensao-titulo',
+      'cuidados-titulo',
+      'final-titulo',
+    ])
+    expect(main).not.toContainElement(screen.getByRole('banner'))
+    expect(main).not.toContainElement(screen.getByRole('contentinfo'))
+  })
+
+  it('o «Instalar a extensão» do hero leva à seção Extensão', () => {
+    renderizar()
+    expect(
+      screen.getByRole('link', { name: 'Instalar a extensão' }),
+    ).toHaveAttribute('href', '#extensao')
+  })
+
+  it('a marca leva ao início da página', () => {
+    renderizar()
+    expect(
+      within(screen.getByRole('banner')).getByRole('link', {
+        name: 'Botaí, início',
+      }),
+    ).toHaveAttribute('href', '#topo')
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'topo')
+  })
+
+  it('o cabeçalho e o rodapé levam à documentação', () => {
     renderizar()
     for (const regiao of [
-      screen.getByRole('navigation', { name: 'Topo' }),
+      screen.getByRole('banner'),
       screen.getByRole('contentinfo'),
     ])
       expect(
@@ -58,79 +107,49 @@ describe('Landing', () => {
       ).toHaveAttribute('href', 'https://docs.botai.pilutech.com.br')
   })
 
-  // A seção "Para devs" fala do servidor HTTP que roda na máquina de quem usa: quem não tem
-  // servidor é a extensão, como na política.
-  it('a privacidade fala da extensão, não do Botaí inteiro', () => {
+  // As lojas ficam só na seção Extensão; nenhum texto diz "disponível".
+  it('sem loja publicada: uma lista só, sem o Edge e sem "disponível"', () => {
     renderizar()
-    const privacidade = screen.getByRole('region', { name: 'Privacidade' })
-    expect(privacidade).toHaveTextContent(
-      'Nada sai do seu navegador: a extensão não tem servidor',
+    const listas = screen.getAllByRole('list', { name: 'Instalar pela loja' })
+    expect(listas).toHaveLength(1)
+    expect(
+      within(
+        screen.getByRole('region', { name: 'Bota aí no navegador.' }),
+      ).getByRole('list', { name: 'Instalar pela loja' }),
+    ).toBe(listas[0])
+    expect(screen.queryByText('Microsoft Edge Add-ons')).toBeNull()
+    expect(screen.queryByText(/dispon[ií]vel/i)).toBeNull()
+    expect(screen.queryAllByRole('link', { name: 'Firefox Add-ons' })).toEqual(
+      [],
     )
-    expect(privacidade).not.toHaveTextContent(/o Botaí não tem servidor/)
   })
 
-  it('em breve: selo, nota e as 3 lojas desabilitadas nos dois blocos, sem o Edge', () => {
-    renderizar()
-    // "Em breve" aparece no selo e dentro de cada botão de loja sem URL.
-    expect(
-      screen.getAllByText('Em breve').filter((el) => !el.closest('button')),
-    ).toHaveLength(1)
-    expect(
-      screen.getByText(
-        'Chegando às lojas do Chrome, do Firefox, do Edge e do Opera',
-      ),
-    ).toBeInTheDocument()
-    expect(
-      screen.getAllByRole('list', { name: 'Instalar pela loja' }),
-    ).toHaveLength(2)
-    expect(screen.getAllByRole('button', { name: /Em breve$/ })).toHaveLength(6)
-    expect(screen.queryByText('Microsoft Edge Add-ons')).toBeNull()
+  it('com o Firefox publicado: um link, em aba nova', () => {
+    renderizar({ ...SEM_LOJA, firefoxUrl: FIREFOX })
+    const [link, ...outros] = screen.getAllByRole('link', {
+      name: 'Firefox Add-ons',
+    })
+    expect(outros).toEqual([])
+    expect(link).toHaveAttribute('href', FIREFOX)
+    expect(link).toHaveAttribute('target', '_blank')
     expect(screen.queryByText(/dispon[ií]vel/i)).toBeNull()
   })
 
-  it('com o Firefox publicado: link nos dois blocos, o resto em breve', () => {
-    renderizar({ ...SEM_LOJA, firefoxUrl: FIREFOX })
-    const links = screen.getAllByRole('link', { name: 'Firefox Add-ons' })
-    expect(links.map((a) => a.getAttribute('href'))).toEqual([FIREFOX, FIREFOX])
-    expect(screen.getByText('Disponível')).toBeInTheDocument()
-    expect(
-      screen.getByText('Firefox · grátis e de código aberto'),
-    ).toBeInTheDocument()
-  })
-
-  it('cinco recursos e três passos, cada um com o seu h3', () => {
+  it('os cuidados levam à política e aos termos, e o rodapé à PiluTech', () => {
     renderizar()
-    const recursos = screen.getByRole('region', { name: 'O que ele bota' })
-    expect(within(recursos).getAllByRole('heading', { level: 3 })).toHaveLength(
-      5,
+    const cuidados = within(
+      screen.getByRole('region', { name: 'Fictício, mas com cuidado.' }),
     )
-    const uso = screen.getByRole('region', { name: 'Como usar' })
     expect(
-      within(uso)
-        .getAllByRole('heading', { level: 3 })
-        .map((h) => h.textContent),
-    ).toEqual(['A página inteira', 'Um campo só', 'Ver e copiar os dados'])
-  })
-
-  it('a política fica em /privacidade, e o rodapé leva à PiluTech', () => {
-    renderizar()
-    expect(
-      screen.getByRole('link', { name: 'Política de privacidade' }),
+      cuidados.getByRole('link', { name: 'Política de privacidade' }),
     ).toHaveAttribute('href', '/privacidade')
-    expect(
-      screen.getByRole('link', { name: 'Powered by PiluTech' }),
-    ).toHaveAttribute('href', 'https://pilutech.com.br')
-    expect(screen.getByRole('link', { name: 'PiluLabs' })).toHaveAttribute(
-      'href',
-      'https://piluvitu.com.br/pilulabs',
-    )
-  })
-
-  it('os cuidados levam aos termos de uso', () => {
-    renderizar()
-    const cuidados = within(screen.getByRole('region', { name: 'Cuidados' }))
     expect(
       cuidados.getByRole('link', { name: 'Termos de uso' }),
     ).toHaveAttribute('href', '/termos')
+    expect(
+      within(screen.getByRole('contentinfo')).getByRole('link', {
+        name: 'Powered by PiluTech',
+      }),
+    ).toHaveAttribute('href', 'https://pilutech.com.br')
   })
 })

@@ -14,3 +14,13 @@ type Story = StoryObj<typeof meta>
 
 export const Escuro: Story = {}
 export const Claro: Story = { globals: { tema: 'claro' } }
+export const A320px: Story = {
+  args: { sizes: '288px' },
+  decorators: [
+    (Story) => (
+      <div className="max-w-[288px]">
+        <Story />
+      </div>
+    ),
+  ],
+}

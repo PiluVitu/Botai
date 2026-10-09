@@ -22,17 +22,23 @@ describe('textos de busca', () => {
     expect(TITULO_DA_HOME.length).toBeLessThanOrEqual(60)
   })
 
-  it('descrição da home: 140–160 caracteres, com os termos buscados', () => {
+  // A v2 apresenta a plataforma: a descrição abre com os termos buscados (o título segue o do gerador
+  // de CPF, CNPJ e CEP) e cita só portas que existem e lojas publicadas.
+  it('descrição da home: 140–160 caracteres, com os termos buscados e as portas', () => {
+    expect(DESCRICAO_DA_HOME).toBe(
+      'Dados de teste brasileiros para formulários: CPF e CNPJ válidos, CEP real com endereço. Extensão para Chrome e Firefox, CLI, servidor HTTP, Docker e Playwright.',
+    )
     expect(DESCRICAO_DA_HOME.length).toBeGreaterThanOrEqual(140)
     expect(DESCRICAO_DA_HOME.length).toBeLessThanOrEqual(160)
     for (const termo of [
-      'Chrome, Firefox, Edge e Opera',
       'dados de teste',
+      'formulário',
       'CPF e CNPJ válidos',
       'CEP real',
-      'formulário',
+      'Chrome e Firefox',
+      'Playwright',
     ])
-      expect(DESCRICAO_DA_HOME).toContain(termo)
+      expect(DESCRICAO_DA_HOME.toLowerCase()).toContain(termo.toLowerCase())
   })
 
   it('a política tem título e descrição próprios', () => {

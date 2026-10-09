@@ -7,6 +7,7 @@ import {
   serializarJsonLd,
   type NoJsonLd,
 } from './json-ld'
+import { DESCRICAO_DA_HOME } from './seo'
 
 const SITE = 'https://botai.pilutech.com.br'
 const SEM_LOJA = { chromeUrl: '', firefoxUrl: '', edgeUrl: '', operaUrl: '' }
@@ -42,11 +43,13 @@ describe('jsonLdDaHome', () => {
     })
   })
 
-  it('WebSite: o nome do site na raiz do subdomínio', () => {
+  // O site apresenta a plataforma (a descrição da home); o SoftwareApplication segue sendo a extensão.
+  it('WebSite: o nome e a descrição do site na raiz do subdomínio', () => {
     expect(no('WebSite', dados['@graph'])).toEqual({
       '@type': 'WebSite',
       '@id': `${SITE}/#site`,
       name: 'Botaí',
+      description: DESCRICAO_DA_HOME,
       url: `${SITE}/`,
       inLanguage: 'pt-BR',
       publisher: { '@id': ID_DA_PILUTECH },

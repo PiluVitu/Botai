@@ -26,7 +26,8 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${sans.variable} ${mono.variable}`}
+      className={`${sans.variable} ${mono.variable} motion-safe:scroll-smooth`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body>

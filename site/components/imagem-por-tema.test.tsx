@@ -4,13 +4,9 @@ import { ImagemPorTema } from './imagem-por-tema'
 
 const [PRIMEIRA] = CAPTURAS
 
-function imagens(destaque?: boolean) {
+function imagens() {
   const { container } = render(
-    <ImagemPorTema
-      variantes={PRIMEIRA.variantes}
-      sizes="100vw"
-      destaque={destaque}
-    />,
+    <ImagemPorTema variantes={PRIMEIRA.variantes} sizes="100vw" />,
   )
   return [...container.querySelectorAll('img')]
 }
@@ -26,18 +22,17 @@ describe('ImagemPorTema', () => {
   })
 
   // Imagem lazy com display:none não é baixada: só a variante do tema ativo sai pela rede.
-  it('nenhuma variante é eager, nem a do topo', () => {
-    for (const img of [...imagens(), ...imagens(true)])
-      expect(img).toHaveAttribute('loading', 'lazy')
+  it('nenhuma variante é eager', () => {
+    for (const img of imagens()) expect(img).toHaveAttribute('loading', 'lazy')
   })
 
-  it('na captura do topo (o LCP), as duas pedem prioridade alta', () => {
-    for (const img of imagens(true))
-      expect(img).toHaveAttribute('fetchpriority', 'high')
-  })
-
-  it('fora do topo, sem prioridade', () => {
+  // Na v2 a captura fica na seção Extensão, longe do topo: não é o LCP.
+  it('sem prioridade alta', () => {
     for (const img of imagens())
       expect(img).not.toHaveAttribute('fetchpriority')
+  })
+
+  it('as duas recebem o sizes pedido', () => {
+    for (const img of imagens()) expect(img).toHaveAttribute('sizes', '100vw')
   })
 })
