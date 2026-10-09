@@ -124,6 +124,13 @@ export async function favoritosGuardados(sw: Worker): Promise<Favorito[]> {
   return (botai_favoritos as Favorito[] | undefined) ?? []
 }
 
+export async function cartaoGuardado(sw: Worker): Promise<unknown> {
+  const { botai_cartao } = await sw.evaluate(() =>
+    chrome.storage.local.get('botai_cartao'),
+  )
+  return botai_cartao
+}
+
 export async function idDaAbaAtiva(sw: Worker): Promise<number> {
   const id = await sw.evaluate(
     async () =>
