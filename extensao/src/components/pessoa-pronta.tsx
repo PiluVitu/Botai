@@ -6,6 +6,7 @@ import {
   faShuffle,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import type { CartaoEscolhido } from '@pilutech/botai-core/cartao'
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { Button } from '@piluvitu/ui/button'
 import { cn } from '@piluvitu/ui/cn'
@@ -18,6 +19,8 @@ import {
 } from '../lib/favoritos'
 import { CHIPS, gruposDaPessoa, type IdGrupo } from '../lib/grupos'
 import { CabecalhoPessoa } from './cabecalho-pessoa'
+import { CartaoAtual } from './cartao-atual'
+import { CartaoDasProximas } from './cartao-das-proximas'
 import { FaixaFavoritos } from './faixa-favoritos'
 import { FavoritoRemovido } from './favorito-removido'
 import { FiltroChips } from './filtro-chips'
@@ -41,6 +44,8 @@ export interface PessoaProntaProps {
   onDevolverFavorito: (removido: Removido) => Promise<unknown>
   onRenomearFavorito: (id: string, apelido: string) => Promise<unknown>
   onUsarFavorito: (id: string) => void
+  escolhaDoCartao: CartaoEscolhido
+  onEscolherCartao: (escolha: CartaoEscolhido) => void
 }
 
 interface Edicao {
@@ -94,6 +99,8 @@ export function PessoaPronta({
   onDevolverFavorito,
   onRenomearFavorito,
   onUsarFavorito,
+  escolhaDoCartao,
+  onEscolherCartao,
 }: PessoaProntaProps) {
   const [filtro, setFiltro] = useState<'tudo' | IdGrupo>('tudo')
   const copiado = useCopiado()
@@ -124,6 +131,11 @@ export function PessoaPronta({
     setEdicao(null)
     const tirado = await onTirarFavorito(favoritoAtivo.id)
     if (tirado) removido.mostrar(tirado)
+  }
+
+  function novaPessoa() {
+    copiado.limpar()
+    onNovaPessoa()
   }
 
   function desfazer() {
@@ -185,10 +197,7 @@ export function PessoaPronta({
             variant="outline"
             size="sm"
             className={BOTAO_SM}
-            onClick={() => {
-              copiado.limpar()
-              onNovaPessoa()
-            }}
+            onClick={novaPessoa}
           >
             <FontAwesomeIcon icon={faShuffle} className="text-xs" />
             Nova pessoa
@@ -229,10 +238,14 @@ export function PessoaPronta({
               <AvisoCaixaPublica onAbrir={onAbrirCaixa} />
             )}
             {grupo.id === 'cartao' && (
-              <p className="text-muted-foreground mx-2 mt-1.5 mb-0.5 text-xs leading-normal text-pretty">
-                Número de teste documentado da Stripe. Passa no Luhn; só aprova
-                em sandbox.
-              </p>
+              <>
+                <CartaoAtual cartao={pessoa.cartao} />
+                <CartaoDasProximas
+                  escolha={escolhaDoCartao}
+                  onEscolher={onEscolherCartao}
+                  onNovaPessoa={novaPessoa}
+                />
+              </>
             )}
           </section>
         ))}

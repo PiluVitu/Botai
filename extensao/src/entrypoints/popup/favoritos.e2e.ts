@@ -58,7 +58,7 @@ test('favoritos: guarda com apelido, troca a ativa pelo chip e preenche com a fa
     ])
 
   // "Nova pessoa" troca só a ativa; o favorito continua lá.
-  await popup.getByRole('button', { name: 'Nova pessoa' }).click()
+  await popup.getByRole('button', { name: 'Nova pessoa', exact: true }).click()
   await expect(
     popup.getByRole('button', { name: 'Guardar nos favoritos' }),
   ).toBeVisible()

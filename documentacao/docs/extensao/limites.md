@@ -50,7 +50,7 @@ Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas
 A pessoa da extensão tem os mesmos limites de qualquer porta. Os principais para quem testa à mão:
 
 - há só 34 CEPs reais, então o endereço se repete;
-- o cartão é sempre um dos dois de teste da Stripe (Visa ou Mastercard);
+- até a versão 1.1.0, o cartão é sempre um dos dois de teste da Stripe (Visa ou Mastercard); a partir da 1.2.0, você escolhe o provedor e o cenário no [popup](./popup.md#cartao), entre os [cartões de teste](../conceitos/cartoes-de-teste.md) da Stripe e da Pagar.me;
 - o celular é sempre móvel, e a idade vai de 18 a 65;
 - o RG é sempre SSP/SP.
 

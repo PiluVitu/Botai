@@ -3,7 +3,7 @@ import { sfc32 } from '@pilutech/botai-core/prng'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Browser } from 'wxt/browser'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
-import { favoritosItem, pessoaItem } from '../../lib/armazenamento'
+import { cartaoItem, favoritosItem, pessoaItem } from '../../lib/armazenamento'
 import type { Favorito } from '../../lib/favoritos'
 import type { Mensagem } from '../../lib/mensagens'
 import { PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
@@ -72,6 +72,17 @@ describe('aoComando', () => {
     await aoComando('botai-preencher', ABA)
     expect(await pessoaItem.getValue()).not.toBeNull()
   })
+
+  it('a pessoa que o atalho gera sai com o cartão escolhido no popup', async () => {
+    await pessoaItem.setValue(null)
+    await cartaoItem.setValue({ provedor: 'pagarme', cenario: 'recusado' })
+    await aoComando('botai-preencher', ABA)
+    expect((await pessoaItem.getValue())?.cartao).toMatchObject({
+      numero: '4000000000000028',
+      provedor: 'pagarme',
+      cenario: 'recusado',
+    })
+  })
 })
 
 describe('aoClicarMenu', () => {
@@ -100,6 +111,16 @@ describe('aoClicarMenu', () => {
   it('"Nova pessoa" troca a pessoa guardada', async () => {
     await aoClicarMenu(clique('botai-nova-pessoa'), ABA)
     expect(await pessoaItem.getValue()).not.toEqual(P)
+  })
+
+  it('"Nova pessoa" do menu gera com o cartão escolhido no popup', async () => {
+    await cartaoItem.setValue({ provedor: 'stripe', cenario: 'pendente' })
+    await aoClicarMenu(clique('botai-nova-pessoa'), ABA)
+    expect((await pessoaItem.getValue())?.cartao).toMatchObject({
+      numero: '4000002760003184',
+      provedor: 'stripe',
+      cenario: 'pendente',
+    })
   })
 
   it('"Abrir caixa de entrada" abre a caixa pública da pessoa numa aba nova', async () => {

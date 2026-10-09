@@ -4,7 +4,7 @@ import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { primeiroNome, type Favorito, type Removido } from '../lib/favoritos'
-import { PESSOA_DOURADA as P } from '../test/pessoa-dourada'
+import { PESSOA_ANTIGA, PESSOA_DOURADA as P } from '../test/pessoa-dourada'
 import { iniciais } from './cabecalho-pessoa'
 import { PessoaPronta, type PessoaProntaProps } from './pessoa-pronta'
 
@@ -34,6 +34,8 @@ function props(extra: Partial<PessoaProntaProps> = {}): PessoaProntaProps {
       .fn<(id: string, apelido: string) => Promise<unknown>>()
       .mockResolvedValue(true),
     onUsarFavorito: vi.fn(),
+    escolhaDoCartao: { provedor: 'stripe', cenario: 'aprovado' },
+    onEscolherCartao: vi.fn(),
     ...extra,
   }
 }
@@ -85,7 +87,7 @@ describe('PessoaPronta (1b)', () => {
     expect(caixa).toHaveBeenCalledTimes(2)
   })
 
-  it('lista os 6 grupos e o filtro mostra só o escolhido, com a nota nova do cartão', async () => {
+  it('lista os 6 grupos e o filtro mostra só o escolhido, com o cenário do cartão', async () => {
     render(<PessoaPronta {...props()} />)
     const rotulosDosGrupos = () =>
       screen.getAllByRole('region').map((r) => r.getAttribute('aria-label'))
@@ -107,7 +109,7 @@ describe('PessoaPronta (1b)', () => {
     expect(rotulosDosGrupos()).toEqual(['Cartão'])
     expect(
       screen.getByText(
-        'Número de teste documentado da Stripe. Passa no Luhn; só aprova em sandbox.',
+        'Aprova a cobrança. Número de teste documentado da Stripe: passa no Luhn e só vale em sandbox.',
       ),
     ).toBeInTheDocument()
   })
@@ -347,5 +349,115 @@ describe('PessoaPronta (1b): favoritos', () => {
     expect(screen.getByText(/Os 3 lugares estão ocupados/)).toBeInTheDocument()
     await userEvent.setup().click(estrela())
     expect(guardar).not.toHaveBeenCalled()
+  })
+})
+
+describe('PessoaPronta (1b): cartão', () => {
+  const cartao = () => within(screen.getByRole('region', { name: 'Cartão' }))
+  const RECUSADA = montarPessoa(sfc32(1, 2, 3, 4), '2026-10-01', {
+    cartao: { provedor: 'pagarme', cenario: 'recusado' },
+  })
+
+  it('o grupo mostra o número, o cenário e o provedor da pessoa atual', () => {
+    render(<PessoaPronta {...props({ pessoa: RECUSADA })} />)
+    expect(cartao().getByText('4000 0000 0000 0028')).toBeInTheDocument()
+    expect(
+      cartao().getByText('recusado', { selector: '[data-tipo]' }),
+    ).toHaveAttribute('data-tipo', 'erro')
+    expect(
+      cartao().getByText('Pagar.me', { selector: 'span' }),
+    ).toBeInTheDocument()
+    expect(
+      cartao().getByText(
+        /^Pedido e cobrança com falha; transação não autorizada\./,
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('o bloco "Cartão das próximas pessoas" fica no grupo Cartão, depois da descrição, e não vira outra região', () => {
+    render(<PessoaPronta {...props()} />)
+    const titulo = cartao().getByRole('heading', {
+      level: 3,
+      name: 'Cartão das próximas pessoas',
+    })
+    expect(
+      cartao()
+        .getByText(/^Aprova a cobrança\./)
+        .compareDocumentPosition(titulo) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(screen.getAllByRole('region')).toHaveLength(6)
+  })
+
+  it('a escolha mostrada é a das próximas, não a da pessoa atual', () => {
+    render(
+      <PessoaPronta
+        {...props({
+          pessoa: P,
+          escolhaDoCartao: { provedor: 'pagarme', cenario: 'chargeback' },
+        })}
+      />,
+    )
+    expect(cartao().getByRole('button', { name: 'Pagar.me' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(
+      cartao().getByRole('button', { name: 'chargeback' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(
+      cartao().getByText('aprovado', { selector: '[data-tipo]' }),
+    ).toBeInTheDocument()
+    expect(
+      cartao().getByRole('button', {
+        name: 'Nova pessoa com Pagar.me · chargeback',
+      }),
+    ).toBeInTheDocument()
+  })
+
+  it('escolher um cenário pede para guardar a escolha', async () => {
+    const escolher = vi.fn()
+    render(<PessoaPronta {...props({ onEscolherCartao: escolher })} />)
+    await userEvent
+      .setup()
+      .click(cartao().getByRole('button', { name: 'exige 3DS' }))
+    expect(escolher).toHaveBeenCalledWith({
+      provedor: 'stripe',
+      cenario: 'pendente',
+    })
+  })
+
+  it('"Nova pessoa com …" chama o mesmo onNovaPessoa e limpa o "copiado"', async () => {
+    const nova = vi.fn()
+    render(<PessoaPronta {...props({ onNovaPessoa: nova })} />)
+    const user = userEvent.setup()
+    await user.click(cartao().getByRole('button', { name: 'Copiar Número' }))
+    expect(await cartao().findByText('copiado')).toBeInTheDocument()
+    await user.click(
+      cartao().getByRole('button', {
+        name: 'Nova pessoa com Stripe · aprovado',
+      }),
+    )
+    expect(nova).toHaveBeenCalledTimes(1)
+    expect(cartao().queryByText('copiado')).toBeNull()
+  })
+
+  it('pessoa antiga, sem provedor nem cenário no cartão, aparece como Stripe aprovado', () => {
+    render(<PessoaPronta {...props({ pessoa: PESSOA_ANTIGA })} />)
+    expect(
+      cartao().getByText('aprovado', { selector: '[data-tipo]' }),
+    ).toHaveAttribute('data-tipo', 'ok')
+    expect(
+      cartao().getByText('Stripe', { selector: 'span' }),
+    ).toBeInTheDocument()
+  })
+
+  it('com o filtro em outro grupo, o bloco do cartão some junto com o grupo', async () => {
+    render(<PessoaPronta {...props()} />)
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Pessoais' }))
+    expect(
+      screen.queryByRole('heading', { name: 'Cartão das próximas pessoas' }),
+    ).toBeNull()
   })
 })

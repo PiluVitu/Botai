@@ -1,3 +1,4 @@
+import type { CartaoEscolhido } from '@pilutech/botai-core/cartao'
 import type { Pessoa } from '@pilutech/botai-core/pessoa'
 import { hojeEmSaoPaulo } from '@pilutech/botai-core'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -10,7 +11,9 @@ import { PrimeiroUso } from '../../components/primeiro-uso'
 import { ResultadoPreenchimento } from '../../components/resultado-preenchimento'
 import { Rodape } from '../../components/rodape'
 import {
+  cartaoItem,
   devolverFavorito,
+  escolherCartao,
   favoritosItem,
   gerarPessoaNova,
   guardarFavorito,
@@ -19,6 +22,7 @@ import {
   tirarFavorito,
   usarFavorito,
 } from '../../lib/armazenamento'
+import { normalizarEscolha } from '../../lib/cartao'
 import {
   aposPreencher,
   estadoAoAbrir,
@@ -98,11 +102,13 @@ function useAtalho(): string | undefined {
 export function App() {
   const pessoa = useGuardado(pessoaItem)
   const favoritos = useGuardado(favoritosItem)
+  const cartao = useGuardado(cartaoItem)
   const aba = useAbaAlvo()
   const atalho = useAtalho()
   if (
     pessoa === undefined ||
     favoritos === undefined ||
+    cartao === undefined ||
     aba === undefined ||
     atalho === undefined
   )
@@ -111,6 +117,7 @@ export function App() {
     <TelaDoPopup
       pessoa={pessoa}
       favoritos={favoritos}
+      escolhaDoCartao={normalizarEscolha(cartao)}
       aba={aba}
       atalho={atalho}
     />
@@ -120,11 +127,13 @@ export function App() {
 function TelaDoPopup({
   pessoa,
   favoritos,
+  escolhaDoCartao,
   aba,
   atalho,
 }: {
   pessoa: Pessoa | null
   favoritos: Favorito[]
+  escolhaDoCartao: CartaoEscolhido
   aba: AbaAlvo | null
   atalho: string
 }) {
@@ -210,6 +219,8 @@ function TelaDoPopup({
         onDevolverFavorito={devolverFavorito}
         onRenomearFavorito={renomearFavorito}
         onUsarFavorito={(id) => void usarFavorito(id)}
+        escolhaDoCartao={escolhaDoCartao}
+        onEscolherCartao={(escolha) => void escolherCartao(escolha)}
       />
     )
   }

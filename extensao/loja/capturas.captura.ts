@@ -72,7 +72,7 @@ const TEXTOS: Record<CenaDeDestaque, { titulo: string; subtitulo: string }> = {
   'pessoa-de-teste': {
     titulo: 'Uma pessoa de teste coerente e pronta para copiar',
     subtitulo:
-      'CPF, CNPJ, RG, PIS e título com dígito verificador certo, CEP real com rua e cidade e o cartão de teste da Stripe.',
+      'CPF, CNPJ, RG, PIS e título com dígito verificador certo, CEP real com rua e cidade e o cartão de teste da Stripe ou da Pagar.me.',
   },
   resultado: {
     titulo: 'Mostra o que preencheu e o que ficou de fora',

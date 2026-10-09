@@ -1,6 +1,6 @@
 ---
 title: O popup
-description: Os cinco estados do popup do Botaí, de 1a a 1e, como copiar um valor da pessoa, achar um campo não reconhecido com a mira e usar os favoritos.
+description: Os cinco estados do popup do Botaí, de 1a a 1e, como copiar um valor, achar um campo não reconhecido, usar os favoritos e escolher o cartão de teste.
 sidebar_position: 4
 ---
 
@@ -30,7 +30,7 @@ Se o formulário é seu, a lista diz o que ajustar: um `autocomplete` ou um labe
 
 ## Trocar a pessoa
 
-"Nova pessoa" troca a pessoa guardada. Os próximos preenchimentos e cópias usam a nova.
+"Nova pessoa" troca a pessoa guardada. Os próximos preenchimentos e cópias usam a nova. A partir da versão 1.2.0, ela sai com o [cartão escolhido no popup](#cartao).
 
 ## Favoritos {#favoritos}
 
@@ -49,6 +49,26 @@ O popup guarda até 3 [pessoas favoritas](./favoritos.md), cada uma com um apeli
 - com 3 guardados, a estrela fica desabilitada.
 
 "Nova pessoa" troca só a ativa e nunca apaga um favorito.
+
+## O cartão {#cartao}
+
+:::note[Documentado]
+
+A escolha do cartão chega na versão 1.2.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.2.0, e a auditoria de 2026-10-08 não o rodou.
+
+:::
+
+No 1b, o grupo "Cartão" mostra, além do número, da validade e do CVV, o cenário do cartão da pessoa ativa: o rótulo (por exemplo `recusado`), com a cor e o ícone do tipo (aprovação, recusa ou espera), o provedor (Stripe ou Pagar.me) e uma frase com o que o provedor faz com aquele número. Uma pessoa guardada antes da 1.2.0 aparece como Stripe `aprovado`, o único cartão de antes.
+
+Logo abaixo, o bloco "Cartão das próximas pessoas" escolhe o cartão de quem for gerado a seguir:
+
+- o provedor: Stripe ou Pagar.me;
+- o cenário, entre os do provedor escolhido. Os cenários e os números estão em [Cartões de teste](../conceitos/cartoes-de-teste.md);
+- o botão "Nova pessoa com …", com o provedor e o cenário escolhidos (por exemplo "Nova pessoa com Pagar.me · recusado"), gera uma pessoa nova com esse cartão.
+
+Trocar o provedor mantém o cenário se o outro provedor também o tiver (`aprovado`, `recusado` e `pendente` existem nos dois); senão, volta a `aprovado`.
+
+A escolha vale só para as pessoas novas: o "Nova pessoa" do popup e do menu, o "Nova pessoa com …" e a primeira pessoa, quando ainda não há nenhuma. A pessoa ativa e as [favoritas](./favoritos.md) mantêm o cartão com que foram geradas. Sem escolha, o cartão é o `aprovado` da Stripe.
 
 ## O atalho
 

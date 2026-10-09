@@ -45,7 +45,7 @@ const PERMISSOES = [
   {
     nome: 'storage',
     paraQue:
-      'Guardar no seu navegador a pessoa fictícia ativa e até 3 favoritas, com os apelidos, para repetir o mesmo cadastro.',
+      'Guardar no seu navegador a pessoa fictícia ativa e até 3 favoritas, com os apelidos, para repetir o mesmo cadastro, e o cartão de teste escolhido para as próximas pessoas.',
     onde: 'Todos',
   },
   {
@@ -73,6 +73,15 @@ const TRATAMENTOS = [
     comQuem: 'Ninguém.',
     prazo:
       'Até você tirar a pessoa dos favoritos ou remover a extensão. “Nova pessoa” não apaga favoritos.',
+  },
+  {
+    dado: 'A preferência do cartão de teste',
+    paraQue:
+      'Gerar as próximas pessoas com o cartão de teste do provedor (Stripe ou Pagar.me) e do cenário (aprovado, recusado, pendente…) que você escolheu no popup.',
+    base: 'Não se aplica: é uma opção da extensão, não um dado pessoal, e fica só no seu navegador. A PiluTech não a recebe.',
+    comQuem: 'Ninguém.',
+    prazo:
+      'Até você escolher outro cartão no popup ou remover a extensão. A pessoa ativa e as favoritas mantêm o cartão com que foram geradas.',
   },
   {
     dado: 'Os campos e o endereço da aba',
@@ -135,9 +144,10 @@ export default function PrivacidadePage() {
           <>
             a extensão {NOME} não coleta nem envia dados. Ela só lê os
             formulários da aba em que você a aciona, no seu navegador, e guarda
-            nele a pessoa fictícia ativa e até 3 favoritas que você escolher.
-            Este site não usa cookies nem analytics; a hospedagem registra dados
-            técnicos de acesso, como em qualquer site.
+            nele a pessoa fictícia ativa, até 3 favoritas que você escolher e o
+            cartão de teste das próximas pessoas. Este site não usa cookies nem
+            analytics; a hospedagem registra dados técnicos de acesso, como em
+            qualquer site.
           </>
         }
       >
@@ -177,8 +187,11 @@ export default function PrivacidadePage() {
           Só a pessoa de teste ativa, a que o atalho, o botão “Preencher esta
           página” e o menu usam, e até 3 pessoas favoritas que você guardar, com
           o apelido que você der a cada uma. As pessoas são fictícias (nome,
-          documentos, endereço, contato, empresa e cartão de teste) e ficam só
-          no armazenamento local da extensão no seu navegador (
+          documentos, endereço, contato, empresa e cartão de teste). Fica também
+          a preferência do cartão de teste das próximas pessoas: o provedor
+          (Stripe ou Pagar.me) e o cenário (aprovado, recusado, pendente…) que
+          você escolher no popup, uma opção da extensão que não é dado pessoal.
+          Tudo fica só no armazenamento local da extensão no seu navegador (
           <code>storage.local</code>). Nada disso é sincronizado entre
           dispositivos nem enviado. Assim você repete o mesmo cadastro até pedir
           outra pessoa, ou volta a uma favorita.
@@ -258,8 +271,9 @@ export default function PrivacidadePage() {
         <p>
           “Nova pessoa”, no popup ou no menu, troca a pessoa ativa por outra,
           mas não apaga os favoritos. A estrela, no popup, tira uma pessoa dos
-          favoritos. Remover a extensão apaga o armazenamento local dela, com a
-          pessoa ativa e os favoritos.
+          favoritos. Escolher outro cartão no popup troca a preferência do
+          cartão. Remover a extensão apaga o armazenamento local dela, com a
+          pessoa ativa, os favoritos e a preferência do cartão.
         </p>
 
         <h2>Este site</h2>

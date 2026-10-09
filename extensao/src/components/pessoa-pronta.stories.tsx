@@ -1,3 +1,4 @@
+import type { CartaoEscolhido } from '@pilutech/botai-core/cartao'
 import { montarPessoa } from '@pilutech/botai-core/pessoa'
 import { sfc32 } from '@pilutech/botai-core/prng'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -10,13 +11,17 @@ import {
   tirarDaLista,
   type Favorito,
 } from '../lib/favoritos'
-import { PESSOA_DOURADA } from '../test/pessoa-dourada'
+import { comoPessoaAntiga, PESSOA_DOURADA } from '../test/pessoa-dourada'
 import { PessoaPronta, type PessoaProntaProps } from './pessoa-pronta'
 import { PopupShell } from './popup-shell'
 import { Rodape } from './rodape'
 
-const outra = (n: number) =>
-  montarPessoa(sfc32(n, n + 1, n + 2, n + 3), '2026-10-01')
+const outra = (n: number, cartao?: CartaoEscolhido) =>
+  montarPessoa(
+    sfc32(n, n + 1, n + 2, n + 3),
+    '2026-10-01',
+    cartao && { cartao },
+  )
 const [COMPRADOR, CLIENTE, NOVA] = [outra(10), outra(20), outra(30)]
 
 const favorito = (id: string, apelido: string, pessoa = PESSOA_DOURADA) =>
@@ -30,11 +35,13 @@ const ADMIN = favorito('f-1', 'admin do staging')
 const PJ = favorito('f-2', 'comprador PJ', COMPRADOR)
 const PI = favorito('f-3', 'cliente com CEP do PI', CLIENTE)
 
-// O storage de verdade fica no App; aqui os favoritos e a ativa vivem num useState,
-// com as mesmas funções puras, para a story responder aos cliques.
+// O storage de verdade fica no App; aqui os favoritos, a ativa e a escolha do cartão vivem num
+// useState, com as mesmas funções puras, para a story responder aos cliques.
 function PopupComFavoritos(args: PessoaProntaProps) {
   const [pessoa, setPessoa] = useState(args.pessoa)
   const [favoritos, setFavoritos] = useState(args.favoritos)
+  const [escolha, setEscolha] = useState(args.escolhaDoCartao)
+  const [geradas, setGeradas] = useState(0)
   return (
     <PopupShell
       host={args.preencherDesabilitado ? 'chrome://settings' : 'localhost:3000'}
@@ -54,6 +61,16 @@ function PopupComFavoritos(args: PessoaProntaProps) {
         pessoa={pessoa}
         idade={pessoa.nascimento.idade}
         favoritos={favoritos}
+        escolhaDoCartao={escolha}
+        onEscolherCartao={(nova) => {
+          args.onEscolherCartao(nova)
+          setEscolha(nova)
+        }}
+        onNovaPessoa={() => {
+          args.onNovaPessoa()
+          setPessoa(outra(100 + geradas, escolha))
+          setGeradas(geradas + 1)
+        }}
         onGuardarFavorito={async () => {
           void args.onGuardarFavorito()
           const resultado = guardarNaLista(favoritos, pessoa, {
@@ -105,6 +122,8 @@ const meta = {
     onDevolverFavorito: fn(async () => undefined),
     onRenomearFavorito: fn(async () => undefined),
     onUsarFavorito: fn(),
+    escolhaDoCartao: { provedor: 'stripe', cenario: 'aprovado' },
+    onEscolherCartao: fn(),
   },
   render: (args) => <PopupComFavoritos {...args} />,
 } satisfies Meta<typeof PessoaPronta>
@@ -170,3 +189,44 @@ const tirou: Story = {
 }
 export const TirouComDesfazer: Story = tirou
 export const TirouComDesfazerClaro: Story = { ...tirou, ...CLARO }
+
+// O grupo Cartão: o filtro "Cartão" deixa só ele, com o cenário da pessoa atual e a escolha das próximas.
+const soOCartao: Story['play'] = async ({ canvasElement }) => {
+  await userEvent.click(
+    within(canvasElement).getByRole('button', { name: 'Cartão' }),
+  )
+}
+
+const stripeAprovado: Story = { play: soOCartao }
+export const CartaoStripeAprovado: Story = stripeAprovado
+export const CartaoStripeAprovadoClaro: Story = { ...stripeAprovado, ...CLARO }
+
+const pagarmeRecusado: Story = {
+  args: {
+    pessoa: outra(40, { provedor: 'pagarme', cenario: 'recusado' }),
+    escolhaDoCartao: { provedor: 'pagarme', cenario: 'recusado' },
+  },
+  play: soOCartao,
+}
+export const CartaoPagarmeRecusado: Story = pagarmeRecusado
+export const CartaoPagarmeRecusadoClaro: Story = {
+  ...pagarmeRecusado,
+  ...CLARO,
+}
+
+const pendente: Story = {
+  args: {
+    pessoa: outra(50, { provedor: 'pagarme', cenario: 'pendente' }),
+    escolhaDoCartao: { provedor: 'stripe', cenario: 'pendente' },
+  },
+  play: soOCartao,
+}
+export const CartaoPendente: Story = pendente
+export const CartaoPendenteClaro: Story = { ...pendente, ...CLARO }
+
+const antiga: Story = {
+  args: { pessoa: comoPessoaAntiga(outra(60)) },
+  play: soOCartao,
+}
+export const CartaoPessoaAntigaSemProvedor: Story = antiga
+export const CartaoPessoaAntigaSemProvedorClaro: Story = { ...antiga, ...CLARO }

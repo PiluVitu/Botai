@@ -3,12 +3,15 @@ import { montarPessoa } from '@pilutech/botai-core/pessoa'
 import { sfc32 } from '@pilutech/botai-core/prng'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
-import { PESSOA_DOURADA } from '../test/pessoa-dourada'
+import { PESSOA_ANTIGA, PESSOA_DOURADA } from '../test/pessoa-dourada'
 import {
+  cartaoItem,
   devolverFavorito,
+  escolherCartao,
   favoritosItem,
   gerarPessoaNova,
   guardarFavorito,
+  lerEscolhaDoCartao,
   obterOuGerarPessoa,
   pessoaItem,
   renomearFavorito,
@@ -208,6 +211,120 @@ describe('armazenamento dos favoritos', () => {
     const pararDeOuvir = favoritosItem.watch(ouvinte)
     const favorito = await guardarFavorito(P)
     await vi.waitFor(() => expect(ouvinte).toHaveBeenCalledWith([favorito], []))
+    pararDeOuvir()
+  })
+})
+
+describe('armazenamento do cartão das próximas pessoas', () => {
+  const PAGARME_RECUSADO = { provedor: 'pagarme', cenario: 'recusado' } as const
+
+  it('sem escolha guardada, vale o aprovado da Stripe', async () => {
+    expect(await cartaoItem.getValue()).toEqual({
+      provedor: 'stripe',
+      cenario: 'aprovado',
+    })
+    expect(await lerEscolhaDoCartao()).toEqual({
+      provedor: 'stripe',
+      cenario: 'aprovado',
+    })
+  })
+
+  it('guarda só o provedor e o cenário em local:botai_cartao, e nada em sync', async () => {
+    await escolherCartao(PAGARME_RECUSADO)
+    expect(await fakeBrowser.storage.local.get('botai_cartao')).toEqual({
+      botai_cartao: PAGARME_RECUSADO,
+    })
+    expect(await fakeBrowser.storage.sync.get(null)).toEqual({})
+    expect(await lerEscolhaDoCartao()).toEqual(PAGARME_RECUSADO)
+  })
+
+  it('escolha inválida não é gravada: vira o padrão', async () => {
+    await escolherCartao({
+      provedor: 'pagarme',
+      cenario: 'recusado-cvc',
+    } as unknown as Parameters<typeof escolherCartao>[0])
+    expect(await fakeBrowser.storage.local.get('botai_cartao')).toEqual({
+      botai_cartao: { provedor: 'stripe', cenario: 'aprovado' },
+    })
+  })
+
+  // O catálogo do core pode perder um cenário numa versão nova: o guardado antes volta ao padrão.
+  it('um valor guardado que o catálogo não tem mais é lido como o padrão', async () => {
+    await fakeBrowser.storage.local.set({
+      botai_cartao: { provedor: 'pagarme', cenario: 'sumiu' },
+    })
+    expect(await lerEscolhaDoCartao()).toEqual({
+      provedor: 'stripe',
+      cenario: 'aprovado',
+    })
+    const pessoa = await gerarPessoaNova()
+    expect(pessoa.cartao).toMatchObject({
+      provedor: 'stripe',
+      cenario: 'aprovado',
+    })
+  })
+
+  it('"Nova pessoa" gera com o cartão escolhido', async () => {
+    await escolherCartao(PAGARME_RECUSADO)
+    const pessoa = await gerarPessoaNova()
+    expect(pessoa.cartao).toMatchObject({
+      numero: '4000000000000028',
+      numeroFormatado: '4000 0000 0000 0028',
+      bandeira: 'visa',
+      provedor: 'pagarme',
+      cenario: 'recusado',
+    })
+    expect(await pessoaItem.getValue()).toEqual(pessoa)
+  })
+
+  it('a primeira geração (obterOuGerarPessoa sem pessoa) também usa a escolha', async () => {
+    await escolherCartao({ provedor: 'stripe', cenario: 'pendente' })
+    const pessoa = await obterOuGerarPessoa()
+    expect(pessoa.cartao).toMatchObject({
+      numero: '4000002760003184',
+      provedor: 'stripe',
+      cenario: 'pendente',
+    })
+  })
+
+  it('escolher não mexe na pessoa ativa: ela fica com o cartão com que foi gerada', async () => {
+    await pessoaItem.setValue(PESSOA_DOURADA)
+    await escolherCartao(PAGARME_RECUSADO)
+    expect(await pessoaItem.getValue()).toEqual(PESSOA_DOURADA)
+    expect(await obterOuGerarPessoa()).toEqual(PESSOA_DOURADA)
+  })
+
+  it('a favorita guarda a pessoa inteira: volta com o cartão com que foi gerada', async () => {
+    await pessoaItem.setValue(PESSOA_DOURADA)
+    const favorito = await guardarFavorito(PESSOA_DOURADA)
+    await escolherCartao(PAGARME_RECUSADO)
+    const nova = await gerarPessoaNova()
+    expect(nova.cartao.provedor).toBe('pagarme')
+    const devolta = await usarFavorito(favorito?.id ?? '')
+    expect(devolta?.cartao).toEqual(PESSOA_DOURADA.cartao)
+    expect(devolta?.cartao).toMatchObject({
+      provedor: 'stripe',
+      cenario: 'aprovado',
+    })
+    expect((await favoritosItem.getValue())[0].pessoa).toEqual(PESSOA_DOURADA)
+  })
+
+  it('a pessoa antiga guardada (sem provedor no cartão) continua sendo lida e usada', async () => {
+    await pessoaItem.setValue(PESSOA_ANTIGA)
+    await escolherCartao(PAGARME_RECUSADO)
+    expect(await obterOuGerarPessoa()).toEqual(PESSOA_ANTIGA)
+  })
+
+  it('watch avisa quem escuta quando a escolha muda', async () => {
+    const ouvinte = vi.fn()
+    const pararDeOuvir = cartaoItem.watch(ouvinte)
+    await escolherCartao(PAGARME_RECUSADO)
+    await vi.waitFor(() =>
+      expect(ouvinte).toHaveBeenCalledWith(PAGARME_RECUSADO, {
+        provedor: 'stripe',
+        cenario: 'aprovado',
+      }),
+    )
     pararDeOuvir()
   })
 })

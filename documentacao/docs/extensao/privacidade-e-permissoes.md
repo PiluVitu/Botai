@@ -1,6 +1,6 @@
 ---
 title: Privacidade e permissões
-description: A extensão não faz chamada de rede, pede quatro permissões e guarda só a pessoa ativa e os favoritos, no armazenamento local do navegador.
+description: A extensão não faz chamada de rede, pede quatro permissões e guarda só a pessoa ativa, os favoritos e o cartão escolhido, no armazenamento local do navegador.
 sidebar_position: 6
 ---
 
@@ -17,7 +17,7 @@ A pessoa é gerada dentro do navegador, sorteada com crypto.
 | `activeTab`    | mexer na aba atual, só depois de um gesto seu (atalho, popup ou menu) |
 | `scripting`    | rodar o preenchimento na página                                       |
 | `contextMenus` | o menu Botaí do botão direito                                         |
-| `storage`      | guardar a pessoa ativa e os favoritos                                 |
+| `storage`      | guardar a pessoa ativa, os favoritos e o cartão escolhido             |
 
 No Firefox, o manifesto soma `menus`.
 
@@ -37,6 +37,14 @@ Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas
 :::
 
 A partir da versão 1.1.0, a extensão guarda também até 3 [pessoas favoritas](./favoritos.md), com o apelido que você der a cada uma, na chave `local:botai_favoritos`. Um favorito fica ali até você o tirar com a estrela, no popup, ou remover a extensão; "Nova pessoa" não o apaga.
+
+:::note[Documentado]
+
+A escolha do cartão chega na versão 1.2.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.2.0, e a auditoria de 2026-10-08 não o rodou.
+
+:::
+
+A partir da versão 1.2.0, a extensão guarda também o [cartão das próximas pessoas](./popup.md#cartao) que você escolher no popup, na chave `local:botai_cartao`: só o provedor e o cenário, como `{ "provedor": "pagarme", "cenario": "recusado" }`. É uma opção da extensão, não um dado pessoal. Ela fica ali até você escolher outro cartão ou remover a extensão. Um valor que a versão instalada não reconhece volta ao padrão, o `aprovado` da Stripe.
 
 Nada disso é sincronizado entre dispositivos nem enviado.
 

@@ -31,11 +31,12 @@ describe('Extensao', () => {
   })
 
   // A 4ª frase é a dos favoritos da 1.1.0: até 3, com apelido, no popup e no "Preencher com".
-  it('o que a extensão faz, em quatro frases', () => {
+  // A 5ª é a do cartão da 1.2.0: Stripe ou Pagar.me, no cenário escolhido no popup.
+  it('o que a extensão faz, em cinco frases', () => {
     const { dentro } = renderizar()
     expect(
       dentro.getByText(
-        'Um atalho preenche a página inteira. O botão direito põe um dado num campo só. A mesma pessoa fica guardada até você pedir outra. Até 3 pessoas favoritas, cada uma com um apelido, voltam pelo popup ou pelo botão direito.',
+        'Um atalho preenche a página inteira. O botão direito põe um dado num campo só. A mesma pessoa fica guardada até você pedir outra. Até 3 pessoas favoritas, cada uma com um apelido, voltam pelo popup ou pelo botão direito. O cartão de teste das próximas pessoas sai da Stripe ou da Pagar.me, no cenário que você escolher.',
       ),
     ).toBeInTheDocument()
   })

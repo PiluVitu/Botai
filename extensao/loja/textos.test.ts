@@ -2,6 +2,11 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
+import {
+  CATALOGO_DE_CARTOES,
+  NOME_DO_PROVEDOR,
+  PROVEDORES,
+} from '@pilutech/botai-core/cartao'
 import { LIMITE_FAVORITOS } from '../src/lib/favoritos'
 import { lerSecoes, permissoesJustificadas } from './textos'
 
@@ -128,8 +133,9 @@ describe('notas para os revisores', () => {
 })
 
 // A política em botai.pilutech.com.br/privacidade diz que a extensão não envia nada e só
-// guarda no navegador a pessoa ativa (local:botai_pessoa) e até 3 favoritas
-// (local:botai_favoritos). Se um destes falhar, atualize a política antes (site/app/privacidade).
+// guarda no navegador a pessoa ativa (local:botai_pessoa), até 3 favoritas
+// (local:botai_favoritos) e o cartão de teste das próximas pessoas (local:botai_cartao).
+// Se um destes falhar, atualize a política antes (site/app/privacidade).
 describe('o que a política promete, o código da extensão cumpre', () => {
   const src = path.join(import.meta.dirname, '..', 'src')
   const fontes = readdirSync(src, { recursive: true, encoding: 'utf8' })
@@ -145,24 +151,43 @@ describe('o que a política promete, o código da extensão cumpre', () => {
       )
   })
 
-  it('duas chaves de storage, local:botai_favoritos e local:botai_pessoa, e nada em sync', () => {
+  it('três chaves de storage, local:botai_cartao, local:botai_favoritos e local:botai_pessoa, e nada em sync', () => {
     const chaves = fontes.flatMap((fonte) =>
       [...fonte.matchAll(/['"`]((?:local|sync|session|managed):[\w-]+)/g)].map(
         (m) => m[1],
       ),
     )
     expect(chaves.sort()).toEqual([
+      'local:botai_cartao',
       'local:botai_favoritos',
       'local:botai_pessoa',
     ])
   })
 
-  it('a justificativa do storage e a descrição falam dos favoritos com o limite do código', () => {
+  it('a justificativa do storage e a descrição falam dos favoritos com o limite do código e da preferência do cartão', () => {
     expect(textos.get('Justificativa: storage')).toBe(
-      `Guardar no próprio navegador (storage.local) a pessoa de teste ativa e até ${LIMITE_FAVORITOS} pessoas favoritas que a pessoa guardar, para reutilizá-las. Nada é sincronizado nem enviado.`,
+      `Guardar no próprio navegador (storage.local) a pessoa de teste ativa, até ${LIMITE_FAVORITOS} pessoas favoritas que a pessoa guardar, para reutilizá-las, e a preferência do cartão de teste (provedor e cenário) das próximas pessoas. Nada é sincronizado nem enviado.`,
     )
     expect(textos.get('Descrição')).toContain(
       `• até ${LIMITE_FAVORITOS} pessoas favoritas, com apelido, para voltar a elas depois`,
     )
+  })
+
+  // Os provedores e os cenários citados são os do catálogo do core que a extensão empacota.
+  it('a descrição cita os cartões de teste da Stripe e da Pagar.me, com cenários do catálogo', () => {
+    const linha = textos
+      .get('Descrição')
+      ?.split('\n')
+      .find((l) => l.startsWith('• cartão de teste'))
+    expect(linha).toBe(
+      '• cartão de teste documentado da Stripe ou da Pagar.me, no cenário que você escolher (aprovado, recusado, pendente…): número, nome, validade e CVV',
+    )
+    for (const provedor of PROVEDORES)
+      expect(linha).toContain(NOME_DO_PROVEDOR[provedor])
+    for (const cenario of ['aprovado', 'recusado', 'pendente'])
+      for (const provedor of PROVEDORES)
+        expect(CATALOGO_DE_CARTOES[provedor].map((c) => c.id)).toContain(
+          cenario,
+        )
   })
 })
