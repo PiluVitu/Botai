@@ -63,6 +63,10 @@ overrides:
   # @docusaurus/bundler trouxer versões desses plugins que aceitem a 7.0.5 ou mais.
   'copy-webpack-plugin>serialize-javascript': '^7.0.5'
   'css-minimizer-webpack-plugin>serialize-javascript': '^7.0.5'
+  # GHSA-w5hq-g745-h8pq / CVE-2026-41907 (uuid < 11.1.1; o Trivy dá high): o sockjs 0.3.24 (último, via
+  # webpack-dev-server do `docusaurus start`) pede ^8.3.2 e só usa o require('uuid').v4, que a 11 mantém em CJS.
+  # Sai quando um sockjs aceitar a 11.1.1 ou mais.
+  'sockjs>uuid': '^11.1.1'
 
 auditConfig:
   ignoreGhsas:
@@ -73,5 +77,6 @@ auditConfig:
     # (direto e pelo wxt) > @devicefarmer/adbkit, que fala com Android no `web-ext run`. Não vai no pacote da extensão.
     - GHSA-86w9-cpqp-85rv
     # braces 3.0.3 (DoS por padrão aninhado, high; sem versão corrigida no npm em 2026-10-05): só pelo micromatch do
-    # @storybook/nextjs e do eslint-config-next (lint), com padrões nossos. Não vai no build da landing nem da extensão.
+    # @storybook/nextjs e do eslint-config-next (lint) e pelo chokidar 3 do @docusaurus/core (o observador de arquivos
+    # do build e do dev da documentacao/), com padrões nossos. Não vai no build da landing nem da extensão.
     - GHSA-vfj7-8cjw-p6xm
