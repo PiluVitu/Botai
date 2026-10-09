@@ -63,11 +63,32 @@ const VITRINE = readFileSync(
   'utf8',
 )
 
-const STORY_DO_POPUP: Record<Cena, string> = {
-  'pagina-preenchida': 'popup-1c-·-resultado',
-  'pessoa-de-teste': 'popup-1b-·-pessoa-pronta',
-  resultado: 'popup-1c-·-resultado',
+const POPUP_1B = 'popup-1b-·-pessoa-pronta'
+const POPUP_1C = 'popup-1c-·-resultado'
+const porTema = (
+  id: string,
+  escuro: string,
+  claro: string,
+): Record<Tema, string> => ({
+  escuro: `${id}--${escuro}`,
+  claro: `${id}--${claro}`,
+})
+const STORY_DO_POPUP: Record<Cena, Record<Tema, string>> = {
+  'pagina-preenchida': porTema(POPUP_1C, 'escuro', 'claro'),
+  'pessoa-de-teste': porTema(POPUP_1B, 'escuro', 'claro'),
+  resultado: porTema(POPUP_1C, 'escuro', 'claro'),
+  favoritos: porTema(POPUP_1B, 'tres-favoritos', 'tres-favoritos-claro'),
+  cartao: porTema(
+    POPUP_1B,
+    'cartao-pagarme-recusado',
+    'cartao-pagarme-recusado-claro',
+  ),
 }
+// A story do cartão chega ao filtro "Cartão" pelo play: a foto espera o clique e rola o popup
+// até a escolha das próximas pessoas, que fica abaixo da dobra.
+const AJUSTE_DA_CENA: Partial<
+  Record<Cena, { filtro: string; rolarAte: string }>
+> = { cartao: { filtro: 'Cartão', rolarAte: 'Cartão das próximas pessoas' } }
 const TEXTOS: Record<CenaDeDestaque, { titulo: string; subtitulo: string }> = {
   'pessoa-de-teste': {
     titulo: 'Uma pessoa de teste coerente e pronta para copiar',
@@ -78,6 +99,16 @@ const TEXTOS: Record<CenaDeDestaque, { titulo: string; subtitulo: string }> = {
     titulo: 'Mostra o que preencheu e o que ficou de fora',
     subtitulo:
       'A mira leva até cada campo que o Botaí não reconheceu. Tudo roda no seu navegador: nada é enviado.',
+  },
+  favoritos: {
+    titulo: 'Até 3 pessoas favoritas, cada uma com um apelido',
+    subtitulo:
+      'Guarde o admin do staging, o comprador PJ ou o cliente do Piauí e volte a eles pelo popup ou pelo botão direito.',
+  },
+  cartao: {
+    titulo: 'O cartão de teste no cenário que o fluxo precisa',
+    subtitulo:
+      'Stripe ou Pagar.me: aprovado, recusado, pendente, saldo insuficiente ou chargeback. A próxima pessoa já sai com ele.',
   },
 }
 
@@ -103,6 +134,7 @@ async function servirStorybook(context: BrowserContext): Promise<void> {
 async function fotografarStory(
   context: BrowserContext,
   id: string,
+  ajuste?: { filtro: string; rolarAte: string },
 ): Promise<Buffer> {
   const pagina = await context.newPage()
   await pagina.goto(
@@ -112,6 +144,14 @@ async function fotografarStory(
   await pagina.addStyleTag({ content: 'body { padding: 0 !important; }' })
   const popup = pagina.locator('#storybook-root > div')
   await expect(popup).toHaveCSS('width', '380px')
+  if (ajuste) {
+    await expect(
+      popup.getByRole('button', { name: ajuste.filtro, exact: true }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    await popup
+      .getByRole('group', { name: ajuste.rolarAte })
+      .evaluate((el) => el.scrollIntoView({ block: 'end' }))
+  }
   await pagina.evaluate(() => document.fonts.ready)
   const png = await popup.screenshot({ scale: 'device' })
   await pagina.close()
@@ -266,7 +306,11 @@ for (const tema of TEMAS) {
       const popup = async (cena: Cena, t: Tema) =>
         dataUrl(
           'image/png',
-          await fotografarStory(context, `${STORY_DO_POPUP[cena]}--${t}`),
+          await fotografarStory(
+            context,
+            STORY_DO_POPUP[cena][t],
+            AJUSTE_DA_CENA[cena],
+          ),
         )
 
       for (const captura of CAPTURAS.filter((c) => c.tema === tema)) {

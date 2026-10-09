@@ -1,5 +1,6 @@
 export type Tema = 'escuro' | 'claro'
-export type Cena = 'pagina-preenchida' | 'pessoa-de-teste' | 'resultado'
+export type Cena =
+  'pagina-preenchida' | 'pessoa-de-teste' | 'resultado' | 'favoritos' | 'cartao'
 export type CenaDeDestaque = Exclude<Cena, 'pagina-preenchida'>
 
 export interface Tamanho {
@@ -19,6 +20,8 @@ export const CENAS: Cena[] = [
   'pagina-preenchida',
   'pessoa-de-teste',
   'resultado',
+  'favoritos',
+  'cartao',
 ]
 export const TEMAS: Tema[] = ['escuro', 'claro']
 

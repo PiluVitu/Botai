@@ -63,7 +63,7 @@ export const RECURSOS: Recurso[] = [
   {
     titulo: 'Cartão',
     texto:
-      'O cartão de teste documentado da Stripe: número, nome impresso, validade e CVV.',
+      'O cartão de teste documentado da Stripe ou da Pagar.me, no cenário que você escolher: número, nome impresso, validade e CVV.',
     icone: faCreditCard,
   },
 ]
