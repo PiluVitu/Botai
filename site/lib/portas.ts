@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { MOTOR } from '@pilutech/botai-core'
 import { ATALHOS } from '@pilutech/botai-core/atalhos'
-import { IMAGEM_DO_SERVIDOR, PACOTE_DO_CORE } from './conteudo'
+import { IMAGEM_DO_SERVIDOR, PACOTE_DO_CORE, REPOSITORIO } from './conteudo'
 import { HOJE_DO_EXEMPLO, SEMENTE_DO_EXEMPLO } from './exemplo'
 
 export type IdDaPorta =
@@ -105,7 +105,7 @@ const DADOS: Dados[] = [
     onde: 'macOS, Linux e Windows, x64 e arm64. No Windows, baixe o .exe do release.',
     comando: {
       linhas: [
-        'curl -fsSL https://github.com/PiluVitu/Botai/releases/latest/download/install.sh | sh',
+        `curl -fsSL ${REPOSITORIO}/releases/latest/download/install.sh | sh`,
       ],
       copiavel: true,
     },

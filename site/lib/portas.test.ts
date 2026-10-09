@@ -2,12 +2,32 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import * as core from '@pilutech/botai-core'
 import { ATALHOS } from '@pilutech/botai-core/atalhos'
+import {
+  NOME_DO_GLOBAL,
+  SEGUNDA_PASSADA_MS,
+  type ApiDoNavegador,
+} from '@pilutech/botai-core/navegador'
+import {
+  HOST_PADRAO,
+  PORTA_PADRAO,
+  responder,
+} from '@pilutech/botai-core/servidor'
 import { executar } from '../../packages/core/src/cli/executar'
+import {
+  garantirCssEscape,
+  simularLayout,
+} from '../../packages/core/src/navegador/layout-teste'
 import {
   IMAGEM_DO_SERVIDOR,
   PACOTE_DO_CORE,
   PACOTE_DO_PLAYWRIGHT,
+  REPOSITORIO,
 } from './conteudo'
+import {
+  HOJE_DO_EXEMPLO,
+  PESSOA_DO_EXEMPLO,
+  SEMENTE_DO_EXEMPLO,
+} from './exemplo'
 import { NOTA_DAS_PORTAS, PORTAS, type IdDaPorta } from './portas'
 
 const RAIZ = join(__dirname, '..', '..')
@@ -161,5 +181,91 @@ describe('comando inventado não passa', () => {
     const fixture = ler('packages', 'playwright', 'src', 'fixture.ts')
     expect(fixture).toMatch(/^\s+botai: async \(/m)
     expect(fixture).toMatch(/^\s+preencher\(\n\s+alvo: Page \| Locator,/m)
+  })
+
+  // O mesmo `responder` que o `botai serve`, a imagem e o binário usam, sem abrir porta.
+  it('o curl da porta HTTP pede ao servidor a pessoa do exemplo', () => {
+    const [linha] = porta('http').comando.linhas
+    const endereco = /^curl '(http:\/\/[^']+)'$/.exec(linha)?.[1]
+    const { hostname, port, pathname, search } = new URL(endereco as string)
+    expect([hostname, Number(port)]).toEqual([HOST_PADRAO, PORTA_PADRAO])
+    const resposta = responder('GET', `${pathname}${search}`)
+    expect(resposta.status).toBe(200)
+    const envelope = JSON.parse(resposta.corpo) as Record<string, unknown>
+    expect(envelope).toMatchObject({
+      semente: String(SEMENTE_DO_EXEMPLO),
+      hoje: HOJE_DO_EXEMPLO,
+    })
+    expect(envelope.pessoa).toEqual(PESSOA_DO_EXEMPLO)
+  })
+
+  // O release do core é o "Latest" do repo e leva o install.sh como asset: o `latest/download` chega nele.
+  it('o install.sh dos binários é o asset que o release do core publica', () => {
+    expect(porta('binarios').comando.linhas).toEqual([
+      `curl -fsSL ${REPOSITORIO}/releases/latest/download/install.sh | sh`,
+    ])
+    const workflow = ler('.github', 'workflows', 'core-distribuicao.yml')
+    expect(workflow).toMatch(
+      /^\s+arquivos=\([^)\n]* packages\/core\/scripts\/install\.sh\)$/m,
+    )
+    expect(workflow).toMatch(/^\s+--latest$/m)
+    expect(workflow).toContain('gh release edit "$GITHUB_REF_NAME" --latest')
+    expect(ler('packages', 'core', 'scripts', 'install.sh')).toContain(
+      `RELEASES=\${BOTAI_RELEASES:-${REPOSITORIO}/releases}`,
+    )
+  })
+
+  describe('o motor', () => {
+    let desfazerLayout: () => void
+
+    beforeEach(() => {
+      garantirCssEscape()
+      desfazerLayout = simularLayout()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+      desfazerLayout()
+      document.body.innerHTML = ''
+      Reflect.deleteProperty(window, NOME_DO_GLOBAL)
+    })
+
+    // O `navegador.iife.js` é o build do iife.ts: tudo o que ele faz é pendurar a API no global.
+    it('a linha chama o preencher que o IIFE pendura na página, e ele preenche', async () => {
+      const [linha] = porta('motor').comando.linhas
+      const lido =
+        /^window\.(\w+)\.preencher\(document, pessoa, hoje, \{ segundaPassada: (true|false) \}\)$/.exec(
+          linha,
+        )
+      expect(lido?.[1]).toBe(NOME_DO_GLOBAL)
+      expect(
+        ler('packages', 'core', 'scripts', 'construir-iife.mjs'),
+      ).toContain('src/navegador/iife.ts')
+      await import('../../packages/core/src/navegador/iife')
+      const api = (window as unknown as Record<string, ApiDoNavegador>)[
+        NOME_DO_GLOBAL
+      ]
+      document.body.innerHTML =
+        '<form><label>Nome completo <input name="nome"></label><label>CPF <input name="cpf"></label></form>'
+      jest.useFakeTimers()
+      const promessa = api.preencher(
+        document,
+        PESSOA_DO_EXEMPLO,
+        HOJE_DO_EXEMPLO,
+        {
+          segundaPassada: lido?.[2] === 'true',
+        },
+      )
+      await jest.advanceTimersByTimeAsync(SEGUNDA_PASSADA_MS)
+      const resultado = await promessa
+      expect(resultado.preenchidos.map((l) => l.rotulo)).toEqual([
+        'Nome completo',
+        'CPF',
+      ])
+      const valor = (nome: string) =>
+        (document.querySelector(`[name="${nome}"]`) as HTMLInputElement).value
+      expect(valor('nome')).toBe(PESSOA_DO_EXEMPLO.nome.completo)
+      expect(valor('cpf')).toBe(PESSOA_DO_EXEMPLO.cpf)
+    })
   })
 })
