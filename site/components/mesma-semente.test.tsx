@@ -133,8 +133,9 @@ describe('os fatos da seção', () => {
     ).toHaveLength(12)
   })
 
-  // Os dourados foram conferidos até a 0.4.1. Subiu o core? Confira de novo antes de mudar o texto.
-  it('"da 0.2.0 à 0.4.1" vale para a versão atual do core', () => {
-    expect(MOTOR).toBe('0.4.1')
+  // Conferido na 0.5.0: os 12 foram regravados (formato 2 e o cartão com provedor e cenario), e o
+  // texto fala da faixa 0.2.0 a 0.4.1, que continua verdade. Subiu o core? Confira de novo antes de mudar o texto.
+  it('"da 0.2.0 à 0.4.1" foi conferido na versão atual do core', () => {
+    expect(MOTOR).toBe('0.5.0')
   })
 })

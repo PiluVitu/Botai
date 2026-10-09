@@ -38,7 +38,7 @@ describe('a pessoa do exemplo', () => {
   // Sem --hoje a saída muda a cada dia (medido em 2026-10-09: o nascimento vira 02/03/1970).
   it('o comando do hero fixa a versão, a semente e o hoje', () => {
     expect(COMANDO_DO_EXEMPLO).toBe(
-      'npx @pilutech/botai-core@0.4.1 pessoa --semente 42 --hoje 2026-10-05',
+      'npx @pilutech/botai-core@0.5.0 pessoa --semente 42 --hoje 2026-10-05',
     )
     expect([SEMENTE_DO_EXEMPLO, HOJE_DO_EXEMPLO]).toEqual([42, '2026-10-05'])
   })
@@ -58,7 +58,7 @@ describe('a pessoa do exemplo', () => {
     expect([npx, pacote]).toEqual(['npx', `${PACOTE_DO_CORE}@${MOTOR}`])
     const envelope = rodar(argv)
     expect(envelope).toMatchObject({
-      formato: 1,
+      formato: 2,
       motor: MOTOR,
       semente: '42',
       hoje: '2026-10-05',

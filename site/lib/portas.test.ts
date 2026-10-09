@@ -161,7 +161,7 @@ describe('comando inventado não passa', () => {
       mensagem: () => {},
     })
     expect(codigo).toBe(0)
-    expect(dados).toMatch(/^-- botai: formato 1, /)
+    expect(dados).toMatch(/^-- botai: formato 2, /)
     expect(dados.match(/^INSERT /gm)).toHaveLength(1000)
   })
 

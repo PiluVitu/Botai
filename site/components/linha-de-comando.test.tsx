@@ -2,7 +2,7 @@ import { render } from '@testing-library/react'
 import { LinhaDeComando } from './linha-de-comando'
 
 const CLI =
-  'npx @pilutech/botai-core@0.4.1 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql'
+  'npx @pilutech/botai-core@0.5.0 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql'
 
 describe('LinhaDeComando', () => {
   // Rolar pediria uma região focável por bloco (axe, scrollable-region-focusable): a linha quebra.

@@ -2,7 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BotaoCopiar, TEMPO_DO_COPIADO } from './botao-copiar'
 
-const COMANDO = 'npx @pilutech/botai-core@0.4.1 pessoa --semente 42'
+const COMANDO = 'npx @pilutech/botai-core@0.5.0 pessoa --semente 42'
 
 describe('BotaoCopiar', () => {
   afterEach(() => jest.useRealTimers())
