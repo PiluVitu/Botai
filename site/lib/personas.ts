@@ -71,3 +71,12 @@ export const CONVITE = {
   href: URL_DA_DOCUMENTACAO,
   rotulo: 'docs.botai.pilutech.com.br',
 }
+
+export type Trecho = { texto: string; codigo: boolean }
+
+export function trechos(texto: string): Trecho[] {
+  return texto
+    .split('`')
+    .map((parte, indice) => ({ texto: parte, codigo: indice % 2 === 1 }))
+    .filter((trecho) => trecho.texto !== '')
+}

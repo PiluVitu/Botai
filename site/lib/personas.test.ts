@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { URL_DA_DOCUMENTACAO } from './conteudo'
-import { CONVITE, PERSONAS } from './personas'
+import { CONVITE, PERSONAS, trechos } from './personas'
 
 const MENUS = readFileSync(
   join(__dirname, '..', '..', 'extensao', 'src', 'lib', 'menus.ts'),
@@ -50,6 +50,30 @@ describe('para quem', () => {
     expect(itens).toHaveLength(23)
     for (const rotulo of ['CPF', 'E-mail', 'CEP'])
       expect(MENUS).toContain(`rotulo: '${rotulo}'`)
+  })
+
+  // O trecho entre crases vira <code> na página; a crase nunca aparece.
+  it('trechos separa o código do texto', () => {
+    expect(
+      trechos('`Botão direito › Botaí › Inserir` põe CPF num campo só.'),
+    ).toEqual([
+      { texto: 'Botão direito › Botaí › Inserir', codigo: true },
+      { texto: ' põe CPF num campo só.', codigo: false },
+    ])
+    expect(trechos('O seed de banco num passo do workflow.')).toEqual([
+      { texto: 'O seed de banco num passo do workflow.', codigo: false },
+    ])
+    expect(trechos('a `b` c `d`')).toEqual([
+      { texto: 'a ', codigo: false },
+      { texto: 'b', codigo: true },
+      { texto: ' c ', codigo: false },
+      { texto: 'd', codigo: true },
+    ])
+  })
+
+  it('toda crase das personas fecha', () => {
+    for (const item of PERSONAS.flatMap((p) => p.itens))
+      expect(item.split('`').length % 2).toBe(1)
   })
 
   it('o convite leva à documentação', () => {
