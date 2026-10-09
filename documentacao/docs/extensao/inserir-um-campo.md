@@ -40,6 +40,7 @@ No Firefox, o Inserir escreve no campo clicado mesmo sem foco e aparece também 
 ## Também no menu
 
 - **Nova pessoa:** troca a pessoa guardada. Os próximos preenchimentos usam a nova.
+- **Preencher com** (a partir da versão 1.1.0): preenche a página com uma das [pessoas favoritas](./favoritos.md) e a torna a pessoa ativa. Só aparece quando há favorito.
 - **Abrir caixa de entrada:** abre a caixa de e-mail da pessoa, para confirmar um cadastro por e-mail. A caixa é pública: qualquer um que saiba o endereço lê as mensagens. Veja o [uso responsável](../conceitos/uso-responsavel.md).
 
 ## Quando usar

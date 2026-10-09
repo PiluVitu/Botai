@@ -82,6 +82,8 @@ Campos que só habilitam depois da busca de CEP ficam vazios: a 2ª passada só 
 
 A pessoa fica guardada até você pedir outra com "Nova pessoa", no popup ou no menu. A idade é recalculada pela data de hoje em São Paulo.
 
+A partir da versão 1.1.0, você também guarda até 3 [pessoas favoritas](./favoritos.md) e preenche a página com qualquer uma pelo botão direito › Botaí › Preencher com. A pessoa guardada passa a ser a pessoa ativa, e "Nova pessoa" troca só ela.
+
 Num fluxo de várias etapas (cadastro, endereço, pagamento), use o atalho em cada página: a pessoa é a mesma. A permissão `activeTab` cai quando a aba navega, então cada etapa precisa de um novo gesto (atalho, popup ou menu).
 
 A extensão usa o mesmo motor do core e do fixture do Playwright, e os testes dela reproduzem os [dourados](../conceitos/versoes-e-dourados.md) por semente. Mesmo assim, ela sorteia a pessoa com crypto: não há opção de semente, UF nem domínio de e-mail. Para uma pessoa reproduzível, use a CLI, a biblioteca ou o [fixture do Playwright](../playwright/o-fixture.md).

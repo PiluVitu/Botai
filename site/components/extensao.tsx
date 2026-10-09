@@ -23,7 +23,9 @@ export function Extensao({ lojas }: { lojas: BotaoDeLoja[] }) {
           </h2>
           <p className="text-muted-foreground text-[17px] leading-[1.55] text-pretty">
             Um atalho preenche a página inteira. O botão direito põe um dado num
-            campo só. A mesma pessoa fica guardada até você pedir outra.
+            campo só. A mesma pessoa fica guardada até você pedir outra. Até 3
+            pessoas favoritas, cada uma com um apelido, voltam pelo popup ou
+            pelo botão direito.
           </p>
           <BotoesLoja lojas={lojas} />
           <p className="text-muted-foreground font-mono text-[12.5px] leading-[1.6]">

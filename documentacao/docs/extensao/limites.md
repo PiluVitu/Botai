@@ -1,12 +1,12 @@
 ---
 title: Limites da extensão
 description: O que a extensão não faz, onde ela não entra e o que fica sem preencher, com o motivo de cada limite.
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 ## Sem opções
 
-A extensão não tem opção de semente, UF nem domínio de e-mail. Ela sorteia a pessoa com crypto, então não dá para pedir de novo a mesma pessoa de ontem nem uma pessoa de um estado. Para isso, use a CLI, a biblioteca ou o [fixture do Playwright](../playwright/opcoes.md).
+A extensão não tem opção de semente, UF nem domínio de e-mail. Ela sorteia a pessoa com crypto, então não dá para gerar de novo a mesma pessoa de ontem nem uma pessoa de um estado. Para isso, use a CLI, a biblioteca ou o [fixture do Playwright](../playwright/opcoes.md). A partir da versão 1.1.0, você pode guardar a pessoa de ontem nos [favoritos](./favoritos.md) e voltar a ela neste navegador.
 
 ## Onde ela não entra
 
@@ -22,6 +22,18 @@ A extensão não tem opção de semente, UF nem domínio de e-mail. Ela sorteia 
 - Campos que só habilitam depois da busca de CEP. A 2ª passada só regrava o que o Botaí já tinha escrito.
 - Campo que o classificador não conhece, como "Idade", "Observações" ou "Código de indicação". Ele entra na lista de não reconhecidos, sem chute. "Telefone fixo" fica de fora de propósito; "Telefone" recebe o celular.
 - Valor que não cabe no `maxlength` (o Botaí não corta o valor) e `<select>` sem a opção da pessoa.
+
+## Favoritos {#favoritos}
+
+:::note[Documentado]
+
+Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.1.0, e a auditoria de 2026-10-08 não o rodou.
+
+:::
+
+- No máximo 3 [pessoas favoritas](./favoritos.md), além da pessoa ativa. Com 3 guardadas, a estrela fica desabilitada.
+- O apelido tem até 24 caracteres.
+- Os favoritos ficam só neste navegador: nada é sincronizado entre dispositivos.
 
 ## Como ele escreve
 

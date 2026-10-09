@@ -96,6 +96,18 @@ Ninguém rodou o motor com Selenium, Cypress, Puppeteer ou WebdriverIO. As pági
 
 O campo pode não ter sido reconhecido. O classificador lê, nesta ordem, o `autocomplete`, o label, o `aria-label`, o `name`, o `id`, o `placeholder`, o formato, o tipo, as opções e o contexto; sem nenhuma pista que ele conheça, o campo vai para `naoReconhecidos`, sem chute. Na extensão, o popup lista esses campos com rótulo e seletor CSS, e o botão direito › Botaí › Inserir escreve o valor de um dos 23 tipos. Outros motivos: o campo estava desabilitado, só leitura, escondido, ou só habilitou depois da busca de CEP.
 
+## Como volto a uma pessoa que já usei na extensão? {#voltar-a-uma-pessoa}
+
+:::note[Documentado]
+
+Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.1.0, e a auditoria de 2026-10-08 não o rodou.
+
+:::
+
+Guarde-a nos favoritos: a estrela, no popup, guarda até 3 pessoas, cada uma com um apelido. Para voltar, clique no favorito no popup ou use o botão direito › Botaí › Preencher com. "Nova pessoa" não apaga favoritos. Mais em [Pessoas favoritas](./extensao/favoritos.md).
+
+Para a mesma pessoa em outra máquina, use uma semente na CLI ou no fixture ([Semente e hoje](./conceitos/semente-e-hoje.md)).
+
 ## Por que o atalho da extensão não faz nada? {#atalho}
 
 Em páginas proibidas (`chrome://`, `about:`, lojas de extensão, leitor de PDF, `file:` sem permissão), a extensão não preenche e o atalho não faz nada. Se outro app tomou a tecla, o popup mostra "definir atalho". Os atalhos sugeridos são `⌥⇧P` no Mac, `Ctrl+Shift+Y` no Windows e no Linux e `Alt+Shift+P` no Firefox para Linux.

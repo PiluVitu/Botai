@@ -52,6 +52,14 @@ describe('para quem', () => {
       expect(MENUS).toContain(`rotulo: '${rotulo}'`)
   })
 
+  // Contrato da 1.1.0: até 3 favoritas, apelido, e o submenu "Preencher com" no botão direito.
+  it('os favoritos: até 3, com apelido, pelo Preencher com', () => {
+    const itens = PERSONAS.find((p) => p.titulo === 'QA manual')?.itens
+    expect(itens?.[1]).toBe(
+      'Guarde até 3 pessoas favoritas, com apelido, e preencha com qualquer uma em `Botão direito › Botaí › Preencher com`.',
+    )
+  })
+
   // O trecho entre crases vira <code> na página; a crase nunca aparece.
   it('trechos separa o código do texto', () => {
     expect(

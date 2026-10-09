@@ -39,6 +39,7 @@ Use a **extensão**.
 
 - Um atalho preenche o cadastro inteiro com uma pessoa coerente: CPF e CNPJ válidos, CEP real com rua, bairro e cidade que batem, e celular com o DDD da cidade.
 - Num fluxo de várias etapas (cadastro, endereço, pagamento), a mesma pessoa fica guardada, e o atalho repreenche cada página.
+- A partir da versão 1.1.0, até 3 [pessoas favoritas](../extensao/favoritos.md), com apelido: botão direito › Botaí › Preencher com preenche a página com qualquer uma.
 - Campo que não foi reconhecido: botão direito › Botaí › Inserir › CPF, E-mail, CEP… (23 tipos).
 - Confirmação por e-mail: "Abrir caixa de entrada" abre a caixa pública da pessoa.
 - Dados avulsos: o popup copia qualquer um dos 24 valores, mesmo em página que a extensão não pode preencher.
