@@ -315,11 +315,13 @@ export function lerTextosDoCartao({
     cenario: cenario as Cenario | undefined,
   })
   if (cenarios === undefined) return escolhido
-  conferirCenarioOuCenarios({
-    cenario: cenario as Cenario | undefined,
-    cenarios: {},
-  })
-  return { provedor: escolhido.provedor, cenarios: lerCenarios(cenarios) }
+  const doLote: OpcoesDoCartaoDoLote = {
+    provedor: escolhido.provedor,
+    ...(cenario !== undefined && { cenario: escolhido.cenario }),
+    cenarios: lerCenarios(cenarios),
+  }
+  conferirCenarioOuCenarios(doLote)
+  return doLote
 }
 
 export function escolherNumero(
