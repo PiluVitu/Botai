@@ -27,8 +27,6 @@ export default defineConfig({
       'scripts/check-tailwind-source.mjs',
       'extensao/**',
       'packages/core/**',
-      // Sai junto com o overrides do pnpm-workspace.yaml (passo C4 do plano da fase 0).
-      'vendor/piluvitu-ui-0.1.0.tgz',
     ],
     // Com sourcesRoot na raiz, a exclusão automática do outDir do WXT não pega estas pastas.
     excludeSources: [

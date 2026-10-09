@@ -49,9 +49,7 @@ trustPolicyExclude:
 # Só dependência direta pode vir de git ou de tarball (pnpm ≥ 10.26.0).
 blockExoticSubdeps: true
 
-# Até o @piluvitu/ui 0.1.0 estar no npm há 24 h (passo C4 do plano da fase 0).
 overrides:
-  '@piluvitu/ui': 'file:vendor/piluvitu-ui-0.1.0.tgz'
   # GHSA-pqg4-j6r4-53mv (shell-quote < 1.11.0, critical): o fx-runner 1.6.0 (último, via web-ext) fixa a 1.10.0.
   # Sai quando um fx-runner novo aceitar a 1.11.0 ou mais.
   'fx-runner>shell-quote': '^1.11.0'
