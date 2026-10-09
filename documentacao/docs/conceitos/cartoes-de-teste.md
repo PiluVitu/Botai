@@ -87,15 +87,15 @@ O `4000 0000 0000 0069` é o `recusado-expirado` da Stripe e o `chargeback` da P
 
 ## Em cada porta {#portas}
 
-| Porta      | Uma pessoa                                       | Um lote                                               |
-| ---------- | ------------------------------------------------ | ----------------------------------------------------- |
-| CLI        | `--cartao` e `--cenario`                         | `--cartao` e `--cenarios recusado:10,aprovado:2`      |
-| Servidor   | `cartao` e `cenario`                             | `cartao` e `cenarios`                                 |
-| Biblioteca | `cartao: { provedor, cenario }`                  | `cartao: { provedor, cenarios: { recusado: 10, … } }` |
-| Fixture    | `botaiCartao: { provedor, cenario }`             | —                                                     |
-| Extensão   | não escolhe: usa o padrão (`stripe`, `aprovado`) | —                                                     |
+| Porta      | Uma pessoa                           | Um lote                                               |
+| ---------- | ------------------------------------ | ----------------------------------------------------- |
+| CLI        | `--cartao` e `--cenario`             | `--cartao` e `--cenarios recusado:10,aprovado:2`      |
+| Servidor   | `cartao` e `cenario`                 | `cartao` e `cenarios`                                 |
+| Biblioteca | `cartao: { provedor, cenario }`      | `cartao: { provedor, cenarios: { recusado: 10, … } }` |
+| Fixture    | `botaiCartao: { provedor, cenario }` | —                                                     |
+| Extensão   | no popup, a partir da versão 1.2.0   | —                                                     |
 
-Os detalhes estão em [Cartões de teste na CLI](../cli/cartoes.md), na [API HTTP](../servidor/api-http.md#cartoes), em [Gerar uma pessoa](../biblioteca/gerar-pessoa.md#cartao), em [Gerar um lote](../biblioteca/gerar-pessoas.md#cenarios) e nas [opções do fixture](../playwright/opcoes.md#botaicartao).
+Na extensão, o popup escolhe o provedor e o cenário das próximas pessoas a partir da versão 1.2.0 ([O popup](../extensao/popup.md#cartao)); até a 1.1.0, ela usa sempre o padrão (`stripe`, `aprovado`). Os detalhes das outras portas estão em [Cartões de teste na CLI](../cli/cartoes.md), na [API HTTP](../servidor/api-http.md#cartoes), em [Gerar uma pessoa](../biblioteca/gerar-pessoa.md#cartao), em [Gerar um lote](../biblioteca/gerar-pessoas.md#cenarios) e nas [opções do fixture](../playwright/opcoes.md#botaicartao).
 
 No lote, os cenários saem em grupos, na ordem dada, e a pessoa `i` continua sendo a da semente `S/i`. E-mail, CPF e CNPJ não se repetem no lote inteiro, como num lote sem cenários ([Lote e unicidade](./lote-e-unicidade.md)).
 

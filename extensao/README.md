@@ -12,7 +12,7 @@ Uma pessoa de teste falsa e coerente, que fica guardada até você pedir outra (
 - CEP real, com rua, bairro, cidade e UF que batem com ele;
 - nome, data de nascimento, celular, e-mail e senha;
 - empresa (razão social, nome fantasia e CNPJ);
-- cartão de teste documentado da Stripe (número, nome impresso, validade e CVV).
+- cartão de teste documentado da Stripe ou da Pagar.me, no cenário que você escolher: aprovado, recusado, pendente… (número, nome impresso, validade e CVV).
 
 ## Como instalar
 
@@ -45,6 +45,7 @@ Uma pessoa de teste falsa e coerente, que fica guardada até você pedir outra (
 - **Um campo só:** botão direito no campo › `Botaí › Inserir › CPF` (ou E-mail, CEP…), para o que a detecção automática errar.
 - **Ver e copiar os dados:** o popup mostra a pessoa inteira; "Nova pessoa" gera outra.
 - **Favoritos:** a estrela ao lado do nome guarda a pessoa ativa, com um apelido ("admin do staging", "comprador PJ"); cabem até 3. Um clique no chip do favorito a torna a pessoa ativa de novo, que é a que o atalho e o "Preencher" usam; pelo botão direito, `Botaí › Preencher com › <apelido>` preenche a página com ela direto. "Nova pessoa" troca só a ativa: os favoritos ficam. Clicar de novo na estrela tira o favorito, e o "Desfazer" o devolve por 5 segundos.
+- **Cartão de teste:** no grupo "Cartão" do popup, "Cartão das próximas pessoas" escolhe o provedor (Stripe ou Pagar.me) e o cenário (aprovado, recusado, pendente…), e "Nova pessoa com …" gera uma pessoa com ele. A escolha vale para as próximas pessoas: a atual e as favoritas mantêm o cartão com que foram geradas.
 
 ## Cuidados
 
@@ -91,7 +92,7 @@ O Botaí sai em quatro lojas pela PiluTech. Como o release funciona está no [`C
 
 ## Privacidade e termos
 
-O Botaí não coleta nem envia dados: ele só lê os formulários da aba em que você o aciona e guarda no navegador a pessoa fictícia ativa e até 3 favoritas que você guardar. A [política de privacidade](https://botai.pilutech.com.br/privacidade) e os [termos de uso](https://botai.pilutech.com.br/termos) moram no site do Botaí; o texto deles fica em `site/app/privacidade/page.tsx` e `site/app/termos/page.tsx`.
+O Botaí não coleta nem envia dados: ele só lê os formulários da aba em que você o aciona e guarda no navegador a pessoa fictícia ativa, até 3 favoritas que você guardar e o cartão de teste (provedor e cenário) que você escolher para as próximas pessoas. A [política de privacidade](https://botai.pilutech.com.br/privacidade) e os [termos de uso](https://botai.pilutech.com.br/termos) moram no site do Botaí; o texto deles fica em `site/app/privacidade/page.tsx` e `site/app/termos/page.tsx`.
 
 ## Licença
 
