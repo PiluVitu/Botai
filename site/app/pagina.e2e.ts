@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { LOJA_UI } from '../components/lojas-ui'
 import { CAPTURAS } from '../lib/capturas'
+import { ANCORAS_DA_LANDING } from '../lib/conteudo'
 import { lerUrlsDasLojas } from '../lib/lojas'
 import { botoesDasLojas } from '../lib/modelo'
 
@@ -22,17 +23,17 @@ test.describe('/', () => {
     const resposta = await page.goto('/')
     expect(resposta?.status()).toBe(200)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Botaí: Gerador de dados fake para formulários (CPF, CNPJ, CEP)',
+      'Botaí: Dados de teste brasileiros em todo lugar que o seu teste roda.',
     )
     await expect(page.getByRole('heading', { level: 2 })).toHaveText([
-      'Por que existe',
-      'O que ele bota',
-      'Capturas',
-      'Como usar',
-      'Para devs',
-      'Privacidade',
-      'Cuidados',
-      'Bota aí no seu navegador',
+      'Um motor, oito portas.',
+      'Mesma semente, mesma pessoa.',
+      'Uma pessoa onde tudo bate.',
+      'Cada um entra pela sua porta.',
+      'O que foi testado, e o que ainda não.',
+      'Bota aí no navegador.',
+      'Fictício, mas com cuidado.',
+      'Botaí no seu teste.',
     ])
     await page.waitForLoadState('networkidle')
     expect(erros).toEqual([])
@@ -46,7 +47,7 @@ test.describe('/', () => {
       const rotulo = LOJA_UI[loja].rotulo
       if (url) {
         const links = page.getByRole('link', { name: rotulo, exact: true })
-        await expect(links).toHaveCount(2)
+        await expect(links).toHaveCount(1)
         for (const link of await links.all()) {
           await expect(link).toHaveAttribute('href', url)
           await expect(link).toHaveAttribute('target', '_blank')
@@ -55,7 +56,7 @@ test.describe('/', () => {
         const botoesDesabilitados = page.getByRole('button', {
           name: `${rotulo} Em breve`,
         })
-        await expect(botoesDesabilitados).toHaveCount(2)
+        await expect(botoesDesabilitados).toHaveCount(1)
         for (const botao of await botoesDesabilitados.all())
           await expect(botao).toBeDisabled()
       }
@@ -65,29 +66,27 @@ test.describe('/', () => {
     await expect(page.locator('a[href="#"]')).toHaveCount(0)
   })
 
-  test('as âncoras do topo levam às seções', async ({ page }) => {
+  test('as âncoras do cabeçalho levam às seções', async ({ page }) => {
     await page.goto('/')
-    for (const [ancora, alvo, titulo] of [
-      ['como usar', 'como-usar', 'Como usar'],
-      ['para devs', 'para-devs', 'Para devs'],
-    ]) {
-      await page.getByRole('link', { name: ancora }).click()
-      await expect(page).toHaveURL(new RegExp(`#${alvo}$`))
-      await expect(
-        page.getByRole('heading', { level: 2, name: titulo }),
-      ).toBeInViewport()
+    const secoes = page.getByRole('navigation', { name: 'Seções' })
+    for (const { id, rotulo } of ANCORAS_DA_LANDING) {
+      await secoes.getByRole('link', { name: rotulo, exact: true }).click()
+      await expect(page).toHaveURL(new RegExp(`#${id}$`))
+      await expect(page.locator(`#${id} h2`)).toBeInViewport()
     }
+    // A âncora da Extensão traz a captura (lazy) para a tela. O `next start` prende a chave do
+    // /_next/image cujo pedido foi abortado (⚠️ do site/CLAUDE.md): espera a captura antes de fechar.
+    await expect
+      .poll(() =>
+        page
+          .locator('#extensao img:visible')
+          .evaluate((img) => (img as HTMLImageElement).naturalWidth),
+      )
+      .toBeGreaterThan(0)
   })
 
-  test('o topo volta para a PiluLabs no piluvitu.com.br, e o suporte leva [Botaí] no assunto', async ({
-    page,
-  }) => {
+  test('o suporte do rodapé leva [Botaí] no assunto', async ({ page }) => {
     await page.goto('/')
-    await expect(
-      page
-        .getByRole('navigation', { name: 'Topo' })
-        .getByRole('link', { name: 'PiluLabs' }),
-    ).toHaveAttribute('href', 'https://piluvitu.com.br/pilulabs')
     const suporte = page
       .getByRole('contentinfo')
       .getByRole('link', { name: 'Suporte' })
@@ -99,12 +98,12 @@ test.describe('/', () => {
   })
 
   // Só o href: clicar sairia para outro host (e o docs.botai é outro projeto da Vercel).
-  test('o Docs do topo e o do rodapé levam à documentação, na mesma aba', async ({
+  test('o Docs do cabeçalho e o do rodapé levam à documentação, na mesma aba', async ({
     page,
   }) => {
     await page.goto('/')
     for (const regiao of [
-      page.getByRole('navigation', { name: 'Topo' }),
+      page.getByRole('banner'),
       page.getByRole('contentinfo'),
     ]) {
       const docs = regiao.getByRole('link', { name: 'Docs', exact: true })
@@ -115,25 +114,6 @@ test.describe('/', () => {
       )
       await expect(docs).not.toHaveAttribute('target')
     }
-  })
-
-  test('abas das capturas pelo teclado (WAI-ARIA)', async ({ page }) => {
-    await page.goto('/')
-    const abas = page.getByRole('tab')
-    await expect(abas).toHaveCount(3)
-    await abas.first().focus()
-    await page.keyboard.press('ArrowRight')
-    await expect(abas.nth(1)).toBeFocused()
-    await expect(abas.nth(1)).toHaveAttribute('aria-selected', 'true')
-    await expect(page.getByRole('tabpanel')).toContainText(CAPTURAS[1].titulo)
-    await page.keyboard.press('End')
-    await expect(abas.nth(2)).toHaveAttribute('aria-selected', 'true')
-    await page.keyboard.press('Home')
-    await expect(abas.first()).toHaveAttribute('aria-selected', 'true')
-    await page.keyboard.press('ArrowLeft')
-    await expect(abas.nth(2)).toHaveAttribute('aria-selected', 'true')
-    await page.keyboard.press('Tab')
-    await expect(page.getByRole('tabpanel')).toBeFocused()
   })
 
   // Sem piscar: a classe tem de vir do script inline do next-themes, antes de qualquer JS do React.
@@ -149,12 +129,12 @@ test.describe('/', () => {
     await page.emulateMedia({ colorScheme: 'dark' })
     await page.goto('/', { waitUntil: 'domcontentloaded' })
     expect(await page.locator('html').getAttribute('class')).toMatch(/\bdark\b/)
-    const topo = page.getByRole('banner')
+    const extensao = page.locator('#extensao')
     await expect(
-      topo.locator(`img[alt="${CAPTURAS[0].variantes.escuro.alt}"]`),
+      extensao.locator(`img[alt="${CAPTURAS[0].variantes.escuro.alt}"]`),
     ).toBeVisible()
     await expect(
-      topo.locator(`img[alt="${CAPTURAS[0].variantes.claro.alt}"]`),
+      extensao.locator(`img[alt="${CAPTURAS[0].variantes.claro.alt}"]`),
     ).toBeHidden()
   })
 
@@ -183,15 +163,26 @@ test.describe('/', () => {
     })
     await page.emulateMedia({ colorScheme: 'dark' })
     await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    // A captura é lazy e fica na seção Extensão: só sai pela rede perto da tela.
+    const escuro = page.getByRole('img', {
+      name: CAPTURAS[0].variantes.escuro.alt,
+    })
+    await escuro.scrollIntoViewIfNeeded()
+    await expect
+      .poll(() =>
+        escuro.evaluate((img) => (img as HTMLImageElement).naturalWidth),
+      )
+      .toBeGreaterThan(0)
     expect(
       pedidas.some((u) => u.includes('01-pagina-preenchida-escuro.png')),
     ).toBe(true)
     expect(pedidas.filter((u) => u.includes('-claro.png'))).toEqual([])
     await page.getByRole('button', { name: 'Alternar tema' }).click()
-    await expect(
-      page.getByRole('img', { name: CAPTURAS[0].variantes.claro.alt }).first(),
-    ).toBeVisible()
+    const claro = page.getByRole('img', {
+      name: CAPTURAS[0].variantes.claro.alt,
+    })
+    await claro.scrollIntoViewIfNeeded()
+    await expect(claro).toBeVisible()
     await expect
       .poll(() =>
         pedidas.some((u) => u.includes('02-pagina-preenchida-claro.png')),
@@ -238,9 +229,9 @@ test.describe('/', () => {
           { plataforma, userAgent },
         )
         await page.goto('/')
-        const cabecalho = page.getByRole('banner')
-        await expect(cabecalho.locator('kbd')).toHaveText(tecla)
-        await expect(cabecalho).toContainText(`preenche a página no ${sistema}`)
+        const hero = page.locator('section[aria-labelledby="hero-titulo"]')
+        await expect(hero.locator('kbd')).toHaveText(tecla)
+        await expect(hero).toContainText(`preenche a página no ${sistema}`)
       })
     }
 
@@ -253,9 +244,9 @@ test.describe('/', () => {
       // chave do /_next/image cujo 1º pedido foi abortado (um teste anterior que fecha a página no meio).
       // O que se mede aqui é o HTML: esperar o `load` deixaria o teste refém daquela imagem.
       await page.goto('/', { waitUntil: 'domcontentloaded' })
-      await expect(page.getByRole('banner').locator('kbd')).toHaveText(
-        'Ctrl+Shift+Y',
-      )
+      await expect(
+        page.locator('section[aria-labelledby="hero-titulo"] kbd'),
+      ).toHaveText('Ctrl+Shift+Y')
       await contexto.close()
     })
   })
@@ -278,7 +269,7 @@ test.describe('/', () => {
     test('nenhum botão de loja passa da borda da lista', async ({ page }) => {
       await page.goto('/')
       const listas = page.getByRole('list', { name: 'Instalar pela loja' })
-      await expect(listas).toHaveCount(2)
+      await expect(listas).toHaveCount(1)
       const vazados = await listas.evaluateAll((elementos) =>
         elementos.flatMap((lista) => {
           const borda = lista.getBoundingClientRect().right
@@ -292,14 +283,14 @@ test.describe('/', () => {
       expect(vazados).toEqual([])
     })
 
-    // O topo ganhou a terceira âncora e o Docs, os comandos da seção para devs têm até 85 caracteres,
-    // e o rodapé ganhou o Docs ao lado do Suporte: os três quebram linha. Como nos botões de loja,
-    // o vazamento para o gutter não aparece no scrollWidth.
-    test('o topo, a seção para devs e o rodapé não passam da coluna', async ({
+    // O cabeçalho tem a marca, as 4 âncoras, o Docs, o GitHub e o tema, e o rodapé tem o Docs ao lado
+    // do Suporte: os dois quebram linha. Como nos botões de loja, o vazamento para o gutter não
+    // aparece no scrollWidth.
+    test('o cabeçalho, as portas e o rodapé não passam da coluna', async ({
       page,
     }) => {
       await page.goto('/')
-      await expect(page.locator('#para-devs pre').first()).toBeAttached()
+      await expect(page.locator('#portas h2')).toBeAttached()
       await expect(
         page.getByRole('contentinfo').getByRole('link', { name: 'Docs' }),
       ).toBeAttached()
@@ -308,9 +299,9 @@ test.describe('/', () => {
           document.querySelector('main') as HTMLElement
         ).getBoundingClientRect()
         return [
-          ...document.querySelectorAll('nav[aria-label="Topo"] *'),
+          ...document.querySelectorAll('header *'),
           ...document.querySelectorAll('footer *'),
-          ...document.querySelectorAll('#para-devs *'),
+          ...document.querySelectorAll('#portas *'),
         ]
           .filter((elemento) => {
             const caixa = elemento.getBoundingClientRect()
