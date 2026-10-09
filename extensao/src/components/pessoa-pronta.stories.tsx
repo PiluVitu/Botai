@@ -171,6 +171,13 @@ const guardando: Story = {
 export const GuardandoComApelido: Story = guardando
 export const GuardandoComApelidoClaro: Story = { ...guardando, ...CLARO }
 
+// A ativa é uma das 3 favoritas: o apelido acima do nome, a faixa cheia e o chip dela pressionado.
+const tresFavoritos: Story = {
+  args: { pessoa: COMPRADOR, favoritos: [ADMIN, PJ, PI] },
+}
+export const TresFavoritos: Story = tresFavoritos
+export const TresFavoritosClaro: Story = { ...tresFavoritos, ...CLARO }
+
 const limite: Story = {
   args: { pessoa: NOVA, favoritos: [ADMIN, PJ, PI] },
 }

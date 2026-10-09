@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { CAPTURAS, CENAS_DA_OPERA, COPIAS, PECAS_DA_LOJA } from './pecas'
 
 describe('peças da loja', () => {
-  it('seis capturas, cada cena nos dois temas, na ordem que o site mostra', () => {
+  // Favoritos (1.1.0) e cartão (1.2.0) entram no fim: os nomes das 6 primeiras não mudam.
+  it('dez capturas, cada cena nos dois temas, na ordem que o site mostra', () => {
     expect(CAPTURAS.map((c) => c.nome)).toEqual([
       '01-pagina-preenchida-escuro',
       '02-pagina-preenchida-claro',
@@ -10,6 +11,10 @@ describe('peças da loja', () => {
       '04-pessoa-de-teste-claro',
       '05-resultado-escuro',
       '06-resultado-claro',
+      '07-favoritos-escuro',
+      '08-favoritos-claro',
+      '09-cartao-escuro',
+      '10-cartao-claro',
     ])
   })
 

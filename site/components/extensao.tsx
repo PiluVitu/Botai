@@ -1,5 +1,5 @@
 import { cn } from '@piluvitu/ui/cn'
-import { CAPTURAS } from '@/lib/capturas'
+import { capturaDa } from '@/lib/capturas'
 import { REQUISITOS_DA_EXTENSAO } from '@/lib/extensao'
 import type { BotaoDeLoja } from '@/lib/modelo'
 import { BotoesLoja } from './botoes-loja'
@@ -7,6 +7,11 @@ import { CARTAO } from './cartao'
 import { ImagemPorTema } from './imagem-por-tema'
 import { ESPACO_DE_SECAO, Sobrelinha, TITULO_DE_SECAO } from './secao'
 import { TabelaAtalhos } from './tabela-atalhos'
+
+const TAMANHOS =
+  '(min-width: 1264px) 572px, (min-width: 900px) calc(48vw - 32px), calc(100vw - 32px)'
+const COLUNAS =
+  'grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-[clamp(28px,4vw,56px)]'
 
 export function Extensao({ lojas }: { lojas: BotaoDeLoja[] }) {
   return (
@@ -16,7 +21,7 @@ export function Extensao({ lojas }: { lojas: BotaoDeLoja[] }) {
       className={cn(ESPACO_DE_SECAO, 'scroll-mt-6')}
     >
       <Sobrelinha numero={6} rotulo="Extensão" />
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] items-start gap-[clamp(28px,4vw,56px)]">
+      <div className={cn(COLUNAS, 'items-start')}>
         <div className="flex min-w-0 flex-col gap-[22px]">
           <h2 id="extensao-titulo" className={TITULO_DE_SECAO}>
             Bota aí no navegador.
@@ -37,8 +42,8 @@ export function Extensao({ lojas }: { lojas: BotaoDeLoja[] }) {
         <figure className="flex min-w-0 flex-col gap-3">
           <div className={cn(CARTAO, 'overflow-hidden')}>
             <ImagemPorTema
-              variantes={CAPTURAS[0].variantes}
-              sizes="(min-width: 1264px) 572px, (min-width: 900px) calc(48vw - 32px), calc(100vw - 32px)"
+              variantes={capturaDa('pagina-preenchida').variantes}
+              sizes={TAMANHOS}
             />
           </div>
           <figcaption className="text-muted-foreground font-mono text-xs">
@@ -46,6 +51,21 @@ export function Extensao({ lojas }: { lojas: BotaoDeLoja[] }) {
             fora.
           </figcaption>
         </figure>
+      </div>
+      <div className={cn(COLUNAS, 'mt-[clamp(28px,4vw,56px)]')}>
+        {(['favoritos', 'cartao'] as const).map((cena) => {
+          const captura = capturaDa(cena)
+          return (
+            <figure key={cena} className="flex min-w-0 flex-col gap-3">
+              <div className={cn(CARTAO, 'overflow-hidden')}>
+                <ImagemPorTema variantes={captura.variantes} sizes={TAMANHOS} />
+              </div>
+              <figcaption className="text-muted-foreground font-mono text-xs">
+                {captura.texto}
+              </figcaption>
+            </figure>
+          )
+        })}
       </div>
     </section>
   )

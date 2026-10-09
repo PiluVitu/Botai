@@ -11,11 +11,14 @@ function tamanhoDoPng(caminho: string) {
 }
 
 describe('CAPTURAS', () => {
-  it('as 3 cenas do design, na ordem das abas', () => {
-    expect(CAPTURAS.map((c) => [c.numero, c.titulo])).toEqual([
-      ['01', 'Página preenchida'],
-      ['02', 'Pessoa de teste'],
-      ['03', 'Resultado'],
+  // Favoritos (extensão 1.1.0) e cartão (1.2.0) vêm depois das 3 cenas do design.
+  it('as 5 cenas, na ordem do gerador das lojas', () => {
+    expect(CAPTURAS.map((c) => [c.numero, c.cena, c.titulo])).toEqual([
+      ['01', 'pagina-preenchida', 'Página preenchida'],
+      ['02', 'pessoa-de-teste', 'Pessoa de teste'],
+      ['03', 'resultado', 'Resultado'],
+      ['04', 'favoritos', 'Favoritos'],
+      ['05', 'cartao', 'Cartão de teste'],
     ])
   })
 
@@ -33,6 +36,8 @@ describe('CAPTURAS', () => {
         '/capturas/04-pessoa-de-teste-claro.png',
       ],
       ['/capturas/05-resultado-escuro.png', '/capturas/06-resultado-claro.png'],
+      ['/capturas/07-favoritos-escuro.png', '/capturas/08-favoritos-claro.png'],
+      ['/capturas/09-cartao-escuro.png', '/capturas/10-cartao-claro.png'],
     ])
   })
 

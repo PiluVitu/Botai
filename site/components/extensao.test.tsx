@@ -69,18 +69,33 @@ describe('Extensao', () => {
     ).toHaveAttribute('tabindex', '0')
   })
 
-  it('a captura 01/02 numa figura com legenda, lazy e sem prioridade', () => {
+  // A 01/02 ao lado do texto; os favoritos (1.1.0) e o cartão (1.2.0) numa fileira logo abaixo.
+  it('as capturas da página, dos favoritos e do cartão, em figuras com legenda, lazy e sem prioridade', () => {
     const { secao, dentro } = renderizar()
-    const figura = dentro.getByRole('figure')
+    const [pagina, favoritos, cartao] = dentro.getAllByRole('figure')
     expect(
-      within(figura).getByText(
+      within(pagina).getByText(
         'O popup mostra quantos campos entraram e lista os que ficaram de fora.',
+      ).tagName,
+    ).toBe('FIGCAPTION')
+    expect(
+      within(favoritos).getByText(
+        'Até 3 pessoas favoritas, cada uma com um apelido, voltam pelo popup ou pelo botão direito.',
+      ).tagName,
+    ).toBe('FIGCAPTION')
+    expect(
+      within(cartao).getByText(
+        'O cartão das próximas pessoas sai da Stripe ou da Pagar.me, no cenário que você escolher.',
       ).tagName,
     ).toBe('FIGCAPTION')
     const imagens = [...secao.querySelectorAll('figure img')]
     expect(imagens.map((img) => img.getAttribute('alt'))).toEqual([
       CAPTURAS[0].variantes.claro.alt,
       CAPTURAS[0].variantes.escuro.alt,
+      CAPTURAS[3].variantes.claro.alt,
+      CAPTURAS[3].variantes.escuro.alt,
+      CAPTURAS[4].variantes.claro.alt,
+      CAPTURAS[4].variantes.escuro.alt,
     ])
     for (const img of imagens) {
       expect(img).toHaveAttribute('loading', 'lazy')
