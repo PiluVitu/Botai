@@ -6,6 +6,7 @@ export {
   type CenarioDoCartao,
   type DistribuicaoDeCenarios,
   type OpcoesDoCartao,
+  type OpcoesDoCartaoDoLote,
   type Provedor,
 } from './cartao'
 export {
@@ -19,7 +20,6 @@ export {
   gerarPessoa,
   gerarPessoas,
   type OpcoesDaPessoa,
-  type OpcoesDoCartaoDoLote,
   type OpcoesDoLote,
 } from './gerar'
 export { hojeEmSaoPaulo } from './hoje'

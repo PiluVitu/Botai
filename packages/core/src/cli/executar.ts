@@ -1,15 +1,13 @@
 import { somenteDigitos } from '../aleatorio'
 import {
-  type Cenario,
   escolherNumero,
   formatarNumeroCartao,
   lerCartao,
-  lerCenarios,
-  type Provedor,
+  lerTextosDoCartao,
+  type OpcoesDoCartaoDoLote,
 } from '../cartao'
 import { envelopar } from '../envelope'
 import {
-  type OpcoesDoCartaoDoLote,
   type OpcoesDoLote,
   type OpcoesResolvidas,
   pessoaResolvida,
@@ -120,18 +118,11 @@ function semPosicionais(lidos: ArgumentosLidos): void {
 }
 
 function cartaoDe(lidos: ArgumentosLidos): OpcoesDoCartaoDoLote | undefined {
-  const provedor = texto(lidos, 'cartao')
-  const cenario = texto(lidos, 'cenario')
-  const cenarios = texto(lidos, 'cenarios')
-  if (provedor === undefined && cenario === undefined && cenarios === undefined)
-    return undefined
-  const escolhido = lerCartao({
-    provedor: provedor as Provedor | undefined,
-    cenario: cenario as Cenario | undefined,
+  return lerTextosDoCartao({
+    cartao: texto(lidos, 'cartao'),
+    cenario: texto(lidos, 'cenario'),
+    cenarios: texto(lidos, 'cenarios'),
   })
-  return cenarios === undefined
-    ? escolhido
-    : { provedor: escolhido.provedor, cenarios: lerCenarios(cenarios) }
 }
 
 function opcoesDaPessoa(lidos: ArgumentosLidos): OpcoesResolvidas {

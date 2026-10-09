@@ -9,6 +9,7 @@ import {
   lerCartao,
   lerCenarios,
   lerDistribuicao,
+  lerTextosDoCartao,
   luhnValido,
   NOME_DO_PROVEDOR,
   PROVEDOR_PADRAO,
@@ -250,6 +251,41 @@ describe('lerCenarios (texto da CLI e do servidor)', () => {
     const erro = erroDe(() => lerCenarios(texto))
     expect(erro.opcao).toBe('cenarios')
     expect(erro.message).toBe(mensagem)
+  })
+})
+
+describe('lerTextosDoCartao (as flags da CLI e a consulta do servidor)', () => {
+  test('nada: sem opção de cartão', () => {
+    expect(lerTextosDoCartao({})).toBeUndefined()
+  })
+
+  test('provedor e cenário saem validados, com o id', () => {
+    expect(lerTextosDoCartao({ cartao: 'PagarMe' })).toEqual({
+      provedor: 'pagarme',
+      cenario: 'aprovado',
+    })
+    expect(lerTextosDoCartao({ cenario: 'recusado' })).toEqual({
+      provedor: 'stripe',
+      cenario: 'recusado',
+    })
+  })
+
+  test('cenarios sai lido, sem cenario', () => {
+    expect(
+      lerTextosDoCartao({
+        cartao: 'pagarme',
+        cenarios: 'recusado:2,aprovado:1',
+      }),
+    ).toEqual({ provedor: 'pagarme', cenarios: { recusado: 2, aprovado: 1 } })
+  })
+
+  test.each([
+    [{ cartao: 'adyen' }, 'cartao'],
+    [{ cenario: 'chargeback' }, 'cenario'],
+    [{ cenarios: 'recusado' }, 'cenarios'],
+    [{ cenario: 'recusado', cenarios: 'aprovado:1' }, 'cenarios'],
+  ])('%j lança ErroDeOpcao(%s)', (textos, opcao) => {
+    expect(erroDe(() => lerTextosDoCartao(textos)).opcao).toBe(opcao)
   })
 })
 

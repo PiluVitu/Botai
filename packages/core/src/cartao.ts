@@ -288,6 +288,40 @@ export function lerDistribuicao(
   return grupos
 }
 
+export interface OpcoesDoCartaoDoLote extends OpcoesDoCartao {
+  cenarios?: DistribuicaoDeCenarios
+}
+
+export function conferirCenarioOuCenarios(opcoes: OpcoesDoCartaoDoLote): void {
+  if (opcoes.cenario !== undefined && opcoes.cenarios !== undefined)
+    throw new ErroDeOpcao('cenarios', 'use cenario ou cenarios, não os dois')
+}
+
+export interface TextosDoCartao {
+  cartao?: string
+  cenario?: string
+  cenarios?: string
+}
+
+export function lerTextosDoCartao({
+  cartao,
+  cenario,
+  cenarios,
+}: TextosDoCartao): OpcoesDoCartaoDoLote | undefined {
+  if (cartao === undefined && cenario === undefined && cenarios === undefined)
+    return undefined
+  const escolhido = lerCartao({
+    provedor: cartao as Provedor | undefined,
+    cenario: cenario as Cenario | undefined,
+  })
+  if (cenarios === undefined) return escolhido
+  conferirCenarioOuCenarios({
+    cenario: cenario as Cenario | undefined,
+    cenarios: {},
+  })
+  return { provedor: escolhido.provedor, cenarios: lerCenarios(cenarios) }
+}
+
 export function escolherNumero(
   rng: Rng = rngPadrao,
   opcoes: OpcoesDoCartao = {},

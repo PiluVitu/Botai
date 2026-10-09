@@ -1,9 +1,10 @@
 import {
   type Cenario,
-  type DistribuicaoDeCenarios,
+  conferirCenarioOuCenarios,
   lerCartao,
   lerDistribuicao,
   type OpcoesDoCartao,
+  type OpcoesDoCartaoDoLote,
 } from './cartao'
 import { hojeEmSaoPaulo } from './hoje'
 import { ErroDeOpcao, lerHoje, lerQuantidade } from './opcoes'
@@ -18,10 +19,6 @@ import {
 export interface OpcoesDaPessoa extends OpcoesDaMontagem {
   semente?: Semente
   hoje?: string
-}
-
-export interface OpcoesDoCartaoDoLote extends OpcoesDoCartao {
-  cenarios?: DistribuicaoDeCenarios
 }
 
 export interface OpcoesDoLote extends Omit<OpcoesDaPessoa, 'cartao'> {
@@ -124,8 +121,7 @@ function cenarioDaPosicao(
 ): (posicao: number) => Cenario {
   const { provedor, cenario } = lerCartao(cartao)
   if (cartao.cenarios === undefined) return () => cenario
-  if (cartao.cenario !== undefined)
-    throw new ErroDeOpcao('cenarios', 'use cenario ou cenarios, não os dois')
+  conferirCenarioOuCenarios(cartao)
   const grupos = lerDistribuicao(provedor, cartao.cenarios)
   const fins: number[] = []
   for (const { quantidade: q } of grupos) fins.push((fins.at(-1) ?? 0) + q)
