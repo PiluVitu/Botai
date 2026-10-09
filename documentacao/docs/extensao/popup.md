@@ -34,12 +34,6 @@ Se o formulário é seu, a lista diz o que ajustar: um `autocomplete` ou um labe
 
 ## Favoritos {#favoritos}
 
-:::note[Documentado]
-
-Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.1.0, e a auditoria de 2026-10-08 não o rodou.
-
-:::
-
 O popup guarda até 3 [pessoas favoritas](./favoritos.md), cada uma com um apelido, além da pessoa ativa (a que o atalho, o botão "Preencher esta página" e o menu usam):
 
 - a estrela ao lado do nome guarda a pessoa ativa nos favoritos ou a tira de lá;
@@ -51,12 +45,6 @@ O popup guarda até 3 [pessoas favoritas](./favoritos.md), cada uma com um apeli
 "Nova pessoa" troca só a ativa e nunca apaga um favorito.
 
 ## O cartão {#cartao}
-
-:::note[Documentado]
-
-A escolha do cartão chega na versão 1.2.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.2.0, e a auditoria de 2026-10-08 não o rodou.
-
-:::
 
 No 1b, o grupo "Cartão" mostra, além do número, da validade e do CVV, o cenário do cartão da pessoa ativa: o rótulo (por exemplo `recusado`), com a cor e o ícone do tipo (aprovação, recusa ou espera), o provedor (Stripe ou Pagar.me) e uma frase com o que o provedor faz com aquele número. Uma pessoa guardada antes da 1.2.0 aparece como Stripe `aprovado`, o único cartão de antes.
 

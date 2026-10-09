@@ -25,12 +25,6 @@ A extensão não tem opção de semente, UF nem domínio de e-mail. Ela sorteia 
 
 ## Favoritos {#favoritos}
 
-:::note[Documentado]
-
-Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.1.0, e a auditoria de 2026-10-08 não o rodou.
-
-:::
-
 - No máximo 3 [pessoas favoritas](./favoritos.md), além da pessoa ativa. Com 3 guardadas, a estrela fica desabilitada.
 - O apelido tem até 24 caracteres.
 - Os favoritos ficam só neste navegador: nada é sincronizado entre dispositivos.

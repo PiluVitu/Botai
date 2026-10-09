@@ -1,10 +1,10 @@
 ---
 title: Instalar a extensão
-description: Onde instalar o Botaí 1.0.0 no Chrome, no Edge e no Firefox, a versão mínima de cada navegador e o que ficou de fora.
+description: Onde instalar o Botaí no Chrome, no Edge e no Firefox, a versão mínima de cada navegador e o que ficou de fora.
 sidebar_position: 1
 ---
 
-A extensão Botaí 1.0.0 (Manifest V3) preenche formulários no navegador com uma pessoa fictícia e coerente: CPF e CNPJ válidos, CEP real com rua, bairro e cidade que batem, e celular com o DDD da cidade. É a porta de quem testa à mão e de quem desenvolve o próprio formulário.
+A extensão Botaí (Manifest V3) preenche formulários no navegador com uma pessoa fictícia e coerente: CPF e CNPJ válidos, CEP real com rua, bairro e cidade que batem, e celular com o DDD da cidade. É a porta de quem testa à mão e de quem desenvolve o próprio formulário.
 
 ## Onde instalar
 
@@ -15,7 +15,7 @@ A extensão Botaí 1.0.0 (Manifest V3) preenche formulários no navegador com um
 | Firefox   | 153.0          | [Firefox Add-ons](https://addons.mozilla.org/pt-BR/firefox/addon/bota%C3%AD/)                                    |
 | Opera     | 109            | em revisão na loja do Opera                                                                                      |
 
-As duas lojas no ar têm a versão 1.0.0. Na Firefox Add-ons, ela é pública desde 2026-10-03. O Edge não tem página própria: instale pela Chrome Web Store. O Opera ainda não tem o Botaí publicado.
+As duas lojas no ar têm a versão 1.2.0, pública desde 2026-10-09, com as [pessoas favoritas](./favoritos.md) e a [escolha do cartão](./popup.md#cartao). O Edge não tem página própria: instale pela Chrome Web Store. O Opera ainda não tem o Botaí publicado.
 
 Não há versão para o Safari nem para o Firefox para Android.
 

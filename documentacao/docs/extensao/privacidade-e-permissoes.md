@@ -30,19 +30,7 @@ O `activeTab` explica dois limites da extensão:
 
 Só a pessoa ativa, na chave `local:botai_pessoa` do `storage.local` do navegador. Ela fica ali até você pedir outra com "Nova pessoa", no popup ou no menu.
 
-:::note[Documentado]
-
-Os favoritos chegam na versão 1.1.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.1.0, e a auditoria de 2026-10-08 não o rodou.
-
-:::
-
 A partir da versão 1.1.0, a extensão guarda também até 3 [pessoas favoritas](./favoritos.md), com o apelido que você der a cada uma, na chave `local:botai_favoritos`. Um favorito fica ali até você o tirar com a estrela, no popup, ou remover a extensão; "Nova pessoa" não o apaga.
-
-:::note[Documentado]
-
-A escolha do cartão chega na versão 1.2.0 da extensão, que ainda não saiu nas lojas. O texto vem do código da 1.2.0, e a auditoria de 2026-10-08 não o rodou.
-
-:::
 
 A partir da versão 1.2.0, a extensão guarda também o [cartão das próximas pessoas](./popup.md#cartao) que você escolher no popup, na chave `local:botai_cartao`: só o provedor e o cenário, como `{ "provedor": "pagarme", "cenario": "recusado" }`. É uma opção da extensão, não um dado pessoal. Ela fica ali até você escolher outro cartão ou remover a extensão. Um valor que a versão instalada não reconhece volta ao padrão, o `aprovado` da Stripe.
 
