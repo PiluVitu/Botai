@@ -33,8 +33,8 @@ Sem servidor, a CLI imprime o mesmo envelope: `botai pessoa --semente cadastro -
 O `navegador.iife.js` vem no pacote `@pilutech/botai-core` do npm. Num projeto com `node_modules`, ele está em `node_modules/@pilutech/botai-core/dist/navegador.iife.js`. Num projeto sem `node_modules`, baixe o pacote uma vez com o npm e guarde o arquivo junto dos testes:
 
 ```bash
-npm pack @pilutech/botai-core@0.4.1
-tar -xzf pilutech-botai-core-0.4.1.tgz package/dist/navegador.iife.js
+npm pack @pilutech/botai-core@0.5.0
+tar -xzf pilutech-botai-core-0.5.0.tgz package/dist/navegador.iife.js
 mv package/dist/navegador.iife.js navegador.iife.js
 ```
 

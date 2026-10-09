@@ -11,11 +11,11 @@ Em Python, o caminho provado é o HTTP: suba o servidor do Botaí e leia o envel
 Escolha uma das portas:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 serve
+npx -y @pilutech/botai-core@0.5.0 serve
 ```
 
 ```bash
-docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.5.0
 ```
 
 Ou o binário, com `botai serve`. As opções estão em [Subir o servidor](../servidor/botai-serve.md).
@@ -98,14 +98,14 @@ Esta receita vem do README do core, e ninguém a rodou. O que foi provado: o `np
 import json, subprocess
 
 saida = subprocess.run(
-    ["npx", "--yes", "@pilutech/botai-core@0.4.1", "pessoas", "-n", "10",
+    ["npx", "--yes", "@pilutech/botai-core@0.5.0", "pessoas", "-n", "10",
      "--semente", "testes", "--hoje", "2026-10-05", "--formato", "ndjson"],
     capture_output=True, text=True, check=True,
 ).stdout
 pessoas = [json.loads(linha)["pessoa"] for linha in saida.splitlines()]
 ```
 
-Com o binário instalado, troque `"npx", "--yes", "@pilutech/botai-core@0.4.1"` por `"botai"`. Os códigos de saída da CLI estão em [Códigos de saída](../cli/codigos-de-saida.md).
+Com o binário instalado, troque `"npx", "--yes", "@pilutech/botai-core@0.5.0"` por `"botai"`. Os códigos de saída da CLI estão em [Códigos de saída](../cli/codigos-de-saida.md).
 
 ## Selenium em Python {#selenium}
 

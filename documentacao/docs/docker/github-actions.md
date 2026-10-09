@@ -15,7 +15,7 @@ O bloco `services:` vem do README do core, e o CI do próprio projeto usa a imag
 ```yaml
 services:
   botai:
-    image: ghcr.io/piluvitu/botai:0.4.1
+    image: ghcr.io/piluvitu/botai:0.5.0
     ports: ['8790:8790']
 ```
 
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       botai:
-        image: ghcr.io/piluvitu/botai:0.4.1
+        image: ghcr.io/piluvitu/botai:0.5.0
         ports: ['8790:8790']
     steps:
       - name: Botaí no ar
@@ -36,7 +36,7 @@ jobs:
         run: curl -fsS 'http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-10-05' > pessoa.json
 ```
 
-Fixe a versão da imagem: `ghcr.io/piluvitu/botai:0.4.1`. Não existe tag de minor (veja [Tags](./imagem.md#tags)). As rotas estão em [API HTTP](../servidor/api-http.md).
+Fixe a versão da imagem: `ghcr.io/piluvitu/botai:0.5.0`. Não existe tag de minor (veja [Tags](./imagem.md#tags)). As rotas estão em [API HTTP](../servidor/api-http.md).
 
 ## Sem service {#sem-service}
 
@@ -46,7 +46,7 @@ O Botaí entra no job por outras duas portas:
 
   ```yaml
   - name: Pessoas para o banco
-    run: npx -y @pilutech/botai-core@0.4.1 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql > pessoas.sql
+    run: npx -y @pilutech/botai-core@0.5.0 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql > pessoas.sql
   ```
 
 - **O binário**, num runner sem Node: veja [install.sh](../binarios/install-sh.md) e [Download e verificação](../binarios/download-e-verificacao.md).

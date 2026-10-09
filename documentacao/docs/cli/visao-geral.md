@@ -1,7 +1,7 @@
 ---
 title: Visão geral da CLI
 sidebar_label: Visão geral
-description: O comando botai no terminal, com os 11 comandos, a ajuda real, as opções com =, a divisão entre stdout e stderr e o uso em pipes.
+description: O comando botai no terminal, com os 12 comandos, a ajuda real, as opções com =, a divisão entre stdout e stderr e o uso em pipes.
 sidebar_position: 1
 ---
 
@@ -13,14 +13,14 @@ Nos exemplos desta documentação, `botai` é o comando. Escolha como chegar nel
 
 | Onde               | Como                                                     | Página                                                |
 | ------------------ | -------------------------------------------------------- | ----------------------------------------------------- |
-| Onde houver Node   | `npx -y @pilutech/botai-core@0.4.1 <comando>`            | [Instalação](../comecar/instalacao.md)                |
+| Onde houver Node   | `npx -y @pilutech/botai-core@0.5.0 <comando>`            | [Instalação](../comecar/instalacao.md)                |
 | Sem Node (binário) | `botai <comando>`, depois do `install.sh`                | [Instalar pelo install.sh](../binarios/install-sh.md) |
-| Sem Node (imagem)  | `docker run --rm ghcr.io/piluvitu/botai:0.4.1 <comando>` | [A imagem Docker](../docker/imagem.md)                |
+| Sem Node (imagem)  | `docker run --rm ghcr.io/piluvitu/botai:0.5.0 <comando>` | [A imagem Docker](../docker/imagem.md)                |
 
 Com o `npx`, o comando fica assim:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 pessoa --semente 42 --hoje 2026-10-05
+npx -y @pilutech/botai-core@0.5.0 pessoa --semente 42 --hoje 2026-10-05
 ```
 
 O pacote publicado no npm gera exatamente a mesma saída. Nos exemplos, o mesmo comando se escreve assim:
@@ -44,16 +44,27 @@ botai: gera pessoas brasileiras de teste, coerentes e reproduzíveis.
 
 Uso:
   botai pessoa  [--semente S] [--hoje AAAA-MM-DD] [--uf UF] [--dominio-email D]
+                [--cartao stripe|pagarme] [--cenario C]
   botai pessoas -n N [--semente S] [--hoje AAAA-MM-DD] [--uf UF] [--dominio-email D]
+                [--cartao stripe|pagarme] [--cenarios C:N,C:N]
                 [--formato json|ndjson|csv|sql] [--dialeto postgres|mysql|sqlite]
                 [--tabela T] [--campos a,b,c]
   botai cpf|cnpj|rg|pis|titulo|celular|cep [--formatado] [--uf UF] [--semente S]
+  botai cartao [--cartao stripe|pagarme] [--cenario C] [--formatado] [--semente S]
   botai validar cpf|cnpj|rg|pis|titulo|cartao <valor>
   botai serve [--porta 8790] [--host 127.0.0.1]
   botai --versao
 
 A mesma semente e o mesmo --hoje geram a mesma pessoa em qualquer máquina.
 Sem --semente, sorteia uma; sem --hoje, usa a data de hoje em São Paulo.
+O cartão e o cenário mudam só o cartão: o resto da pessoa é o mesmo.
+
+Cartões de teste (padrão: stripe, aprovado):
+  stripe   aprovado, recusado, pendente, recusado-saldo, recusado-roubado,
+           recusado-perdido, recusado-expirado, recusado-cvc,
+           erro-processamento
+  pagarme  aprovado, recusado, pendente, pendente-recusado, pendente-cancelado,
+           chargeback
 
 Saída: dados no stdout, mensagens no stderr.
 Códigos de saída: 0 ok, 1 valor inválido (validar), 2 erro de uso, 3 erro interno.
@@ -69,15 +80,16 @@ botai pessoas --help
 
 Também funcionam `--version` (igual a `--versao`), `-h` e `ajuda` (iguais a `--help`), que não aparecem na ajuda.
 
-## Os 11 comandos
+## Os 12 comandos
 
-| Comando                                                | O que faz                                    | Página                                      |
-| ------------------------------------------------------ | -------------------------------------------- | ------------------------------------------- |
-| `pessoa`                                               | uma pessoa, num envelope JSON                | [Uma pessoa](./pessoa.md)                   |
-| `pessoas`                                              | um lote em json, ndjson, csv ou sql          | [Um lote de pessoas](./pessoas.md)          |
-| `cpf`, `cnpj`, `rg`, `pis`, `titulo`, `celular`, `cep` | um valor avulso                              | [Geradores avulsos](./geradores-avulsos.md) |
-| `validar`                                              | confere o dígito verificador de um documento | [Validar documentos](./validar.md)          |
-| `serve`                                                | o servidor HTTP local                        | [`botai serve`](../servidor/botai-serve.md) |
+| Comando                                                | O que faz                                            | Página                                        |
+| ------------------------------------------------------ | ---------------------------------------------------- | --------------------------------------------- |
+| `pessoa`                                               | uma pessoa, num envelope JSON                        | [Uma pessoa](./pessoa.md)                     |
+| `pessoas`                                              | um lote em json, ndjson, csv ou sql                  | [Um lote de pessoas](./pessoas.md)            |
+| `cpf`, `cnpj`, `rg`, `pis`, `titulo`, `celular`, `cep` | um valor avulso                                      | [Geradores avulsos](./geradores-avulsos.md)   |
+| `cartao`                                               | um número de cartão de teste, por provedor e cenário | [Cartões de teste](./cartoes.md#botai-cartao) |
+| `validar`                                              | confere o dígito verificador de um documento         | [Validar documentos](./validar.md)            |
+| `serve`                                                | o servidor HTTP local                                | [`botai serve`](../servidor/botai-serve.md)   |
 
 `botai --versao` imprime a versão do pacote:
 
@@ -86,7 +98,7 @@ botai --versao
 ```
 
 ```text
-0.4.1
+0.5.0
 ```
 
 ## Opções com `=`

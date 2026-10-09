@@ -21,7 +21,7 @@ O anexo é o envelope, com `formato`, `motor`, `semente`, `hoje` e `pessoa`. No 
 Suponha que o relatório mostra a semente `chromium › cadastro.spec.ts › cadastro` e o hoje `2026-10-08`. Sem instalar nada, onde houver Node:
 
 ```bash
-npx -y @pilutech/botai-core@0.4.1 pessoa --semente "chromium › cadastro.spec.ts › cadastro" --hoje 2026-10-08
+npx -y @pilutech/botai-core@0.5.0 pessoa --semente "chromium › cadastro.spec.ts › cadastro" --hoje 2026-10-08
 ```
 
 Com a CLI `botai` instalada:
@@ -33,8 +33,8 @@ botai pessoa --semente "chromium › cadastro.spec.ts › cadastro" --hoje 2026-
 <!-- prettier-ignore -->
 ```json
 {
-  "formato": 1,
-  "motor": "0.4.1",
+  "formato": 2,
+  "motor": "0.5.0",
   "semente": "chromium › cadastro.spec.ts › cadastro",
   "hoje": "2026-10-08",
   "pessoa": {
@@ -97,7 +97,9 @@ botai pessoa --semente "chromium › cadastro.spec.ts › cadastro" --hoje 2026-
       "validade": "08/30",
       "mes": "08",
       "ano": "30",
-      "cvv": "378"
+      "cvv": "378",
+      "provedor": "stripe",
+      "cenario": "aprovado"
     }
   }
 }
@@ -111,7 +113,7 @@ curl -fsS -G 'http://127.0.0.1:8790/pessoa' \
   --data-urlencode 'hoje=2026-10-08'
 ```
 
-O fixture 0.1.0 usa o core 0.4.0, e o anexo diz `motor` 0.4.0. A pessoa é a mesma que o core 0.4.1 gera.
+O fixture 0.2.0 usa o core 0.5.0, e o anexo diz `motor` 0.5.0. Se o teste usou o `botaiCartao`, o anexo traz o `provedor` e o `cenario` no cartão: passe-os à CLI com `--cartao` e `--cenario`.
 
 ## Recriar a pessoa dentro do teste
 

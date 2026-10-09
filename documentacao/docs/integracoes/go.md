@@ -82,7 +82,7 @@ A chamada ao `npx` vem do README do core. Ninguém a rodou em Go.
 :::
 
 ```go
-saida, err := exec.Command("npx", "--yes", "@pilutech/botai-core@0.4.1", "pessoa",
+saida, err := exec.Command("npx", "--yes", "@pilutech/botai-core@0.5.0", "pessoa",
 	"--semente", "cadastro-1", "--hoje", "2026-10-05").Output()
 if err != nil {
 	log.Fatal(err)
@@ -93,4 +93,4 @@ if err := json.Unmarshal(saida, &env); err != nil {
 }
 ```
 
-Fixe a versão no `npx`. Com o [binário](../binarios/install-sh.md) instalado, troque `"npx", "--yes", "@pilutech/botai-core@0.4.1"` por `"botai"`. A CLI sai com 2 em erro de uso, sempre com o stdout vazio (veja [Códigos de saída](../cli/codigos-de-saida.md)).
+Fixe a versão no `npx`. Com o [binário](../binarios/install-sh.md) instalado, troque `"npx", "--yes", "@pilutech/botai-core@0.5.0"` por `"botai"`. A CLI sai com 2 em erro de uso, sempre com o stdout vazio (veja [Códigos de saída](../cli/codigos-de-saida.md)).

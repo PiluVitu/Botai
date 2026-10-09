@@ -1,11 +1,12 @@
 ---
 title: Uma pessoa
-description: O botai pessoa gera uma pessoa num envelope JSON, reproduzível pela semente e pelo hoje, com UF e domínio de e-mail opcionais.
+description: O botai pessoa gera uma pessoa num envelope JSON, reproduzível pela semente e pelo hoje, com UF, domínio de e-mail e cartão de teste opcionais.
 sidebar_position: 2
 ---
 
 ```text
 botai pessoa [--semente S] [--hoje AAAA-MM-DD] [--uf UF] [--dominio-email D]
+             [--cartao stripe|pagarme] [--cenario C]
 ```
 
 | Opção               | O que faz                                                               |
@@ -14,8 +15,10 @@ botai pessoa [--semente S] [--hoje AAAA-MM-DD] [--uf UF] [--dominio-email D]
 | `--hoje AAAA-MM-DD` | data de referência da idade e da validade do cartão                     |
 | `--uf UF`           | sigla da UF do endereço; o CPF, o título e o DDD seguem a UF            |
 | `--dominio-email D` | domínio do e-mail (o padrão é `tuamaeaquelaursa.com`, de caixa pública) |
+| `--cartao P`        | provedor do cartão de teste: `stripe` (o padrão) ou `pagarme`           |
+| `--cenario C`       | cenário do cartão (o padrão é `aprovado`); muda só o cartão             |
 
-As quatro são opcionais. Sem `--semente`, a CLI sorteia uma e a devolve no envelope. Sem `--hoje`, vale a data de hoje em São Paulo.
+Todas são opcionais. Sem `--semente`, a CLI sorteia uma e a devolve no envelope. Sem `--hoje`, vale a data de hoje em São Paulo.
 
 ## O envelope
 
@@ -26,8 +29,8 @@ botai pessoa --semente 42 --hoje 2026-10-05
 <!-- prettier-ignore -->
 ```json
 {
-  "formato": 1,
-  "motor": "0.4.1",
+  "formato": 2,
+  "motor": "0.5.0",
   "semente": "42",
   "hoje": "2026-10-05",
   "pessoa": {
@@ -90,13 +93,15 @@ botai pessoa --semente 42 --hoje 2026-10-05
       "validade": "11/28",
       "mes": "11",
       "ano": "28",
-      "cvv": "388"
+      "cvv": "388",
+      "provedor": "stripe",
+      "cenario": "aprovado"
     }
   }
 }
 ```
 
-- `formato` é a versão da forma do envelope: 1 nesta versão. `motor` é a versão do pacote que gerou a pessoa.
+- `formato` é a versão da forma do envelope: 2 nesta versão (desde a 0.5.0, quando o cartão ganhou `provedor` e `cenario`). `motor` é a versão do pacote que gerou a pessoa.
 - `semente` sai sempre como texto, mesmo quando é um número.
 - `hoje` é a data usada. Com a `semente` e a mesma versão do pacote, ela gera a mesma pessoa de novo.
 
@@ -151,6 +156,22 @@ botai pessoa --semente 42 --hoje 2026-10-05 --dominio-email Example.COM | grep -
 ```
 
 A caixa do domínio padrão é pública: qualquer pessoa lê o que chega nela. Veja [Uso responsável](../conceitos/uso-responsavel.md).
+
+## `--cartao` e `--cenario` {#cartao}
+
+O provedor e o cenário mudam só o cartão: o número, a bandeira, o `provedor` e o `cenario`. A validade, o CVV e o resto da pessoa são os da semente.
+
+```bash testar
+botai pessoa --semente 42 --hoje 2026-10-05 --cartao pagarme --cenario chargeback | grep -E '"(numero|provedor|cenario)": "([0-9]{16}|[a-z-]+)"'
+```
+
+```text
+      "numero": "4000000000000069",
+      "provedor": "pagarme",
+      "cenario": "chargeback"
+```
+
+Os cenários de cada provedor estão em [Cartões de teste](./cartoes.md).
 
 ## `--hoje`
 

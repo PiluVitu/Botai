@@ -6,11 +6,11 @@ sidebar_position: 2
 
 O servidor aceita só GET, em três rotas. Os exemplos usam o endereço padrão, `http://127.0.0.1:8790`; para subir o servidor, veja [Subir o servidor](./botai-serve.md).
 
-| Rota       | Parâmetros                                                                                         | Resposta                                       |
-| ---------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| `/pessoa`  | `semente`, `hoje`, `uf` e `dominioEmail`, todos opcionais                                          | o envelope de uma pessoa, em JSON              |
-| `/pessoas` | `n` (obrigatório, de 1 a 10 000), os quatro de `/pessoa`, `formato`, `dialeto`, `tabela`, `campos` | o lote, no formato pedido                      |
-| `/saude`   | nenhum                                                                                             | `{"ok": true, "formato": 1, "motor": "0.4.1"}` |
+| Rota       | Parâmetros                                                                                                                               | Resposta                                       |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `/pessoa`  | `semente`, `hoje`, `uf`, `dominioEmail`, `cartao` e `cenario`, todos opcionais                                                           | o envelope de uma pessoa, em JSON              |
+| `/pessoas` | `n` (de 1 a 10 000; obrigatório sem `cenarios`), os de `/pessoa` menos o `cenario`, `cenarios`, `formato`, `dialeto`, `tabela`, `campos` | o lote, no formato pedido                      |
+| `/saude`   | nenhum                                                                                                                                   | `{"ok": true, "formato": 2, "motor": "0.5.0"}` |
 
 Os parâmetros têm o nome das opções da CLI em camelCase: `--dominio-email` vira `dominioEmail`. Um nome que a rota não conhece dá 400, com a lista dos aceitos (veja [Erros](#erros)).
 
@@ -22,6 +22,8 @@ Os parâmetros têm o nome das opções da CLI em camelCase: `--dominio-email` v
 | `hoje`         | uma data `AAAA-MM-DD`                                                                          | usa a data de hoje em São Paulo                                |
 | `uf`           | uma das 27 siglas, em qualquer caixa                                                           | a pessoa sai de qualquer UF                                    |
 | `dominioEmail` | um domínio, como `example.com`                                                                 | `tuamaeaquelaursa.com`, uma caixa de entrada pública           |
+| `cartao`       | o provedor do cartão de teste: `stripe` ou `pagarme`                                           | `stripe`                                                       |
+| `cenario`      | um cenário do provedor, como `recusado` ([Cartões de teste](../conceitos/cartoes-de-teste.md)) | `aprovado`                                                     |
 
 ```bash testar
 curl -fsS 'http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-10-05'
@@ -30,8 +32,8 @@ curl -fsS 'http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-10-05'
 <!-- prettier-ignore -->
 ```json
 {
-  "formato": 1,
-  "motor": "0.4.1",
+  "formato": 2,
+  "motor": "0.5.0",
   "semente": "42",
   "hoje": "2026-10-05",
   "pessoa": {
@@ -94,7 +96,9 @@ curl -fsS 'http://127.0.0.1:8790/pessoa?semente=42&hoje=2026-10-05'
       "validade": "11/28",
       "mes": "11",
       "ano": "28",
-      "cvv": "388"
+      "cvv": "388",
+      "provedor": "stripe",
+      "cenario": "aprovado"
     }
   }
 }
@@ -127,14 +131,15 @@ O que cada opção muda na pessoa está em [A pessoa](../conceitos/a-pessoa.md).
 
 ## /pessoas {#pessoas}
 
-| Parâmetro                               | Valor                                                                    |
-| --------------------------------------- | ------------------------------------------------------------------------ |
-| `n`                                     | obrigatório: um inteiro de 1 a 10 000                                    |
-| `semente`, `hoje`, `uf`, `dominioEmail` | como em `/pessoa`                                                        |
-| `formato`                               | `json` (o padrão), `ndjson`, `csv` ou `sql`                              |
-| `dialeto`                               | `postgres`, `mysql` ou `sqlite`, em minúsculas; só com `formato=sql`     |
-| `tabela`                                | `tabela` ou `esquema.tabela`; só com `formato=sql`                       |
-| `campos`                                | as colunas, separadas por vírgula; só com `formato=csv` ou `formato=sql` |
+| Parâmetro                                         | Valor                                                                                                         |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `n`                                               | um inteiro de 1 a 10 000; obrigatório sem `cenarios` (com eles, se vier, tem de ser a soma)                   |
+| `semente`, `hoje`, `uf`, `dominioEmail`, `cartao` | como em `/pessoa`                                                                                             |
+| `cenarios`                                        | quantas pessoas em cada cenário, como `recusado:10,aprovado:2`: em grupos, nesta ordem; a soma vai até 10 000 |
+| `formato`                                         | `json` (o padrão), `ndjson`, `csv` ou `sql`                                                                   |
+| `dialeto`                                         | `postgres`, `mysql` ou `sqlite`, em minúsculas; só com `formato=sql`                                          |
+| `tabela`                                          | `tabela` ou `esquema.tabela`; só com `formato=sql`                                                            |
+| `campos`                                          | as colunas, separadas por vírgula; só com `formato=csv` ou `formato=sql`                                      |
 
 A resposta é o mesmo texto de `botai pessoas` com as mesmas opções:
 
@@ -144,7 +149,7 @@ diff <(botai pessoas -n 3 --semente demo --hoje 2026-10-08 --formato csv --campo
   && echo iguais
 ```
 
-Os formatos, as 33 colunas e a proteção do `tabela` estão em [Um lote de pessoas](../cli/pessoas.md) e em [Colunas](../referencia/colunas.md). Dentro de um lote, e-mail, CPF e CNPJ não se repetem; a regra do lote está em [Lote e unicidade](../conceitos/lote-e-unicidade.md).
+Os formatos, as 35 colunas e a proteção do `tabela` estão em [Um lote de pessoas](../cli/pessoas.md) e em [Colunas](../referencia/colunas.md). Dentro de um lote, e-mail, CPF e CNPJ não se repetem; a regra do lote está em [Lote e unicidade](../conceitos/lote-e-unicidade.md).
 
 ### CSV
 
@@ -166,7 +171,7 @@ curl -fsS 'http://127.0.0.1:8790/pessoas?n=2&semente=demo&hoje=2026-10-08&format
 ```
 
 ```sql
--- botai: formato 1, motor 0.4.1, semente demo, hoje 2026-10-08
+-- botai: formato 2, motor 0.5.0, semente demo, hoje 2026-10-08
 INSERT INTO "app"."clientes" ("nome", "cpf", "email") VALUES ('Isabela Freitas Santos', '550.160.642-96', 'isabela-santos-7825@tuamaeaquelaursa.com');
 INSERT INTO "app"."clientes" ("nome", "cpf", "email") VALUES ('Vitória Alves Carvalho', '843.495.439-70', 'vitoria-carvalho-1721@tuamaeaquelaursa.com');
 ```
@@ -190,7 +195,42 @@ curl -fsS 'http://127.0.0.1:8790/pessoas?n=3&semente=demo&hoje=2026-10-08&format
 
 ### JSON
 
-Sem `formato`, a resposta é um envelope só, com a lista em `pessoas`: `{"formato": 1, "motor": "0.4.1", "semente": "demo", "hoje": "2026-10-08", "pessoas": [...]}`.
+Sem `formato`, a resposta é um envelope só, com a lista em `pessoas`: `{"formato": 2, "motor": "0.5.0", "semente": "demo", "hoje": "2026-10-08", "pessoas": [...]}`.
+
+## Cartões {#cartoes}
+
+O `cartao` e o `cenario` (no `/pessoas`, o `cenarios`) valem como o `--cartao`, o `--cenario` e o `--cenarios` da CLI ([Cartões de teste](../cli/cartoes.md)). Com `cenarios`, o `n` pode faltar: vale a soma.
+
+```bash testar
+curl -fsS 'http://127.0.0.1:8790/pessoas?cartao=pagarme&cenarios=recusado:2,aprovado:1&semente=demo&hoje=2026-10-08&formato=csv&campos=nome,cartao_numero,cartao_provedor,cartao_cenario'
+```
+
+```csv
+nome,cartao_numero,cartao_provedor,cartao_cenario
+Isabela Freitas Santos,4000000000000028,pagarme,recusado
+Vitória Alves Carvalho,4000000000000028,pagarme,recusado
+Lucas Gabriel Pereira Oliveira,4000000000000010,pagarme,aprovado
+```
+
+É o mesmo texto da CLI:
+
+```bash testar
+diff <(botai pessoas --cartao pagarme --cenarios recusado:2,aprovado:1 --semente demo --hoje 2026-10-08 --formato ndjson) \
+  <(curl -fsS 'http://127.0.0.1:8790/pessoas?cartao=pagarme&cenarios=recusado:2,aprovado:1&semente=demo&hoje=2026-10-08&formato=ndjson') \
+  && echo iguais
+```
+
+Um `n` diferente da soma, um cenário que o provedor não tem ou uma soma acima de 10 000 dão 400:
+
+```bash testar
+curl -sS 'http://127.0.0.1:8790/pessoas?n=5&cenarios=recusado:10'
+```
+
+```json
+{
+  "erro": "n: n (5) diferente da soma dos cenários (10)"
+}
+```
 
 ## /saude {#saude}
 
@@ -201,8 +241,8 @@ curl -fsS http://127.0.0.1:8790/saude
 ```json
 {
   "ok": true,
-  "formato": 1,
-  "motor": "0.4.1"
+  "formato": 2,
+  "motor": "0.5.0"
 }
 ```
 
@@ -249,7 +289,7 @@ curl -sS 'http://127.0.0.1:8790/pessoa?dominio-email=example.com'
 
 ```json
 {
-  "erro": "parâmetro desconhecido: dominio-email (aceitos: semente, hoje, uf, dominioEmail)"
+  "erro": "parâmetro desconhecido: dominio-email (aceitos: semente, hoje, uf, dominioEmail, cartao, cenario)"
 }
 ```
 

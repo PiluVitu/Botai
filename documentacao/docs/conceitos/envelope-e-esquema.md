@@ -10,8 +10,8 @@ O envelope é o JSON que leva a pessoa (ou o lote) junto com o que a reproduz: a
 
 | Campo     | O que é                                                                                      |
 | --------- | -------------------------------------------------------------------------------------------- |
-| `formato` | a forma do envelope. Hoje é sempre `1`; muda quando a forma muda                             |
-| `motor`   | a versão do pacote que gerou os dados, como `0.4.1`                                          |
+| `formato` | a forma do envelope: `2` desde a 0.5.0 (`1` até a 0.4.1); muda quando a forma muda           |
+| `motor`   | a versão do pacote que gerou os dados, como `0.5.0`                                          |
 | `semente` | a semente usada, sempre como texto (`42` sai `"42"`); se você não passou, a que foi sorteada |
 | `hoje`    | o dia usado, em `AAAA-MM-DD`; se você não passou, a data de hoje em São Paulo                |
 | `pessoa`  | a pessoa, no envelope de uma pessoa ([A pessoa](./a-pessoa.md))                              |
@@ -25,8 +25,8 @@ botai pessoas -n 2 --semente demo --hoje 2026-10-08 | head -n 6
 
 ```text
 {
-  "formato": 1,
-  "motor": "0.4.1",
+  "formato": 2,
+  "motor": "0.5.0",
   "semente": "demo",
   "hoje": "2026-10-08",
   "pessoas": [
@@ -50,7 +50,7 @@ botai pessoas -n 2 --semente demo --hoje 2026-10-08 --formato sql | head -n 1
 ```
 
 ```sql
--- botai: formato 1, motor 0.4.1, semente demo, hoje 2026-10-08
+-- botai: formato 2, motor 0.5.0, semente demo, hoje 2026-10-08
 ```
 
 O `/saude` do servidor responde com o `formato` e o `motor`, sem pessoa:
@@ -62,8 +62,8 @@ curl -fsS 'http://127.0.0.1:8790/saude'
 ```json
 {
   "ok": true,
-  "formato": 1,
-  "motor": "0.4.1"
+  "formato": 2,
+  "motor": "0.5.0"
 }
 ```
 
@@ -72,11 +72,12 @@ curl -fsS 'http://127.0.0.1:8790/saude'
 O pacote leva o contrato do envelope em JSON Schema 2020-12:
 
 ```text
-@pilutech/botai-core/esquema/envelope-v1.schema.json
+@pilutech/botai-core/esquema/envelope-v2.schema.json
 ```
 
 - Aceita os dois envelopes (`oneOf`): o de uma pessoa e o do lote.
-- `formato` é a constante `1`.
+- `formato` é a constante `2`.
+- O cartão exige `provedor` (`stripe` ou `pagarme`) e `cenario`, e o cenário tem de ser um dos do provedor.
 - Todo objeto tem `additionalProperties: false`: um campo a mais reprova.
 - `semente` é texto de 1 a 256 caracteres, e `hoje` segue `AAAA-MM-DD`.
 - Não tem `$id`.
@@ -86,7 +87,7 @@ Serve de contrato entre linguagens: quem lê o JSON da CLI ou do servidor confer
 ```js title="validar.mjs"
 import { readFileSync } from 'node:fs'
 import Ajv2020 from 'ajv/dist/2020.js'
-import esquema from '@pilutech/botai-core/esquema/envelope-v1.schema.json' with { type: 'json' }
+import esquema from '@pilutech/botai-core/esquema/envelope-v2.schema.json' with { type: 'json' }
 
 const validar = new Ajv2020().compile(esquema)
 
@@ -98,3 +99,17 @@ for (const linha of readFileSync('lote.ndjson', 'utf8').trim().split('\n'))
 ```
 
 Com `pessoa.json` de `botai pessoa --semente 42 --hoje 2026-10-05` e `lote.ndjson` de `botai pessoas -n 3 --semente demo --hoje 2026-10-08 --formato ndjson`, o script imprime `true` e nada mais. Use a classe `Ajv2020`: a `Ajv` padrão não conhece o 2020-12 e falha ao compilar, com `no schema with key or ref "https://json-schema.org/draft/2020-12/schema"`.
+
+## O formato 2 {#formato-2}
+
+Até a 0.4.1, o envelope era o formato 1. Na 0.5.0, o cartão ganhou `provedor` e `cenario` ([Cartões de teste](./cartoes-de-teste.md)). Como o esquema 1 tem `additionalProperties: false`, um envelope com esses campos reprovaria nele. Por isso o `formato` foi a `2`, com um esquema novo:
+
+| Formato | Motor           | Esquema                                                | O cartão                                |
+| ------- | --------------- | ------------------------------------------------------ | --------------------------------------- |
+| 1       | 0.2.0 a 0.4.1   | `@pilutech/botai-core/esquema/envelope-v1.schema.json` | sem `provedor` e `cenario`              |
+| 2       | 0.5.0 em diante | `@pilutech/botai-core/esquema/envelope-v2.schema.json` | com `provedor` e `cenario` obrigatórios |
+
+- O pacote leva os dois esquemas. O v1 não mudou: serve para validar envelopes guardados de antes da 0.5.0, e recusa os de formato 2.
+- Fora o cartão, a pessoa de uma semente é a mesma nos dois formatos, campo a campo. Quem lê só os outros campos não precisa mudar nada.
+- Quem valida com o esquema escolhe pelo campo `formato` do envelope: `1` usa o v1, `2` usa o v2.
+- A 1ª linha do SQL e o `/saude` também dizem `formato 2`.

@@ -4,10 +4,10 @@ description: O servidor e a CLI do Botaí pela imagem ghcr.io/piluvitu/botai, se
 sidebar_position: 1
 ---
 
-A imagem `ghcr.io/piluvitu/botai` traz o servidor HTTP e a CLI inteira. Você não precisa de Node na máquina. Fixe a versão exata: `ghcr.io/piluvitu/botai:0.4.1`.
+A imagem `ghcr.io/piluvitu/botai` traz o servidor HTTP e a CLI inteira. Você não precisa de Node na máquina. Fixe a versão exata: `ghcr.io/piluvitu/botai:0.5.0`.
 
 ```bash
-docker pull ghcr.io/piluvitu/botai:0.4.1
+docker pull ghcr.io/piluvitu/botai:0.5.0
 ```
 
 A imagem é publicada para linux/amd64 e linux/arm64.
@@ -23,7 +23,7 @@ A auditoria de 2026-10-08 rodou só a arm64. A amd64 passa pela fumaça do CI do
 Sem argumentos, a imagem sobe o `botai serve` na porta 8790:
 
 ```bash
-docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.4.1
+docker run --rm -p 8790:8790 ghcr.io/piluvitu/botai:0.5.0
 ```
 
 O contêiner fica `healthy` em 1 a 2 s (medido em 2026-10-08, macOS arm64). Confira de fora:
@@ -35,8 +35,8 @@ curl -fsS http://127.0.0.1:8790/saude
 ```json
 {
   "ok": true,
-  "formato": 1,
-  "motor": "0.4.1"
+  "formato": 2,
+  "motor": "0.5.0"
 }
 ```
 
@@ -47,7 +47,7 @@ As rotas e os parâmetros estão em [API HTTP](../servidor/api-http.md).
 O HEALTHCHECK olha a porta 8790 de dentro do contêiner. Mude a porta de fora com o `-p`, não com `--porta`:
 
 ```bash
-docker run --rm -p 9000:8790 ghcr.io/piluvitu/botai:0.4.1
+docker run --rm -p 9000:8790 ghcr.io/piluvitu/botai:0.5.0
 ```
 
 O servidor passa a responder em `http://127.0.0.1:9000`.
@@ -57,9 +57,9 @@ O servidor passa a responder em `http://127.0.0.1:9000`.
 O `ENTRYPOINT` da imagem é o `botai`. O que vem depois do nome da imagem são os argumentos da CLI:
 
 ```bash
-docker run --rm ghcr.io/piluvitu/botai:0.4.1 pessoa --semente 42 --hoje 2026-10-05
-docker run --rm ghcr.io/piluvitu/botai:0.4.1 pessoas -n 3 --semente demo --hoje 2026-10-08 --formato csv --campos nome,cpf
-docker run --rm ghcr.io/piluvitu/botai:0.4.1 validar cpf 634.132.403-07
+docker run --rm ghcr.io/piluvitu/botai:0.5.0 pessoa --semente 42 --hoje 2026-10-05
+docker run --rm ghcr.io/piluvitu/botai:0.5.0 pessoas -n 3 --semente demo --hoje 2026-10-08 --formato csv --campos nome,cpf
+docker run --rm ghcr.io/piluvitu/botai:0.5.0 validar cpf 634.132.403-07
 ```
 
 A saída é a mesma da CLI instalada. O lote em CSV, por exemplo:
@@ -107,7 +107,7 @@ O `docker stop` encerra o servidor em menos de 0,4 s, com código 0 (medido em 2
 
 ## Tags {#tags}
 
-As tags publicadas são `0.3.0`, `0.4.0`, `0.4.1` e `latest`, que tem o mesmo digest da `0.4.1`. Não existe tag de minor, como `:0.4`.
+Cada versão do core publicada na imagem tem a sua tag exata (`0.3.0`, `0.4.0`, `0.4.1`, `0.5.0`), e a `latest` tem o mesmo digest da mais nova. Não existe tag de minor, como `:0.5`.
 
 Fixe a versão exata. Mudar a pessoa que uma semente gera é versão major; na série 0.x, é a minor. Veja [Versões e dourados](../conceitos/versoes-e-dourados.md).
 

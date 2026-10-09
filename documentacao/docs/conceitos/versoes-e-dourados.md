@@ -10,26 +10,26 @@ A mesma semente e o mesmo hoje só geram a mesma pessoa na mesma versão do moto
 
 Mudar a pessoa de uma semente é **versão major**. Na série 0.x, é a **minor**. Uma versão de correção (patch) nunca muda a pessoa.
 
-Na prática, hoje: da 0.4.1 para outra 0.4.x, as pessoas ficam; numa 0.5.0, podem mudar.
+Na prática, hoje: da 0.5.0 para outra 0.5.x, as pessoas ficam; numa 0.6.0, podem mudar.
 
 :::note[Documentado]
 
-A política vem do README do `@pilutech/botai-core`. A prova indireta rodou: os dourados gravados pelo motor 0.2.0 continuam batendo com a 0.4.1, então a 0.3.0, a 0.4.0 e a 0.4.1 não mudaram nenhuma pessoa.
+A política vem do README do `@pilutech/botai-core`. A prova indireta rodou: os dourados gravados pelo motor 0.2.0 continuam batendo com a 0.4.1, então a 0.3.0, a 0.4.0 e a 0.4.1 não mudaram nenhuma pessoa. A 0.5.0 regravou os dourados: o envelope passou ao formato 2 e o cartão ganhou `provedor` e `cenario`; fora isso, nenhum campo das 1011 pessoas dos dourados mudou.
 
 :::
 
 ## Fixe a versão exata {#fixe-a-versao}
 
-| Porta    | Como fixar                                                                                                 |
-| -------- | ---------------------------------------------------------------------------------------------------------- |
-| npx      | `npx -y @pilutech/botai-core@0.4.1 …`                                                                      |
-| npm      | `npm install --save-dev --save-exact @pilutech/botai-core@0.4.1`                                           |
-| imagem   | `ghcr.io/piluvitu/botai:0.4.1`. Não existe tag de minor (`:0.4`), e a `latest` só aponta para a 0.4.1 hoje |
-| binário  | `BOTAI_VERSAO=0.4.1` no `install.sh`, ou o release `core-v0.4.1`                                           |
-| fixture  | `npm install --save-dev --save-exact @pilutech/botai-playwright@0.1.0`                                     |
-| extensão | não se aplica: a extensão sorteia cada pessoa                                                              |
+| Porta    | Como fixar                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------------- |
+| npx      | `npx -y @pilutech/botai-core@0.5.0 …`                                                                         |
+| npm      | `npm install --save-dev --save-exact @pilutech/botai-core@0.5.0`                                              |
+| imagem   | `ghcr.io/piluvitu/botai:0.5.0`. Não existe tag de minor (`:0.5`), e a `latest` aponta para a versão mais nova |
+| binário  | `BOTAI_VERSAO=0.5.0` no `install.sh`, ou o release `core-v0.5.0`                                              |
+| fixture  | `npm install --save-dev --save-exact @pilutech/botai-playwright@0.2.0`                                        |
+| extensão | não se aplica: a extensão sorteia cada pessoa                                                                 |
 
-O fixture do Playwright 0.1.0 depende do core 0.4.0 exato. A pessoa é a mesma da 0.4.1; só o anexo `botai-pessoa.json` diz `motor 0.4.0`.
+O fixture do Playwright 0.2.0 depende do core 0.5.0 exato; o 0.1.0 dependia do core 0.4.0.
 
 ## O campo motor {#motor}
 
@@ -40,7 +40,7 @@ botai --versao
 ```
 
 ```text
-0.4.1
+0.5.0
 ```
 
 ## Os dourados {#dourados}
@@ -62,7 +62,7 @@ Os dourados são 12 arquivos guardados em `packages/core/dourado/v1`, no [reposi
 | `pessoas-lote.sqlite.sql`     | o mesmo lote em SQL do SQLite                        |
 | `pessoas-1000.json`           | um lote de 1000 (semente `mil-3`), com 1,1 MB        |
 
-Os dourados foram gravados pelo motor 0.2.0, e a pasta tem um commit só. Onde foram conferidos na 0.4.1:
+Os dourados foram gravados pelo motor 0.2.0 e regravados pelo 0.5.0, com o formato 2 e o cartão com `provedor` e `cenario` (os outros campos ficaram iguais, byte a byte). Onde foram conferidos na 0.4.1:
 
 | Onde                                                                     | Resultado                                     |
 | ------------------------------------------------------------------------ | --------------------------------------------- |

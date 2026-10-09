@@ -81,7 +81,7 @@ Use a **CLI**, o **servidor**, a **imagem** e a **biblioteca**.
 - Os mesmos 1000 INSERTs saem em qualquer máquina, com e-mail, CPF e CNPJ únicos, compatíveis com colunas UNIQUE. O SQL traz só INSERTs: crie a tabela antes.
 
   ```bash
-  npx -y @pilutech/botai-core@0.4.1 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql | psql "$DATABASE_URL"
+  npx -y @pilutech/botai-core@0.5.0 pessoas -n 1000 --semente carga --hoje 2026-10-05 --formato sql | psql "$DATABASE_URL"
   ```
 
 - CSV para o `\copy` do Postgres, para planilha ou BI, com as colunas que você escolhe: `--campos nome,cpf,email`.

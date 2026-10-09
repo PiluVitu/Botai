@@ -1,14 +1,14 @@
 ---
 title: Visão plana, CSV e SQL
-description: O subpath /plano com pessoaPlana, as 33 COLUNAS, lerCampos, paraCsv e paraSql nos dialetos postgres, mysql e sqlite.
+description: O subpath /plano com pessoaPlana, as 35 COLUNAS, lerCampos, paraCsv e paraSql nos dialetos postgres, mysql e sqlite.
 sidebar_position: 5
 ---
 
-O subpath `/plano` achata a pessoa em 33 colunas e a escreve em CSV ou em SQL. É o mesmo código do `--formato csv` e do `--formato sql` da CLI e do servidor.
+O subpath `/plano` achata a pessoa em 35 colunas e a escreve em CSV ou em SQL. É o mesmo código do `--formato csv` e do `--formato sql` da CLI e do servidor.
 
 ## A visão plana
 
-`pessoaPlana(pessoa)` devolve um objeto com as 33 colunas de `COLUNAS`, nesta ordem. `idade` é número; `email_caixa_url` é `null` com domínio próprio; o resto é texto.
+`pessoaPlana(pessoa)` devolve um objeto com as 35 colunas de `COLUNAS`, nesta ordem. `idade` é número; `email_caixa_url` é `null` com domínio próprio; o resto é texto.
 
 ```js
 import { gerarPessoa } from '@pilutech/botai-core'
@@ -19,10 +19,10 @@ console.log(COLUNAS.length, plana.nome, plana.idade, plana.email_caixa_url)
 ```
 
 ```text
-33 Márcio Carvalho Rodrigues 56 https://tuamaeaquelaursa.com/marcio-rodrigues-0337
+35 Márcio Carvalho Rodrigues 56 https://tuamaeaquelaursa.com/marcio-rodrigues-0337
 ```
 
-As 33 colunas, com o campo da pessoa de onde cada uma vem, estão em [Colunas](../referencia/colunas.md).
+As 35 colunas, com o campo da pessoa de onde cada uma vem, estão em [Colunas](../referencia/colunas.md).
 
 ## Escolher as colunas: `lerCampos`
 
@@ -63,7 +63,7 @@ Para escrever aos poucos, sem montar o texto inteiro, use `cabecalhoCsv(colunas?
 | --------- | ------------------------------------------------------- | ------------ |
 | `dialeto` | `'postgres'`, `'mysql'` ou `'sqlite'`                   | `'postgres'` |
 | `tabela`  | `tabela` ou `esquema.tabela`, com letras, dígitos e `_` | `'pessoas'`  |
-| `colunas` | uma lista de `lerCampos`                                | as 33        |
+| `colunas` | uma lista de `lerCampos`                                | as 35        |
 
 ```js
 import { gerarPessoas } from '@pilutech/botai-core'
@@ -88,8 +88,8 @@ INSERT INTO `app`.`pessoas` (`nome`, `idade`, `cpf`, `email`) VALUES ('Júlia Ri
 
 - `idade` sai como número e `null` como `NULL`.
 - Postgres e SQLite saem iguais byte a byte; só o MySQL muda: crases nos nomes e a barra invertida escapada.
-- Só há `INSERT`, sem `CREATE TABLE`: crie a tabela antes. Um `CREATE TABLE` de Postgres com as 33 colunas está em [Receitas de banco](../cli/receitas-de-banco.md).
-- A CLI e o servidor escrevem, antes dos `INSERT`, uma linha `-- botai: formato 1, motor 0.4.1, semente …, hoje …`. O `paraSql` não escreve essa linha.
+- Só há `INSERT`, sem `CREATE TABLE`: crie a tabela antes. Um `CREATE TABLE` de Postgres com as 35 colunas está em [Receitas de banco](../cli/receitas-de-banco.md).
+- A CLI e o servidor escrevem, antes dos `INSERT`, uma linha `-- botai: formato 2, motor 0.5.0, semente …, hoje …`. O `paraSql` não escreve essa linha.
 
 Para um `INSERT` só, use `insertSql(pessoa, opcoes?)`, com as mesmas opções.
 

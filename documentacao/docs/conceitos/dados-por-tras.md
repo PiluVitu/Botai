@@ -8,20 +8,20 @@ A pessoa sai de listas pequenas e conferidas, todas dentro do pacote. Nada é bu
 
 ## As listas {#listas}
 
-| Dado                                        | Valor                                                                                                                                                          | Fonte                                                               |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Prenomes femininos, masculinos e sobrenomes | 20, 20 e 30                                                                                                                                                    | `packages/core/src/nome.ts`                                         |
-| Nomes completos possíveis                   | 34 800 (40 prenomes × 30 × 29 pares de sobrenomes distintos)                                                                                                   | calculado a partir de `src/nome.ts`                                 |
-| Usuários de e-mail possíveis                | 11 700 000 (39 primeiros nomes distintos × 30 sobrenomes × 10 000 sufixos)                                                                                     | `src/nome.ts`                                                       |
-| CEPs reais                                  | 34 CEPs, 29 cidades, 27 UFs e 29 DDDs. SP tem 6 (São Paulo, Campinas e Santos), RJ e MG têm 2, as outras 24 UFs têm 1 cada. Conferidos no ViaCEP em 2026-10-01 | `packages/core/src/endereco.ts` (`LOGRADOUROS`)                     |
-| Regiões fiscais do CPF (9º dígito)          | a tabela abaixo                                                                                                                                                | `packages/core/src/uf.ts` (`REGIAO_FISCAL_CPF`, folheto da Receita) |
-| Código da UF no título                      | SP 01 … TO 27; exterior ZZ 28                                                                                                                                  | `src/uf.ts` (Resolução TSE 23.659/2021)                             |
-| Domínio de e-mail padrão                    | `tuamaeaquelaursa.com`, com caixa pública em `https://tuamaeaquelaursa.com/<usuario>`                                                                          | `src/nome.ts`                                                       |
-| Cartões                                     | só Visa `4242424242424242` e Mastercard `5555555555554444`, os de teste da Stripe. Validade de hoje + 12 a hoje + 59 meses, CVV de 100 a 999                   | `src/cartao.ts`                                                     |
-| Empresa                                     | 7 ramos e 6 sufixos de nome fantasia                                                                                                                           | `src/empresa.ts`                                                    |
-| UFs aceitas                                 | as 27 siglas, em qualquer caixa (`ZZ` só no gerador de título)                                                                                                 | `UFS` e `lerUF`                                                     |
-| Tentativas por pessoa no lote               | 1000                                                                                                                                                           | `src/gerar.ts`                                                      |
-| Tamanho máximo da semente                   | 256 caracteres                                                                                                                                                 | `src/semente.ts`                                                    |
+| Dado                                        | Valor                                                                                                                                                                                                                                  | Fonte                                                               |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Prenomes femininos, masculinos e sobrenomes | 20, 20 e 30                                                                                                                                                                                                                            | `packages/core/src/nome.ts`                                         |
+| Nomes completos possíveis                   | 34 800 (40 prenomes × 30 × 29 pares de sobrenomes distintos)                                                                                                                                                                           | calculado a partir de `src/nome.ts`                                 |
+| Usuários de e-mail possíveis                | 11 700 000 (39 primeiros nomes distintos × 30 sobrenomes × 10 000 sufixos)                                                                                                                                                             | `src/nome.ts`                                                       |
+| CEPs reais                                  | 34 CEPs, 29 cidades, 27 UFs e 29 DDDs. SP tem 6 (São Paulo, Campinas e Santos), RJ e MG têm 2, as outras 24 UFs têm 1 cada. Conferidos no ViaCEP em 2026-10-01                                                                         | `packages/core/src/endereco.ts` (`LOGRADOUROS`)                     |
+| Regiões fiscais do CPF (9º dígito)          | a tabela abaixo                                                                                                                                                                                                                        | `packages/core/src/uf.ts` (`REGIAO_FISCAL_CPF`, folheto da Receita) |
+| Código da UF no título                      | SP 01 … TO 27; exterior ZZ 28                                                                                                                                                                                                          | `src/uf.ts` (Resolução TSE 23.659/2021)                             |
+| Domínio de e-mail padrão                    | `tuamaeaquelaursa.com`, com caixa pública em `https://tuamaeaquelaursa.com/<usuario>`                                                                                                                                                  | `src/nome.ts`                                                       |
+| Cartões                                     | só números de teste: os da Stripe (docs.stripe.com/testing) e os do simulador da Pagar.me, por cenário; o padrão é Visa `4242424242424242` ou Mastercard `5555555555554444`. Validade de hoje + 12 a hoje + 59 meses, CVV de 100 a 999 | `src/cartao.ts` (`CATALOGO_DE_CARTOES`)                             |
+| Empresa                                     | 7 ramos e 6 sufixos de nome fantasia                                                                                                                                                                                                   | `src/empresa.ts`                                                    |
+| UFs aceitas                                 | as 27 siglas, em qualquer caixa (`ZZ` só no gerador de título)                                                                                                                                                                         | `UFS` e `lerUF`                                                     |
+| Tentativas por pessoa no lote               | 1000                                                                                                                                                                                                                                   | `src/gerar.ts`                                                      |
+| Tamanho máximo da semente                   | 256 caracteres                                                                                                                                                                                                                         | `src/semente.ts`                                                    |
 
 Os caminhos são do repositório [PiluVitu/Botai](https://github.com/PiluVitu/Botai). As tabelas de UF também saem do subpath `@pilutech/botai-core/uf`, como `UFS`, `REGIAO_FISCAL_CPF` e `CODIGO_UF_TITULO`.
 
@@ -75,7 +75,7 @@ A distribuição por UF segue a lista: SP, com 6 CEPs, aparece em cerca de 18% d
 
 ## Os cartões {#cartoes}
 
-O cartão é sempre um dos dois de teste da Stripe, em proporção parecida:
+Sem escolher o provedor e o cenário, o cartão é um dos dois aprovados da Stripe, em proporção parecida:
 
 ```bash testar
 botai pessoas -n 10000 --semente cartoes --hoje 2026-10-05 --formato csv \
@@ -88,7 +88,7 @@ botai pessoas -n 10000 --semente cartoes --hoje 2026-10-05 --formato csv \
 5053 visa,4242424242424242
 ```
 
-O número passa no Luhn; a validade e o CVV mudam por pessoa. Não há Elo, Amex nem Hipercard.
+O número passa no Luhn; a validade e o CVV mudam por pessoa. Não há Elo, Amex nem Hipercard. Os outros cenários da Stripe e os da Pagar.me, com os números e as fontes, estão em [Cartões de teste](./cartoes-de-teste.md).
 
 ## O RG {#rg}
 
