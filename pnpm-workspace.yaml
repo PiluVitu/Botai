@@ -1,6 +1,7 @@
 packages:
   - 'extensao'
   - 'site'
+  - 'documentacao'
   - 'packages/*'
 
 # Só estes pacotes rodam script de instalação (o pnpm 11 bloqueia o resto).
@@ -11,6 +12,8 @@ allowBuilds:
   unrs-resolver: true
   # Negado: o script só compila com npm_config_build_from_source=true; o binário vem do pacote opcional da plataforma.
   '@parcel/watcher': false
+  # Negado: o postinstall do core-js (via @docusaurus/core, na documentacao/) só imprime o pedido de doação.
+  core-js: false
 
 # O eslint-config-next (site/) resolve o next por require: ele precisa estar na raiz do node_modules.
 publicHoistPattern:
@@ -32,6 +35,17 @@ trustPolicyExclude:
   - 'eslint-import-resolver-typescript@3.10.1'
   # semver 6.3.1 (2023-07-10, via @babel/core, eslint-plugin-react e outros): backport do fix de ReDoS sem a proveniência que a 7.5.x já tinha.
   - 'semver@6.3.1'
+  # @docsearch/{react,core,css} 4.7.1 (2026-10-05, via @docusaurus/theme-search-algolia do preset-classic da documentacao/,
+  # que aceita ^3.9.0 || ^4.3.2): a linha 4.x sempre saiu sem trusted publisher; a evidência é da 5.x (CircleCI, desde
+  # 2026-07-17). Release v4.7.1 do algolia/docsearch (commit 42eb3c5), publicada por um mantenedor listado. A busca
+  # Algolia não é configurada: o código não entra no build.
+  - '@docsearch/react@4.7.1'
+  - '@docsearch/core@4.7.1'
+  - '@docsearch/css@4.7.1'
+  # webpack-dev-middleware 7.4.6 (2026-09-03, via webpack-dev-server do `docusaurus start`): backport na 7.x da correção
+  # de path traversal (release v7.4.6 do webpack/webpack-dev-middleware), publicado à mão por um mantenedor listado;
+  # o trusted publisher é só da linha 8.x, que o webpack-dev-server 5 não aceita (^7.4.2).
+  - 'webpack-dev-middleware@7.4.6'
 # Só dependência direta pode vir de git ou de tarball (pnpm ≥ 10.26.0).
 blockExoticSubdeps: true
 
@@ -41,6 +55,18 @@ overrides:
   # GHSA-pqg4-j6r4-53mv (shell-quote < 1.11.0, critical): o fx-runner 1.6.0 (último, via web-ext) fixa a 1.10.0.
   # Sai quando um fx-runner novo aceitar a 1.11.0 ou mais.
   'fx-runner>shell-quote': '^1.11.0'
+  # GHSA-5gmw-xhrv-c9v3 e GHSA-85c8-ppgw-ccpr (tinypool < 2.1.2, critical): o @docusaurus/core 3.10.2 (documentacao/,
+  # último) pede ^1.0.2. Sai quando um @docusaurus/core aceitar a 2.1.2 ou mais.
+  '@docusaurus/core>tinypool': '^2.1.2'
+  # GHSA-5c6j-r48x-rmvq (serialize-javascript <= 7.0.2, high) e GHSA-qj8w-gfj5-8c6v (< 7.0.5, moderate): o
+  # copy-webpack-plugin 11 e o css-minimizer-webpack-plugin 5 (via @docusaurus/bundler) pedem ^6. Saem quando o
+  # @docusaurus/bundler trouxer versões desses plugins que aceitem a 7.0.5 ou mais.
+  'copy-webpack-plugin>serialize-javascript': '^7.0.5'
+  'css-minimizer-webpack-plugin>serialize-javascript': '^7.0.5'
+  # GHSA-w5hq-g745-h8pq / CVE-2026-41907 (uuid < 11.1.1; o Trivy dá high): o sockjs 0.3.24 (último, via
+  # webpack-dev-server do `docusaurus start`) pede ^8.3.2 e só usa o require('uuid').v4, que a 11 mantém em CJS.
+  # Sai quando um sockjs aceitar a 11.1.1 ou mais.
+  'sockjs>uuid': '^11.1.1'
 
 auditConfig:
   ignoreGhsas:
@@ -51,5 +77,6 @@ auditConfig:
     # (direto e pelo wxt) > @devicefarmer/adbkit, que fala com Android no `web-ext run`. Não vai no pacote da extensão.
     - GHSA-86w9-cpqp-85rv
     # braces 3.0.3 (DoS por padrão aninhado, high; sem versão corrigida no npm em 2026-10-05): só pelo micromatch do
-    # @storybook/nextjs e do eslint-config-next (lint), com padrões nossos. Não vai no build da landing nem da extensão.
+    # @storybook/nextjs e do eslint-config-next (lint) e pelo chokidar 3 do @docusaurus/core (o observador de arquivos
+    # do build e do dev da documentacao/), com padrões nossos. Não vai no build da landing nem da extensão.
     - GHSA-vfj7-8cjw-p6xm

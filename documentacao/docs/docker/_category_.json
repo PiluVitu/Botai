@@ -1,0 +1,9 @@
+{
+  "label": "Docker",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "slug": "/docker",
+    "description": "A imagem do Botaí no GitHub Container Registry: o servidor e a CLI sem instalar Node."
+  }
+}

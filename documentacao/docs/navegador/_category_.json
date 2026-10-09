@@ -1,0 +1,9 @@
+{
+  "label": "Motor no navegador",
+  "position": 11,
+  "link": {
+    "type": "generated-index",
+    "slug": "/navegador",
+    "description": "O motor de preenchimento para qualquer ferramenta que execute JS na página: o navegador.iife.js e o subpath /navegador."
+  }
+}

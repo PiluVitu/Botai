@@ -1,0 +1,9 @@
+{
+  "label": "Extensão",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "slug": "/extensao",
+    "description": "A extensão para Chrome, Edge e Firefox: preencher a página inteira, inserir um campo, o popup, a privacidade e os limites."
+  }
+}
