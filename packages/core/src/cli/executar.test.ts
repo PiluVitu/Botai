@@ -77,7 +77,7 @@ describe('botai pessoas', () => {
   test('json (padrão): envelope do lote', () => {
     const e = JSON.parse(rodar(...LOTE).stdout) as EnvelopeDasPessoas
     expect(e).toEqual({
-      formato: 1,
+      formato: 2,
       motor: MOTOR,
       semente: 'lote',
       hoje: HOJE,
@@ -126,7 +126,7 @@ describe('botai pessoas', () => {
     const r = rodar(...LOTE, '--formato', 'sql', '--campos', 'nome')
     const linhas = r.stdout.trimEnd().split('\n')
     expect(linhas[0]).toBe(
-      `-- botai: formato 1, motor ${MOTOR}, semente lote, hoje ${HOJE}`,
+      `-- botai: formato 2, motor ${MOTOR}, semente lote, hoje ${HOJE}`,
     )
     expect(linhas.slice(1)).toHaveLength(3)
     expect(linhas[1]).toMatch(

@@ -59,6 +59,7 @@ const EXTRAS = [
   'dist/versao.d.ts',
   'dist/versao.js',
   'esquema/envelope-v1.schema.json',
+  'esquema/envelope-v2.schema.json',
 ]
 const alvos = (destino) =>
   typeof destino === 'string' ? [destino] : Object.values(destino)

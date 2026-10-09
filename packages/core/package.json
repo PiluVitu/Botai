@@ -49,6 +49,7 @@
     "./atalhos": "./src/atalhos.ts",
     "./plano": "./src/plano.ts",
     "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json",
+    "./esquema/envelope-v2.schema.json": "./esquema/envelope-v2.schema.json",
     "./servidor": "./src/servidor/index.ts",
     "./navegador": "./src/navegador/index.ts",
     "./navegador.iife.js": "./dist/navegador.iife.js"
@@ -141,6 +142,7 @@
         "default": "./dist/plano.js"
       },
       "./esquema/envelope-v1.schema.json": "./esquema/envelope-v1.schema.json",
+      "./esquema/envelope-v2.schema.json": "./esquema/envelope-v2.schema.json",
       "./servidor": {
         "types": "./dist/servidor/index.d.ts",
         "default": "./dist/servidor/index.js"

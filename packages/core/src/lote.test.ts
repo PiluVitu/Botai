@@ -56,7 +56,7 @@ describe('textoDoLote', () => {
         return
       }
       expect(obtido.split('\n')[0]).toBe(
-        `-- botai: formato 1, motor ${MOTOR}, semente lote, hoje 2026-10-05`,
+        `-- botai: formato 2, motor ${MOTOR}, semente lote, hoje 2026-10-05`,
       )
       expect(semPrimeiraLinha(obtido)).toBe(ler(derivado.arquivo))
     },

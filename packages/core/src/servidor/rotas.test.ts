@@ -173,7 +173,7 @@ describe('responder', () => {
   test('/saude diz o formato e o motor', () => {
     expect(json('/saude')).toEqual({
       status: 200,
-      corpo: { ok: true, formato: 1, motor: MOTOR },
+      corpo: { ok: true, formato: 2, motor: MOTOR },
     })
   })
 

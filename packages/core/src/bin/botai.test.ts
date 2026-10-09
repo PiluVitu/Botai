@@ -140,7 +140,7 @@ describe('bin botai do build', () => {
     expect(r.codigo).toBe(0)
     const [comentario, ...inserts] = r.stdout.split('\n')
     expect(comentario).toMatch(
-      /^-- botai: formato 1, motor \d+\.\d+\.\d+\S*, semente mil-3, hoje 2026-10-05$/,
+      /^-- botai: formato 2, motor \d+\.\d+\.\d+\S*, semente mil-3, hoje 2026-10-05$/,
     )
     expect(inserts.join('\n')).toBe(paraSql(dourado.pessoas))
     expect(inserts.filter((l) => l.startsWith('INSERT INTO'))).toHaveLength(
