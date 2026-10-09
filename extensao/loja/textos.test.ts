@@ -94,6 +94,7 @@ describe('textos da listagem', () => {
     ].map((m) => m[1])
     expect(itens).toEqual([
       'Preencher esta página',
+      'Preencher com',
       'Inserir',
       'Nova pessoa',
       'Abrir caixa de entrada',

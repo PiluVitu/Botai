@@ -1,7 +1,10 @@
+import { montarPessoa } from '@pilutech/botai-core/pessoa'
+import { sfc32 } from '@pilutech/botai-core/prng'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Browser } from 'wxt/browser'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
-import { pessoaItem } from '../../lib/armazenamento'
+import { favoritosItem, pessoaItem } from '../../lib/armazenamento'
+import type { Favorito } from '../../lib/favoritos'
 import type { Mensagem } from '../../lib/mensagens'
 import { PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
 import {
@@ -112,6 +115,39 @@ describe('aoClicarMenu', () => {
     expect(abrir).not.toHaveBeenCalled()
   })
 
+  describe('"Preencher com › <favorito>"', () => {
+    const FAVORITA = montarPessoa(sfc32(10, 11, 12, 13), '2026-10-01')
+    const FAVORITO: Favorito = {
+      id: 'f-1',
+      apelido: 'admin do staging',
+      pessoa: FAVORITA,
+      guardadoEm: '2026-10-09T12:00:00.000Z',
+    }
+    beforeEach(() => favoritosItem.setValue([FAVORITO]))
+
+    it('torna o favorito a pessoa ativa e preenche a aba com ele, pelo mesmo fluxo do Preencher', async () => {
+      await aoClicarMenu(clique('botai-preencher-com:f-1'), ABA)
+      expect(await pessoaItem.getValue()).toEqual(FAVORITA)
+      expect(chamada(0)).toEqual({
+        target: { tabId: 7, allFrames: true },
+        files: ['/content-scripts/preencher.js'],
+      })
+      expect(chamada(1).target).toEqual({ tabId: 7, allFrames: true })
+      expect(chamada(1).args?.[0]).toEqual(FAVORITA)
+    })
+
+    it('não mexe na lista de favoritos', async () => {
+      await aoClicarMenu(clique('botai-preencher-com:f-1'), ABA)
+      expect(await favoritosItem.getValue()).toEqual([FAVORITO])
+    })
+
+    it('favorito que já saiu (menu velho) não troca a ativa nem preenche', async () => {
+      await aoClicarMenu(clique('botai-preencher-com:f-9'), ABA)
+      expect(await pessoaItem.getValue()).toEqual(P)
+      expect(executar).not.toHaveBeenCalled()
+    })
+  })
+
   it('"Abrir caixa de entrada" sem pessoa gera uma antes', async () => {
     await pessoaItem.setValue(null)
     const abrir = vi.spyOn(fakeBrowser.tabs, 'create')
@@ -193,5 +229,41 @@ describe('recriarMenus', () => {
         title: `CPF · ${P.cpf}`,
       }),
     )
+  })
+
+  it('recria o "Preencher com" com os favoritos guardados', async () => {
+    await favoritosItem.setValue([
+      {
+        id: 'f-1',
+        apelido: 'admin do staging',
+        pessoa: P,
+        guardadoEm: '2026-10-09T12:00:00.000Z',
+      },
+    ])
+    await recriarMenus()
+    expect(criar).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'botai-preencher-com' }),
+    )
+    expect(criar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'botai-preencher-com:f-1',
+        parentId: 'botai-preencher-com',
+      }),
+    )
+  })
+
+  it('duas recriações seguidas não se intercalam (senão o Chrome recusaria ids repetidos)', async () => {
+    const ordem: string[] = []
+    Object.assign(fakeBrowser.contextMenus, {
+      removeAll: vi.fn(async () => {
+        ordem.push('removeAll')
+        await new Promise((resolver) => setTimeout(resolver, 5))
+      }),
+      create: vi.fn(({ id }: { id: string }) => {
+        if (id === 'botai-abrir-caixa') ordem.push('ultimo')
+      }),
+    })
+    await Promise.all([recriarMenus(), recriarMenus()])
+    expect(ordem).toEqual(['removeAll', 'ultimo', 'removeAll', 'ultimo'])
   })
 })

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
-import { pessoaItem } from '../../lib/armazenamento'
+import { favoritosItem, pessoaItem } from '../../lib/armazenamento'
+import { primeiroNome } from '../../lib/favoritos'
 import { PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
 import background from './index'
 
@@ -80,6 +81,35 @@ describe('background', () => {
     expect(atualizar).toHaveBeenCalledWith('botai-inserir:cep', {
       title: `CEP · ${P.endereco.cep}`,
     })
+  })
+
+  it('favoritos que mudam refazem o menu, e o "Preencher com" acompanha a lista', async () => {
+    await favoritosItem.setValue([
+      {
+        id: 'f-1',
+        apelido: 'admin do staging',
+        pessoa: P,
+        guardadoEm: '2026-10-09T12:00:00.000Z',
+      },
+    ])
+    await vi.waitFor(() =>
+      expect(criar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'botai-preencher-com:f-1',
+          title: `admin do staging · ${primeiroNome(P)}`,
+        }),
+      ),
+    )
+    criar.mockClear()
+    await favoritosItem.setValue([])
+    await vi.waitFor(() =>
+      expect(criar).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'botai-abrir-caixa' }),
+      ),
+    )
+    expect(criar).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'botai-preencher-com' }),
+    )
   })
 
   it('o atalho botai-preencher injeta o content script na aba do comando', async () => {
