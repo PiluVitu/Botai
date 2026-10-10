@@ -67,3 +67,8 @@ updates:
       include: 'scope'
     cooldown:
       default-days: 7
+    # A base da imagem fica numa linha LTS do Node: major (Current ou ímpar) é troca manual.
+    ignore:
+      - dependency-name: 'node'
+        update-types:
+          - 'version-update:semver-major'

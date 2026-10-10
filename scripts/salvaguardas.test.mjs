@@ -151,3 +151,20 @@ test('todo job que constrói imagem passa antes pelo espelho do Docker Hub (mirr
     /https:\/\/mirror\.gcr\.io/,
   )
 })
+
+// A imagem ghcr.io/piluvitu/botai é usada por outros projetos: a base fica numa linha LTS do Node
+// (par). O Dependabot propõe toda major, inclusive a Current e as ímpares, que nunca viram LTS
+// (o PR #1 propôs a 26.10.0, Current, em 2026-10-06); a troca de major é manual.
+test('a base da imagem do core é uma linha LTS do Node, e o Dependabot não propõe major dela', () => {
+  const major = Number(
+    /^FROM node:(\d+)\./m.exec(ler('packages/core/Dockerfile'))?.[1],
+  )
+  assert.equal(major % 2, 0, `node ${major}`)
+  const docker = ler('.github/dependabot.yml').split(
+    /^  - package-ecosystem: 'docker'$/m,
+  )[1]
+  assert.match(
+    docker,
+    /ignore:\n\s+- dependency-name: 'node'\n\s+update-types:\n\s+- 'version-update:semver-major'/,
+  )
+})
