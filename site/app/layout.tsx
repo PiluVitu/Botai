@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google'
 import type { ReactNode } from 'react'
+import { MedicaoDaVercel } from '@/components/medicao-da-vercel'
 import { TemaProvider } from '@/components/tema-provider'
 import { metadataDoSite, VIEWPORT } from '@/lib/seo'
 import { urlDoSite } from '@/lib/site'
@@ -32,6 +33,7 @@ export default function RootLayout({
     >
       <body>
         <TemaProvider>{children}</TemaProvider>
+        <MedicaoDaVercel />
       </body>
     </html>
   )

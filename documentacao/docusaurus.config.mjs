@@ -1,5 +1,7 @@
 import { themes } from 'prism-react-renderer'
 
+const NA_PRODUCAO_DA_VERCEL = process.env.VERCEL_ENV === 'production'
+
 /** @type {import('@docusaurus/types').Config} */
 export default {
   title: 'Botaí — documentação',
@@ -18,6 +20,8 @@ export default {
   },
 
   i18n: { defaultLocale: 'pt-BR', locales: ['pt-BR'] },
+
+  clientModules: NA_PRODUCAO_DA_VERCEL ? ['./src/medicao-da-vercel.js'] : [],
 
   presets: [
     [
@@ -62,6 +66,12 @@ export default {
       ],
     },
     footer: {
+      links: [
+        {
+          label: 'Política de privacidade',
+          href: 'https://botai.pilutech.com.br/privacidade',
+        },
+      ],
       copyright: '<a href="https://pilutech.com.br">Powered by PiluTech</a>',
     },
     prism: {

@@ -15,11 +15,11 @@ describe('/privacidade', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Política de privacidade do Botaí',
     )
-    // A data muda com o texto: é a da 1.2.0, que trouxe a preferência do cartão de teste
-    // (a 1.1.0, dos favoritos, também é de 2026-10-09).
-    const data = screen.getByText('9 de outubro de 2026')
+    // A data muda com o texto: é a do Vercel Web Analytics no site (a 1.2.0, da preferência
+    // do cartão de teste, e a 1.1.0, dos favoritos, são de 2026-10-09).
+    const data = screen.getByText('11 de outubro de 2026')
     expect(data.tagName).toBe('TIME')
-    expect(data).toHaveAttribute('dateTime', '2026-10-09')
+    expect(data).toHaveAttribute('dateTime', '2026-10-11')
   })
 
   it('as seções da política, na ordem', () => {
@@ -34,7 +34,7 @@ describe('/privacidade', () => {
       'Dados fictícios e pessoas reais',
       'Permissões',
       'Como apagar os dados',
-      'Este site',
+      'Este site e a documentação',
       'Quando você escreve para o suporte',
       'Cada dado, para quê e por quanto tempo',
       'Segurança',
@@ -53,19 +53,47 @@ describe('/privacidade', () => {
       'A preferência do cartão de teste',
       'Os campos e o endereço da aba',
       'A escolha de tema claro ou escuro',
-      'Os registros de acesso a este site',
+      'Os registros de acesso ao site e à documentação',
+      'As estatísticas de visita do site e da documentação',
       'O que você manda ao suporte por e-mail',
     ])
     const listas = document.querySelectorAll('dl')
-    expect(listas).toHaveLength(7)
+    expect(listas).toHaveLength(8)
     for (const lista of listas)
       expect(
         [...lista.querySelectorAll('dt')].map((dt) => dt.textContent),
       ).toEqual(['Para quê', 'Base legal', 'Com quem', 'Por quanto tempo'])
     expect(listas[5]).toHaveTextContent('art. 7º, IX')
     expect(listas[5]).toHaveTextContent('Vercel')
-    expect(listas[6]).toHaveTextContent('art. 7º, II')
-    expect(listas[6]).toHaveTextContent('Gmail')
+    expect(listas[6]).toHaveTextContent('art. 7º, IX')
+    expect(listas[6]).toHaveTextContent('Vercel Web Analytics')
+    expect(listas[6]).toHaveTextContent('Vercel Speed Insights')
+    expect(listas[6]).toHaveTextContent('24 horas')
+    expect(listas[7]).toHaveTextContent('art. 7º, II')
+    expect(listas[7]).toHaveTextContent('Gmail')
+  })
+
+  // Desde 2026-10-11 o site e a documentação (só eles) medem as visitas com o Vercel Web
+  // Analytics e o Vercel Speed Insights, sem cookie. A extensão continua sem: "O que é enviado" é dela.
+  it('o site e a documentação medem as visitas com o Vercel Web Analytics, sem cookie; a extensão segue sem', () => {
+    expect(document.body).not.toHaveTextContent(
+      /site (botai\.pilutech\.com\.br )?não usa cookies,? (nem )?analytics/i,
+    )
+    expect(document.body).toHaveTextContent(
+      'Este site e a documentação não usam cookies e medem as visitas com o Vercel Web Analytics',
+    )
+    expect(document.body).toHaveTextContent(
+      'O site botai.pilutech.com.br e a documentação, em docs.botai.pilutech.com.br, não usam cookies nem anúncios',
+    )
+    expect(document.body).toHaveTextContent(
+      'descartado em 24 horas, e os relatórios só mostram números somados',
+    )
+    expect(document.body).toHaveTextContent(
+      'O Vercel Speed Insights mede a velocidade de cada carregamento',
+    )
+    expect(document.body).toHaveTextContent(
+      'Também não usa analytics, cookies nem anúncios',
+    )
   })
 
   // Contrato da 1.1.0: storage.local com local:botai_pessoa (a ativa) e local:botai_favoritos (até 3).

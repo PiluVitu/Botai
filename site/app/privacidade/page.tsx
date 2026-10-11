@@ -18,7 +18,7 @@ import {
 } from '@/lib/seo'
 import { urlDoSite } from '@/lib/site'
 
-const VIGENCIA = { iso: '2026-10-09', texto: '9 de outubro de 2026' }
+const VIGENCIA = { iso: '2026-10-11', texto: '11 de outubro de 2026' }
 const POLITICA_DA_VERCEL = 'https://vercel.com/legal/privacy-policy'
 const POLITICA_DO_GOOGLE = 'https://policies.google.com/privacy'
 const ANPD = 'https://www.gov.br/anpd/pt-br'
@@ -94,18 +94,29 @@ const TRATAMENTOS = [
   },
   {
     dado: 'A escolha de tema claro ou escuro',
-    paraQue: 'Abrir este site no tema que você escolheu.',
+    paraQue: 'Abrir o site e a documentação no tema que você escolheu.',
     base: 'Não se aplica: fica só no seu navegador (localStorage) e não é enviada.',
     comQuem: 'Ninguém.',
     prazo: 'Até você limpar os dados do site no navegador.',
   },
   {
-    dado: 'Os registros de acesso a este site',
-    paraQue: 'Entregar as páginas e proteger o site contra abuso e falhas.',
-    base: 'Legítimo interesse da PiluTech em manter o site no ar e seguro (LGPD, art. 7º, IX).',
+    dado: 'Os registros de acesso ao site e à documentação',
+    paraQue:
+      'Entregar as páginas e proteger o site e a documentação contra abuso e falhas.',
+    base: 'Legítimo interesse da PiluTech em manter o site e a documentação no ar e seguros (LGPD, art. 7º, IX).',
     comQuem: 'Vercel, a hospedagem, que os trata em nome da PiluTech.',
     prazo:
       'O prazo de retenção da Vercel. A PiluTech não os copia para outro lugar.',
+  },
+  {
+    dado: 'As estatísticas de visita do site e da documentação',
+    paraQue:
+      'Ter uma visão geral do público: quantas pessoas visitam, quais páginas leem, de onde chegam, em que dispositivos, e a velocidade das páginas.',
+    base: 'Legítimo interesse da PiluTech em entender o uso do site e da documentação (LGPD, art. 7º, IX), com dados que não identificam quem visita.',
+    comQuem:
+      'Vercel, pelo Vercel Web Analytics e pelo Vercel Speed Insights, que os tratam em nome da PiluTech.',
+    prazo:
+      'O código que reconhece a visita é descartado em 24 horas. Os números somados ficam no painel da Vercel pelo prazo do plano dela (hoje, até 1 mês).',
   },
   {
     dado: 'O que você manda ao suporte por e-mail',
@@ -145,9 +156,10 @@ export default function PrivacidadePage() {
             a extensão {NOME} não coleta nem envia dados. Ela só lê os
             formulários da aba em que você a aciona, no seu navegador, e guarda
             nele a pessoa fictícia ativa, até 3 favoritas que você escolher e o
-            cartão de teste das próximas pessoas. Este site não usa cookies nem
-            analytics; a hospedagem registra dados técnicos de acesso, como em
-            qualquer site.
+            cartão de teste das próximas pessoas. Este site e a documentação não
+            usam cookies e medem as visitas com o Vercel Web Analytics, que não
+            identifica quem visita; a hospedagem registra dados técnicos de
+            acesso, como em qualquer site.
           </>
         }
       >
@@ -276,18 +288,32 @@ export default function PrivacidadePage() {
           pessoa ativa, os favoritos e a preferência do cartão.
         </p>
 
-        <h2>Este site</h2>
+        <h2>Este site e a documentação</h2>
         <p>
-          O site botai.pilutech.com.br não usa cookies, analytics nem anúncios,
-          e não carrega nada de terceiros: as fontes e as imagens vêm dele
-          mesmo. A escolha de tema claro ou escuro fica guardada no seu
-          navegador (<code>localStorage</code>) e não é enviada.
+          O site botai.pilutech.com.br e a documentação, em
+          docs.botai.pilutech.com.br, não usam cookies nem anúncios e não
+          carregam nada de terceiros: as fontes, as imagens e os scripts de
+          estatística vêm deles mesmos. A escolha de tema claro ou escuro, e na
+          documentação outras preferências de leitura, ficam guardadas no seu
+          navegador (<code>localStorage</code>) e não são enviadas.
         </p>
         <p>
-          A hospedagem é da Vercel Inc., empresa dos Estados Unidos. Como em
-          qualquer site, o servidor registra dados técnicos de cada acesso:
-          endereço IP, navegador e sistema, página pedida, data e hora, e a
-          cidade e o país aproximados a partir do IP. A Vercel trata esses
+          Para ter uma visão geral do público, os dois usam o Vercel Web
+          Analytics, da mesma Vercel que os hospeda. A cada página vista, ele
+          registra a página, a página de onde você veio, o país, a região e a
+          cidade aproximados, o tipo de dispositivo, o sistema e o navegador.
+          Ele não usa cookie: a visita é reconhecida por um código calculado a
+          partir da requisição, descartado em 24 horas, e os relatórios só
+          mostram números somados. O Vercel Speed Insights mede a velocidade de
+          cada carregamento (as Web Vitals), com a página, o tipo de conexão, o
+          navegador, o dispositivo e o país, também sem cookie e sem identificar
+          quem visita. Nenhum dos dois roda na extensão.
+        </p>
+        <p>
+          A hospedagem dos dois é da Vercel Inc., empresa dos Estados Unidos.
+          Como em qualquer site, o servidor registra dados técnicos de cada
+          acesso: endereço IP, navegador e sistema, página pedida, data e hora,
+          e a cidade e o país aproximados a partir do IP. A Vercel trata esses
           registros em nome da PiluTech e pode processá-los fora do Brasil (veja
           a{' '}
           <a
@@ -344,8 +370,9 @@ export default function PrivacidadePage() {
           A extensão não envia nada, então não existe dado dela num servidor
           para vazar. A pessoa fictícia ativa e as favoritas, com os apelidos,
           ficam no perfil do seu navegador, sem criptografia própria: quem usa o
-          seu computador e o seu perfil consegue vê-las. Este site só responde
-          por HTTPS. O código da extensão e o do site são{' '}
+          seu computador e o seu perfil consegue vê-las. O site e a documentação
+          só respondem por HTTPS. O código da extensão, o do site e o da
+          documentação são{' '}
           <a href={REPOSITORIO} target="_blank" rel="noopener noreferrer">
             abertos
           </a>{' '}

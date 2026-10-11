@@ -9,8 +9,8 @@ test.describe('/privacidade', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Política de privacidade do Botaí',
     )
-    await expect(page.locator('time[datetime="2026-10-09"]')).toHaveText(
-      '9 de outubro de 2026',
+    await expect(page.locator('time[datetime="2026-10-11"]')).toHaveText(
+      '11 de outubro de 2026',
     )
     await expect(
       page
