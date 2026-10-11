@@ -63,11 +63,40 @@ test('navbar com Site, GitHub e npm', () => {
   )
 })
 
-test('rodapé: "Powered by PiluTech" com link para pilutech.com.br', () => {
+test('rodapé: "Powered by PiluTech" e a política de privacidade, que cobre a documentação', () => {
   assert.match(
     config.themeConfig.footer.copyright,
     /^<a href="https:\/\/pilutech\.com\.br">Powered by PiluTech<\/a>$/,
   )
+  assert.deepEqual(config.themeConfig.footer.links, [
+    {
+      label: 'Política de privacidade',
+      href: 'https://botai.pilutech.com.br/privacidade',
+    },
+  ])
+})
+
+// Só a produção da Vercel mede: o preview gastaria as cotas grátis da conta (Web Analytics e
+// Speed Insights, divididas entre os projetos), e o build local não tem os scripts. Os dois
+// são da própria Vercel, servidos pelo domínio da documentação: não é script de terceiro.
+test('o Vercel Web Analytics e o Speed Insights entram só no build de produção da Vercel', async () => {
+  assert.deepEqual(config.clientModules ?? [], [])
+  process.env.VERCEL_ENV = 'production'
+  try {
+    const { default: producao } =
+      await import('./docusaurus.config.mjs?producao')
+    assert.deepEqual(producao.clientModules, ['./src/medicao-da-vercel.js'])
+  } finally {
+    delete process.env.VERCEL_ENV
+  }
+  const modulo = readFileSync(join(AQUI, 'src/medicao-da-vercel.js'), 'utf8')
+  assert.match(modulo, /^import \{ inject \} from '@vercel\/analytics'$/m)
+  assert.match(
+    modulo,
+    /^import \{ injectSpeedInsights \} from '@vercel\/speed-insights'$/m,
+  )
+  assert.match(modulo, /^inject\(\)$/m)
+  assert.match(modulo, /^injectSpeedInsights\(\)$/m)
 })
 
 test('sem busca de serviço externo e sem script de terceiros', () => {
