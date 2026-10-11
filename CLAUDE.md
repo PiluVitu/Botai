@@ -132,6 +132,13 @@ O `.env.example` da raiz lista os nomes; o `.gitignore` ignora `.env*` menos ele
 
 O repo só aceita squash merge (por isso a versão e a tag da extensão são dois passos: `make versao-botai` e, depois do merge, `make release-botai`).
 
+**Proteção da `main`:** o ruleset "main protegida" (Settings → Rules → Rulesets), versionado em `.github/rulesets/main.json`. Ninguém dá push direto nem force push na `main`, e ninguém a apaga. Tudo entra por PR com squash, histórico linear e conversas resolvidas, e só com os checks exigidos verdes: os 8 jobs do `ci.yml` e o "Segredos (falha o PR)" do `trivy.yml`, que rodam em todo PR, sem filtro de caminho. Os path-filtered (`botai-e2e.yml`, `botai-release.yml`, `core-distribuicao.yml`, `publicar-playwright.yml`) e os da Vercel ficam de fora, porque um check exigido que não roda fica "Expected" e trava o PR.
+
+- Aprovação: 0. O dono é o único mantenedor, e o GitHub não deixa aprovar o próprio PR.
+- Branch atualizada antes do merge: não exigida (`strict` desligado), para um PR não precisar de rebase a cada merge de outro.
+- Bypass: só o papel admin, e só no PR (`bypass_mode: pull_request`): `gh pr merge --admin` passa por cima de um check vermelho que não é do PR (o Docker Hub de 2026-10-09, por exemplo). Push direto continua barrado para todo mundo.
+- Aplicar uma mudança: edite o JSON e rode `gh api -X PUT repos/PiluVitu/Botai/rulesets/<id> --input .github/rulesets/main.json` (o id sai de `gh api repos/PiluVitu/Botai/rulesets`). Renomeou ou criou job no `ci.yml`? O JSON muda junto: o `salvaguardas.test.mjs` reprova job do CI fora dos exigidos e exigido sem job.
+
 ## Vercel
 
 Projeto `botai-site`, Root Directory `site`, "Include files outside the root directory" ligado, domínio `botai.pilutech.com.br`. Detalhes e conferência em `site/CLAUDE.md`, "Deploy".
