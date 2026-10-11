@@ -1,0 +1,85 @@
+{
+  "name": "main protegida",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [
+    {
+      "actor_id": 5,
+      "actor_type": "RepositoryRole",
+      "bypass_mode": "pull_request"
+    }
+  ],
+  "conditions": {
+    "ref_name": {
+      "include": ["~DEFAULT_BRANCH"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "required_linear_history"
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true,
+        "allowed_merge_methods": ["squash"]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": false,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "Dependências e salvaguardas (lockfile, dedupe, audit, node --test, actionlint)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Core (tsc sem DOM + Jest + build + pacote)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Imagem do core (docker build + fumaça)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Binário Bun linux-x64 (dourados + serve)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Extensão (lint + test + builds de Chrome, Firefox e Opera + web-ext lint)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Site (lint + tsc + test + build)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Documentação (Prettier + versões + exemplos + build do Docusaurus)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Plugin do Playwright (lint + Jest + E2E nos 3 navegadores + pacote)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Segredos (falha o PR)",
+            "integration_id": 15368
+          }
+        ]
+      }
+    }
+  ]
+}

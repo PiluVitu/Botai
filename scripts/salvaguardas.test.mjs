@@ -168,3 +168,44 @@ test('a base da imagem do core é uma linha LTS do Node, e o Dependabot não pro
     /ignore:\n\s+- dependency-name: 'node'\n\s+update-types:\n\s+- 'version-update:semver-major'/,
   )
 })
+
+// O ruleset da main mora no GitHub (Settings → Rules → Rulesets) e é aplicado a partir deste
+// JSON (ver "Proteção da main" no CLAUDE.md). Check exigido que nenhum job produz fica
+// "Expected" para sempre e trava todo PR: renomear um job do CI pede o JSON junto.
+test('o ruleset da main exige PR com squash, histórico linear e os checks que rodam em todo PR', () => {
+  const ruleset = JSON.parse(ler('.github/rulesets/main.json'))
+  assert.equal(ruleset.target, 'branch')
+  assert.equal(ruleset.enforcement, 'active')
+  assert.deepEqual(ruleset.conditions.ref_name.include, ['~DEFAULT_BRANCH'])
+  const regra = (tipo) => ruleset.rules.find((r) => r.type === tipo)
+  for (const tipo of [
+    'deletion',
+    'non_fast_forward',
+    'required_linear_history',
+  ])
+    assert.ok(regra(tipo), tipo)
+  assert.deepEqual(regra('pull_request').parameters.allowed_merge_methods, [
+    'squash',
+  ])
+  assert.ok(
+    ruleset.bypass_actors.every((ator) => ator.bypass_mode === 'pull_request'),
+    'ninguém pula o ruleset num push direto',
+  )
+
+  const exigidos = regra(
+    'required_status_checks',
+  ).parameters.required_status_checks.map((c) => c.context)
+  const nomesDosJobs = (arquivo) => {
+    const texto = workflow(arquivo)
+    assert.match(texto, /^  pull_request:\n    branches: \[main\]$/m, arquivo)
+    assert.doesNotMatch(texto, /^    paths(-ignore)?:/m, arquivo)
+    assert.doesNotMatch(texto, /^    if:/m, arquivo)
+    return [...texto.matchAll(/^    name: (.+)$/gm)].map((m) => m[1])
+  }
+  const doCi = nomesDosJobs('ci.yml')
+  const doTrivy = nomesDosJobs('trivy.yml')
+  for (const nome of doCi) assert.ok(exigidos.includes(nome), nome)
+  assert.ok(exigidos.includes('Segredos (falha o PR)'))
+  for (const nome of exigidos)
+    assert.ok([...doCi, ...doTrivy].includes(nome), `sem job: ${nome}`)
+})
