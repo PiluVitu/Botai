@@ -30,6 +30,6 @@
   "devDependencies": {
     "@pilutech/botai-core": "workspace:*",
     "@piluvitu/ui": "0.1.0",
-    "prettier": "^3.9.9"
+    "prettier": "^3.9.10"
   }
 }
