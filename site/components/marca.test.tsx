@@ -18,11 +18,11 @@ describe('Marca', () => {
       r.getAttribute('fill'),
     )
     expect(cores).toEqual([
-      '#38bdf8',
-      '#0a0f1a',
-      '#0a0f1a',
-      '#0a0f1a',
-      '#0a0f1a',
+      '#f83838',
+      '#1a0a0a',
+      '#1a0a0a',
+      '#1a0a0a',
+      '#1a0a0a',
     ])
   })
 })

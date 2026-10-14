@@ -137,6 +137,10 @@ const CSS_DO_DESIGN_SYSTEM = readFileSync(
   ),
   'utf8',
 )
+// O globals.css do site sobrescreve os tokens depois do import do design system.
+const CSS_DOS_TEMAS =
+  CSS_DO_DESIGN_SYSTEM +
+  readFileSync(join(__dirname, '..', 'app', 'globals.css'), 'utf8')
 
 function hslParaHex(h: number, s: number, l: number): string {
   const sat = s / 100
@@ -155,14 +159,12 @@ function hslParaHex(h: number, s: number, l: number): string {
 }
 
 function fundoDoTema(seletor: ':root' | '.dark'): string {
-  const bloco = CSS_DO_DESIGN_SYSTEM.slice(
-    CSS_DO_DESIGN_SYSTEM.indexOf(`${seletor} {`),
-  )
+  const bloco = CSS_DOS_TEMAS.slice(CSS_DOS_TEMAS.lastIndexOf(`${seletor} {`))
   const [, h, s, l] = /--background:\s*(\d+)\s+(\d+)%\s+(\d+)%/.exec(bloco)!
   return hslParaHex(Number(h), Number(s), Number(l))
 }
 
-// A barra do navegador acompanha o fundo de cada tema do @piluvitu/ui.
+// A barra do navegador acompanha o fundo de cada tema da landing.
 it('theme-color claro e escuro são o --background dos dois temas', () => {
   expect(VIEWPORT.themeColor).toEqual([
     { media: '(prefers-color-scheme: light)', color: fundoDoTema(':root') },

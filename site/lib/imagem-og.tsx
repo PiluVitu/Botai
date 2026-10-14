@@ -12,12 +12,12 @@ export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
 const COR = {
-  fundo: '#090b11',
-  cartao: '#0f141f',
-  borda: '#1c3140',
-  primaria: '#3abff8',
-  texto: '#e7ecf3',
-  apagado: '#94a0b3',
+  fundo: '#110909',
+  cartao: '#1f0f0f',
+  borda: '#401c1c',
+  primaria: '#f83a3a',
+  texto: '#f3e7e7',
+  apagado: '#b39494',
 }
 
 export const COMANDO_DO_OG = `npx ${PACOTE_DO_CORE} pessoa --semente ${SEMENTE_DO_EXEMPLO}`
@@ -165,10 +165,10 @@ export async function imagemOg({
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: 72,
-        background: '#0b1220',
+        background: '#200b0b',
       }}
     >
-      <div style={{ display: 'flex', fontSize: 30, color: '#38bdf8' }}>
+      <div style={{ display: 'flex', fontSize: 30, color: '#f83838' }}>
         {rotulo}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 48 }}>
@@ -187,7 +187,7 @@ export async function imagemOg({
               display: 'flex',
               fontSize: titulo.length > 14 ? 72 : 92,
               fontWeight: 700,
-              color: '#f8fafc',
+              color: '#fcf8f8',
               letterSpacing: -2,
             }}
           >
@@ -197,7 +197,7 @@ export async function imagemOg({
             style={{
               display: 'flex',
               fontSize: 38,
-              color: '#94a3b8',
+              color: '#b89494',
               lineHeight: 1.3,
             }}
           >
@@ -205,7 +205,7 @@ export async function imagemOg({
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', fontSize: 28, color: '#64748b' }}>
+      <div style={{ display: 'flex', fontSize: 28, color: '#8b6464' }}>
         PiluLabs · Powered by PiluTech
       </div>
     </div>,

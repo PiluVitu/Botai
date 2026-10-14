@@ -18,9 +18,9 @@ export function Marca({ tamanho, className }: MarcaProps) {
       aria-hidden
       className={cn('shrink-0', className)}
     >
-      <rect width="16" height="16" rx="3.5" fill="#38bdf8" />
+      <rect width="16" height="16" rx="3.5" fill="#f83838" />
       {BLOCOS.map((bloco) => (
-        <rect key={`${bloco.x}-${bloco.y}`} {...bloco} fill="#0a0f1a" />
+        <rect key={`${bloco.x}-${bloco.y}`} {...bloco} fill="#1a0a0a" />
       ))}
     </svg>
   )

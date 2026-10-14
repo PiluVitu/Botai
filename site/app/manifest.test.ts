@@ -16,8 +16,8 @@ it('nome, idioma, cores e o ícone de 300×300', () => {
     lang: 'pt-BR',
     start_url: '/',
     display: 'browser',
-    background_color: '#090b11',
-    theme_color: '#090b11',
+    background_color: '#110909',
+    theme_color: '#110909',
     icons: [{ src: '/icon.png', sizes: '300x300', type: 'image/png' }],
   })
 })

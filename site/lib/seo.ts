@@ -12,8 +12,8 @@ export const TITULO_DOS_TERMOS = 'Termos de uso do Botaí'
 export const DESCRICAO_DOS_TERMOS =
   'Termos de uso do Botaí: dados fictícios só para teste, o que é proibido (fraude, cadastro real, burlar verificação), a licença MIT, garantias e o foro.'
 
-export const COR_DO_TEMA_CLARO = '#f7f9fc'
-export const COR_DO_TEMA_ESCURO = '#090b11'
+export const COR_DO_TEMA_CLARO = '#fcf7f7'
+export const COR_DO_TEMA_ESCURO = '#110909'
 
 export type PaginaDoSite = {
   caminho: string
