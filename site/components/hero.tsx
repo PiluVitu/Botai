@@ -27,10 +27,11 @@ export function Hero() {
         {POSICIONAMENTO}
       </h1>
       <p className="text-muted-foreground max-w-[720px] text-[clamp(17px,1.6vw,20px)] leading-[1.55] text-pretty">
-        O Botaí gera uma pessoa brasileira fictícia e coerente, com CPF, CEP,
-        celular e empresa que batem entre si, e preenche formulários com ela. Um
-        motor só, com oito portas: extensão, CLI, biblioteca, HTTP, Docker,
-        binários, Playwright e o motor direto na página.
+        O Botaí é um gerador de pessoa de teste: ele cria uma pessoa brasileira
+        fictícia e coerente, com CPF, CEP, celular e empresa que batem entre si,
+        e preenche formulários com ela. Um motor só, com oito portas: extensão,
+        CLI, biblioteca, HTTP, Docker, binários, Playwright e o motor direto na
+        página.
       </p>
       <div className="mt-1 flex flex-wrap items-center gap-3">
         <Button asChild size="lg" className={cn(BOTAO_DO_HERO, 'px-[22px]')}>

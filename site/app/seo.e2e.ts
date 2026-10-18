@@ -200,7 +200,11 @@ test('JSON-LD de /: SoftwareApplication gratuito, sem nota, com as lojas do loja
   if (lojas.length > 0) expect(aplicacao.installUrl).toEqual(lojas)
   else expect(aplicacao).not.toHaveProperty('installUrl')
   expect(aplicacao.sameAs).toEqual([REPOSITORIO, ...lojas])
-  expect(grafo[1]).toMatchObject({ name: 'Botaí', alternateName: ['Botai'] })
+  expect(grafo[1]).toMatchObject({
+    name: 'Botaí',
+    alternateName: ['Botai', 'Bota Aí', 'Bota ai'],
+  })
+  expect(grafo[1].keywords).toContain('gerador de pessoa')
 })
 
 test('JSON-LD de /privacidade: a trilha Botaí › Política', async ({ page }) => {

@@ -5,6 +5,19 @@ export const TITULO_DA_HOME =
   'Botaí: gerador de CPF, CNPJ e CEP para testar formulários'
 export const DESCRICAO_DA_HOME =
   'Dados de teste brasileiros para formulários: CPF e CNPJ válidos, CEP real com endereço. Extensão para Chrome e Firefox, CLI, servidor HTTP, Docker e Playwright.'
+// Termos do nicho no `keywords` do WebSite. O Google não usa para ranquear: quem ranqueia é o título, a
+// descrição e o texto da página, que já trazem esses termos.
+export const PALAVRAS_CHAVE_DA_HOME = [
+  'gerador de pessoa',
+  'gerador de pessoa de teste',
+  'gerador de dados fake',
+  'gerador de CPF',
+  'gerador de CNPJ',
+  'gerador de CEP',
+  'dados de teste para formulários',
+  'preencher formulário automaticamente',
+  'cartão de teste',
+]
 export const TITULO_DA_PRIVACIDADE = 'Política de privacidade do Botaí'
 export const DESCRICAO_DA_PRIVACIDADE =
   'Como o Botaí trata seus dados: a extensão não envia nada. O que ela acessa e guarda, as permissões, o que este site registra e seus direitos na LGPD.'

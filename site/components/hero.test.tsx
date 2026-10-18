@@ -27,9 +27,9 @@ describe('Hero', () => {
     const hero = renderizar()
     expect(hero.querySelector('p')).toHaveTextContent('~/pilulabs/botai')
     expect(
-      within(hero).getByText(/^O Botaí gera uma pessoa brasileira fictícia/),
+      within(hero).getByText(/^O Botaí é um gerador de pessoa de teste/),
     ).toHaveTextContent(
-      'O Botaí gera uma pessoa brasileira fictícia e coerente, com CPF, CEP, celular e empresa que batem entre si, e preenche formulários com ela. Um motor só, com oito portas: extensão, CLI, biblioteca, HTTP, Docker, binários, Playwright e o motor direto na página.',
+      'O Botaí é um gerador de pessoa de teste: ele cria uma pessoa brasileira fictícia e coerente, com CPF, CEP, celular e empresa que batem entre si, e preenche formulários com ela. Um motor só, com oito portas: extensão, CLI, biblioteca, HTTP, Docker, binários, Playwright e o motor direto na página.',
     )
   })
 
