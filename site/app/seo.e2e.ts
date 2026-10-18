@@ -11,6 +11,7 @@ import {
   TITULO_DA_PRIVACIDADE,
   TITULO_DOS_TERMOS,
 } from '../lib/seo'
+import { REPOSITORIO } from '../lib/conteudo'
 import { SITE_DE_PRODUCAO } from '../lib/site'
 
 const ROTAS = [
@@ -198,6 +199,8 @@ test('JSON-LD de /: SoftwareApplication gratuito, sem nota, com as lojas do loja
   const lojas = lojasPublicadas(lerUrlsDasLojas()).map((l) => l.url)
   if (lojas.length > 0) expect(aplicacao.installUrl).toEqual(lojas)
   else expect(aplicacao).not.toHaveProperty('installUrl')
+  expect(aplicacao.sameAs).toEqual([REPOSITORIO, ...lojas])
+  expect(grafo[1]).toMatchObject({ name: 'Botaí', alternateName: ['Botai'] })
 })
 
 test('JSON-LD de /privacidade: a trilha Botaí › Política', async ({ page }) => {

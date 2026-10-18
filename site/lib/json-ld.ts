@@ -4,6 +4,7 @@ import {
   NOME,
   PROPOSTA,
   RECURSOS,
+  REPOSITORIO,
   REQUISITOS_DO_SOFTWARE,
   URL_DA_PILUTECH,
 } from './conteudo'
@@ -41,6 +42,7 @@ export function jsonLdDaHome(
         '@type': 'WebSite',
         '@id': `${raiz}#site`,
         name: NOME,
+        alternateName: ['Botai'],
         description: DESCRICAO_DA_HOME,
         url: raiz,
         inLanguage: 'pt-BR',
@@ -63,6 +65,7 @@ export function jsonLdDaHome(
           urlAbsoluta(c.variantes.escuro.src, siteUrl),
         ),
         ...(instalacao.length > 0 ? { installUrl: instalacao } : {}),
+        sameAs: [REPOSITORIO, ...instalacao],
         offers: { '@type': 'Offer', price: 0, priceCurrency: 'BRL' },
         publisher: pilutech,
         author: pilutech,
