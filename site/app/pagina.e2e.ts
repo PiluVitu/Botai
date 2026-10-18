@@ -128,13 +128,17 @@ test.describe('/', () => {
       await expect(page).toHaveURL(new RegExp(`#${id}$`))
       await expect(page.locator(`#${id} h2`)).toBeInViewport()
     }
-    // A âncora da Extensão traz a captura (lazy) para a tela. O `next start` prende a chave do
-    // /_next/image cujo pedido foi abortado (⚠️ do site/CLAUDE.md): espera a captura antes de fechar.
+    // A âncora da Extensão traz as capturas (lazy) para a tela. O `next start` prende a chave do
+    // /_next/image cujo pedido foi abortado (⚠️ do site/CLAUDE.md): espera todas antes de fechar.
+    const capturas = page.locator('#extensao img:visible')
+    await expect(capturas).not.toHaveCount(0)
     await expect
       .poll(() =>
-        page
-          .locator('#extensao img:visible')
-          .evaluate((img) => (img as HTMLImageElement).naturalWidth),
+        capturas.evaluateAll((imgs) =>
+          Math.min(
+            ...imgs.map((img) => (img as HTMLImageElement).naturalWidth),
+          ),
+        ),
       )
       .toBeGreaterThan(0)
   })
