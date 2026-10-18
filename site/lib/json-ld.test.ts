@@ -49,6 +49,7 @@ describe('jsonLdDaHome', () => {
       '@type': 'WebSite',
       '@id': `${SITE}/#site`,
       name: 'Botaí',
+      alternateName: ['Botai'],
       description: DESCRICAO_DA_HOME,
       url: `${SITE}/`,
       inLanguage: 'pt-BR',
@@ -84,10 +85,28 @@ describe('jsonLdDaHome', () => {
         `${SITE}/capturas/07-favoritos-escuro.png`,
         `${SITE}/capturas/09-cartao-escuro.png`,
       ],
+      sameAs: ['https://github.com/PiluVitu/Botai'],
       offers: { '@type': 'Offer', price: 0, priceCurrency: 'BRL' },
       publisher: { '@id': ID_DA_PILUTECH },
       author: { '@id': ID_DA_PILUTECH },
     })
+  })
+
+  // Liga a marca aos perfis oficiais: o repositório e as páginas das lojas publicadas.
+  it('sameAs: o repositório e as lojas publicadas', () => {
+    const aplicacao = no(
+      'SoftwareApplication',
+      jsonLdDaHome(SITE, {
+        ...SEM_LOJA,
+        chromeUrl: URL_CHROME,
+        firefoxUrl: URL_FIREFOX,
+      })['@graph'],
+    )
+    expect(aplicacao?.sameAs).toEqual([
+      'https://github.com/PiluVitu/Botai',
+      URL_CHROME,
+      URL_FIREFOX,
+    ])
   })
 
   // O Google proíbe copiar a nota das lojas.
