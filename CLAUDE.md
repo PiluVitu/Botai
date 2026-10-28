@@ -12,6 +12,8 @@ Guia do Claude Code para o repositório do **Botaí** (`github.com/PiluVitu/Bota
 
 > **Regra de manutenção:** tecnologia nova ou fluxo mudado → atualize o `CLAUDE.md` do workspace onde mexeu (ou este, se for transversal).
 
+> **`PRODUTO.md` é texto público:** o build do repo `PiluVitu/pilutech-sites` o puxa para a seção "Mais sobre" de `pilutech.com.br/apps/botai`. Mudar ele muda a página do catálogo: nada interno, sem preço, sem promessa, e cada fato tem de bater com o código e o `extensao/README.md`.
+
 ## Origem e fronteira com o monorepo
 
 - O repo saiu do monorepo `PiluVitu/PiluVitu-Dev` em 2026-10, pelo `git filter-repo`, com o histórico: spec `docs/superpowers/specs/2026-10-05-botai-repo-proprio-design.md`, contrato `docs/superpowers/plans/2026-10-05-botai-repo-proprio-contrato.md` (nomes, caminhos, versões e environments que cruzam as fases) e plano `docs/superpowers/plans/2026-10-05-botai-fase0-separacao.md`. O log começa no primeiro commit que tocou o Botaí; os PRs antigos aparecem como `PiluVitu/PiluVitu-Dev#NN`.
