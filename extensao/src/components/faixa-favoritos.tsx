@@ -56,7 +56,7 @@ export function FaixaFavoritos({
               onClick={() => onUsar(favorito.id)}
               className={cn(
                 CHIP,
-                'gap-[7px] py-[5px] pr-2.5 pl-[5px]',
+                'motion-safe:animate-botai-aparecer gap-[7px] py-[5px] pr-2.5 pl-[5px]',
                 ativo
                   ? 'border-primary bg-accent-soft'
                   : 'bg-card hover:bg-accent',

@@ -4,6 +4,7 @@ import { cn } from '@piluvitu/ui/cn'
 import { ESTADO_SEM_URL, NOME_DO_NAVEGADOR } from '@/lib/extensao'
 import type { BotaoDeLoja } from '@/lib/modelo'
 import { LOJA_UI } from './lojas-ui'
+import { PRESSIONAR } from './pressionar'
 
 type BotoesLojaProps = { lojas: BotaoDeLoja[]; className?: string }
 
@@ -21,7 +22,10 @@ export function BotoesLoja({ lojas, className }: BotoesLojaProps) {
               <Button
                 asChild
                 size="lg"
-                className="h-auto min-h-11 max-w-full gap-2 px-5 py-2 font-semibold whitespace-normal"
+                className={cn(
+                  'h-auto min-h-11 max-w-full gap-2 px-5 py-2 font-semibold whitespace-normal',
+                  PRESSIONAR,
+                )}
               >
                 <a href={url} target="_blank" rel="noopener noreferrer">
                   <FontAwesomeIcon icon={icone} className="size-4" />

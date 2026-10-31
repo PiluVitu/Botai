@@ -25,7 +25,7 @@ import { FaixaFavoritos } from './faixa-favoritos'
 import { FavoritoRemovido } from './favorito-removido'
 import { FiltroChips } from './filtro-chips'
 import { LinhaCopiavel } from './linha-copiavel'
-import { BOTAO_SM, OVERLINE } from './tipografia'
+import { BOTAO_SM, OVERLINE, PRESSIONAR } from './tipografia'
 import { useCopiado } from './use-copiado'
 import { useDesfazer } from './use-desfazer'
 
@@ -180,7 +180,7 @@ export function PessoaPronta({
       <div className="flex flex-col gap-2 px-4 pb-4">
         <Button
           size="lg"
-          className="w-full gap-2"
+          className={cn('w-full gap-2', PRESSIONAR)}
           disabled={preencherDesabilitado}
           onClick={onPreencher}
         >
@@ -218,7 +218,10 @@ export function PessoaPronta({
         </div>
       </div>
       <FiltroChips opcoes={CHIPS} ativo={filtro} onChange={setFiltro} />
-      <div className="px-2 pb-3">
+      <div
+        key={`${filtro}:${pessoa.cpf}`}
+        className="motion-safe:animate-botai-aparecer px-2 pb-3"
+      >
         {grupos.map((grupo) => (
           <section key={grupo.id} aria-label={grupo.rotulo}>
             <CabecalhoGrupo rotulo={grupo.rotulo} total={grupo.linhas.length} />

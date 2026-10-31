@@ -242,7 +242,13 @@ function TelaDoPopup({
         )
       }
     >
-      {conteudo}
+      <div
+        key={`${estado.tela}:${pessoa === null ? 'sem-pessoa' : 'com-pessoa'}`}
+        data-tela={estado.tela}
+        className="motion-safe:animate-botai-entrar"
+      >
+        {conteudo}
+      </div>
     </PopupShell>
   )
 }
