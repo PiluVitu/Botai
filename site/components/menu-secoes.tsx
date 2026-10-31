@@ -3,6 +3,7 @@
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useEffect, useId, useRef, useState } from 'react'
+import { PRESSIONAR } from './pressionar'
 
 export type AncoraDoMenu = { id: string; rotulo: string }
 
@@ -41,15 +42,19 @@ export function MenuSecoes({ ancoras }: MenuSecoesProps) {
         aria-expanded={aberto}
         aria-controls={aberto ? idDoPainel : undefined}
         onClick={() => setAberto(!aberto)}
-        className="border-input text-foreground hover:bg-accent focus-visible:ring-ring inline-flex size-9 cursor-pointer items-center justify-center rounded-md border bg-transparent outline-none focus-visible:ring-2 min-[900px]:hidden"
+        className={`border-input text-foreground hover:bg-accent focus-visible:ring-ring inline-flex size-9 cursor-pointer items-center justify-center rounded-md border bg-transparent outline-none focus-visible:ring-2 min-[900px]:hidden ${PRESSIONAR}`}
       >
-        <FontAwesomeIcon icon={aberto ? faXmark : faBars} className="size-4" />
+        <FontAwesomeIcon
+          key={aberto ? 'fechar' : 'abrir'}
+          icon={aberto ? faXmark : faBars}
+          className="motion-safe:animate-botai-surgir size-4"
+        />
       </button>
       {aberto ? (
         <nav
           id={idDoPainel}
           aria-label="Seções"
-          className="bg-card border-border absolute inset-x-0 top-[calc(100%+8px)] z-10 flex flex-col rounded-lg border p-2 min-[900px]:hidden"
+          className="bg-card border-border motion-safe:animate-botai-entrar absolute inset-x-0 top-[calc(100%+8px)] z-10 flex flex-col rounded-lg border p-2 min-[900px]:hidden"
         >
           {ancoras.map((ancora) => (
             <a

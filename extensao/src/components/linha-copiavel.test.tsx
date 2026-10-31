@@ -40,4 +40,34 @@ describe('LinhaCopiavel', () => {
         .querySelector('svg[data-icon="check"]'),
     ).not.toBeNull()
   })
+
+  // A animação vem só com motion-safe: com "reduzir movimento" o CSS não a aplica (o E2E do popup confere).
+  it('o check entra com a animação motion-safe, e o ícone de copiar fica parado', () => {
+    const { rerender } = render(
+      <LinhaCopiavel
+        rotulo="CPF"
+        valor="529.982.247-25"
+        copiado={false}
+        onCopiar={vi.fn()}
+      />,
+    )
+    const botao = screen.getByRole('button', { name: 'Copiar CPF' })
+    expect(botao.querySelector('svg')).not.toHaveClass(
+      'motion-safe:animate-botai-surgir',
+    )
+    rerender(
+      <LinhaCopiavel
+        rotulo="CPF"
+        valor="529.982.247-25"
+        copiado
+        onCopiar={vi.fn()}
+      />,
+    )
+    expect(botao.querySelector('svg')).toHaveClass(
+      'motion-safe:animate-botai-surgir',
+    )
+    expect(screen.getByText('copiado')).toHaveClass(
+      'motion-safe:animate-botai-aparecer',
+    )
+  })
 })
