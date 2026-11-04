@@ -11,7 +11,16 @@ export default defineConfig({
     baseURL: 'http://localhost:3020',
     trace: 'on-first-retry',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: process.env.CI ? undefined : 'chrome',
+        launchOptions: { chromiumSandbox: !process.env.CI },
+      },
+    },
+  ],
   webServer: {
     command: 'pnpm run build && pnpm run start',
     url: 'http://localhost:3020',

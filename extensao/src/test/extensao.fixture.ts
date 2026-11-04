@@ -46,6 +46,7 @@ export const test = base.extend<{
   context: async ({ aparencia }, use) => {
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
+      chromiumSandbox: !process.env.CI,
       colorScheme: aparencia.tema === 'escuro' ? 'dark' : 'light',
       deviceScaleFactor: aparencia.escala,
       args: [
