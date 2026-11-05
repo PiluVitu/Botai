@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import type { Config } from 'jest'
 
 const config: Config = {
@@ -5,7 +6,14 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)sx?$': [
       'ts-jest',
-      { tsconfig: { moduleResolution: 'node', allowJs: true } },
+      {
+        tsconfig: {
+          moduleResolution: 'bundler',
+          allowJs: true,
+          // O TypeScript 6 não infere mais o rootDir, e os .js do @piluvitu/ui moram no node_modules/.pnpm da raiz.
+          rootDir: fileURLToPath(new URL('..', import.meta.url)),
+        },
+      },
     ],
   },
   // O @piluvitu/ui vem do npm só como ESM: sem transformá-lo, todo teste que renderiza um componente dele quebra.
