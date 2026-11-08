@@ -460,4 +460,19 @@ describe('PessoaPronta (1b): cartão', () => {
       screen.queryByRole('heading', { name: 'Cartão das próximas pessoas' }),
     ).toBeNull()
   })
+
+  // O key da lista muda com o filtro: ela é montada de novo e a entrada motion-safe roda outra vez.
+  it('trocar o filtro monta a lista de novo, com a entrada motion-safe', async () => {
+    render(<PessoaPronta {...props()} />)
+    const antes = screen.getByRole('region', { name: 'Pessoais' }).parentElement
+    expect(antes).toHaveClass('motion-safe:animate-botai-aparecer')
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Pessoais' }))
+    const depois = screen.getByRole('region', {
+      name: 'Pessoais',
+    }).parentElement
+    expect(depois).toHaveClass('motion-safe:animate-botai-aparecer')
+    expect(depois).not.toBe(antes)
+  })
 })

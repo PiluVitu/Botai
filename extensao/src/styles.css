@@ -12,6 +12,30 @@
 @source not '../scripts';
 @source not '../*.md';
 
+@theme {
+  --animate-botai-entrar: botai-entrar 200ms ease-out both;
+  --animate-botai-aparecer: botai-aparecer 180ms ease-out both;
+  --animate-botai-surgir: botai-surgir 160ms ease-out both;
+
+  @keyframes botai-entrar {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+  @keyframes botai-aparecer {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes botai-surgir {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+  }
+}
+
 @layer base {
   :root {
     --font-plus-jakarta: 'Plus Jakarta Sans Variable';

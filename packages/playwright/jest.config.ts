@@ -8,7 +8,7 @@ const config: Config = {
       {
         tsconfig: {
           module: 'commonjs',
-          moduleResolution: 'node',
+          moduleResolution: 'bundler',
           target: 'es2022',
           strict: true,
           esModuleInterop: true,

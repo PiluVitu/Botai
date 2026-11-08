@@ -115,6 +115,13 @@ CSS próprio em px (`preencher.content/aviso.css`, classes `botai-*` e variávei
   - ⚠️ No Playwright, `getByRole('button', { name: 'Nova pessoa' })` acha também o "Nova pessoa com …" (o nome casa por trecho): use `exact: true`, como em `favoritos.e2e.ts`. O mesmo vale para "Stripe" e "Pagar.me".
 - **Crédito "Powered by PiluTech"**: `CreditoPiluTech` é a última faixa do `PopupShell`, abaixo do rodapé quando ele existe, em todos os estados (1a–1e, inclusive o 1e, que não tem rodapé). O componente só recebe `onAbrirPiluTech`; quem abre `https://pilutech.com.br` numa aba nova (`browser.tabs.create`) é o `App.tsx`, como na caixa de entrada. Nome acessível "Powered by PiluTech (abre pilutech.com.br)". É `<div>` + `<button>`, **não** `<footer>`: um segundo `contentinfo` duplicaria o landmark do rodapé, e os testes usam "nenhum `contentinfo`" para dizer "estado sem rodapé".
 
+## Movimento
+
+- As animações moram no `@theme` do `src/styles.css`: `animate-botai-entrar` (opacidade + 4 px de subida, 200 ms; a tela do popup, o aviso de favorito removido), `animate-botai-aparecer` (só opacidade, 180 ms; o que troca dentro da tela: a lista de dados a cada filtro ou pessoa nova, os chips de favorito, o campo de apelido, o rótulo "copiado") e `animate-botai-surgir` (opacidade + escala de 0,8, 160 ms; o ícone que acabou de mudar: o check do copiar, a estrela cheia). Para repetir a entrada, o elemento ganha um `key` novo (a tela do `App`, a lista do `PessoaPronta`, o ícone).
+- Sempre com o prefixo `motion-safe:`, e o pressionar dos botões é o `PRESSIONAR` do `tipografia.ts` (escala de 0,97 em 150 ms, já dentro do `BOTAO_SM`). Só `transform`/`scale` e `opacity`; as cores seguem no `transition-colors` que já havia. Com "reduzir movimento", nada anima.
+- O aviso na página tem a própria `@keyframes botai-entrar` no `aviso.css`, dentro de `@media (prefers-reduced-motion: no-preference)`. A saída do aviso e a troca de tela não têm animação de saída.
+- Testes: o Vitest confere as classes e os `key`; o `popup.e2e.ts` ("prefers-reduced-motion") mede o `animation-name` computado da tela, do check e do aviso nas duas preferências.
+
 ## Stack e configuração (armadilhas medidas)
 
 - **Vite 8, `@vitejs/plugin-react` 6 e Vitest 5 sobem juntos** (o WXT 0.21.4 aceita `vite ^8.0.0-0`): o plugin 6 exige Vite 8 (no Vite 7 o build quebra com `ERR_PACKAGE_PATH_NOT_EXPORTED './internal'`). O plugin entra direto, sem `@wxt-dev/module-react`. O Vite 8 empacota com Rolldown e não traz esbuild próprio (só peer opcional, satisfeito pelo 0.28.1 do core).

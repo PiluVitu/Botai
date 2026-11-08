@@ -425,12 +425,62 @@ test.describe('/', () => {
       await page.setViewportSize({ width: 320, height: 800 })
       await page.goto('/')
       await page.getByRole('button', { name: 'Abrir menu' }).click()
-      await expect(
-        page.getByRole('banner').getByRole('navigation', { name: 'Seções' }),
-      ).toBeVisible()
+      const painel = page
+        .getByRole('banner')
+        .getByRole('navigation', { name: 'Seções' })
+      await expect(painel).toBeVisible()
+      // O axe mede o contraste com a opacidade do meio da entrada: espera o painel assentar.
+      await painel.evaluate((el) =>
+        Promise.all(el.getAnimations().map((animacao) => animacao.finished)),
+      )
       expect(await vazadosDaColuna(page)).toEqual([])
       expect(await violacoesDoAxe(page)).toEqual([])
     })
+  })
+
+  test.describe('movimento e prefers-reduced-motion', () => {
+    test.use({ viewport: { width: 390, height: 844 } })
+
+    const CASOS = [
+      { preferencia: 'no-preference', animacao: 'botai-entrar', transicoes: 1 },
+      { preferencia: 'reduce', animacao: 'none', transicoes: 0 },
+    ] as const
+
+    for (const { preferencia, animacao, transicoes } of CASOS) {
+      test(`${preferencia}: menu com animation-name ${animacao} e ${transicoes} View Transition na troca de tema`, async ({
+        page,
+      }) => {
+        await page.emulateMedia({ reducedMotion: preferencia })
+        await page.addInitScript(() => {
+          const original = document.startViewTransition.bind(document)
+          const janela = window as unknown as { transicoes: number }
+          janela.transicoes = 0
+          document.startViewTransition = ((...args: [() => void]) => {
+            janela.transicoes += 1
+            return original(...args)
+          }) as typeof document.startViewTransition
+        })
+        await page.goto('/')
+        await page.getByRole('button', { name: 'Abrir menu' }).click()
+        await expect(
+          page.getByRole('banner').getByRole('navigation', { name: 'Seções' }),
+        ).toHaveCSS('animation-name', animacao)
+
+        await page.keyboard.press('Escape')
+        const escuro = await page.evaluate(() =>
+          document.documentElement.classList.contains('dark'),
+        )
+        await page.getByRole('button', { name: 'Alternar tema' }).click()
+        await expect(page.locator('html')).toHaveClass(
+          escuro ? /\blight\b/ : /\bdark\b/,
+        )
+        expect(
+          await page.evaluate(
+            () => (window as unknown as { transicoes: number }).transicoes,
+          ),
+        ).toBe(transicoes)
+      })
+    }
   })
 
   // Review Focus 3.

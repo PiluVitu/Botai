@@ -15,9 +15,37 @@ function renderizar(temaInicial: 'dark' | 'light') {
   )
 }
 
+function preferirMovimento(reduzido: boolean) {
+  window.matchMedia = jest.fn().mockImplementation((consulta: string) => ({
+    matches: reduzido && consulta === '(prefers-reduced-motion: reduce)',
+    media: consulta,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+  }))
+}
+
+function simularViewTransition() {
+  const iniciar = jest.fn((trocar: () => void) => {
+    trocar()
+    return {} as ViewTransition
+  })
+  document.startViewTransition =
+    iniciar as unknown as typeof document.startViewTransition
+  return iniciar
+}
+
+const matchMediaOriginal = window.matchMedia
+
 beforeEach(() => {
   localStorage.clear()
   document.documentElement.className = ''
+})
+
+afterEach(() => {
+  window.matchMedia = matchMediaOriginal
+  Reflect.deleteProperty(document, 'startViewTransition')
 })
 
 describe('BotaoTema', () => {
@@ -33,6 +61,32 @@ describe('BotaoTema', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Alternar tema' }))
     expect(document.documentElement).toHaveClass('dark')
     expect(localStorage.getItem('theme')).toBe('dark')
+  })
+
+  // A troca de tema vira um cross-fade da página inteira pela View Transitions API.
+  it('com movimento, troca o tema dentro de uma View Transition', async () => {
+    preferirMovimento(false)
+    const iniciar = simularViewTransition()
+    renderizar('light')
+    await userEvent.click(screen.getByRole('button', { name: 'Alternar tema' }))
+    expect(iniciar).toHaveBeenCalledTimes(1)
+    expect(document.documentElement).toHaveClass('dark')
+  })
+
+  it('com "reduzir movimento", troca o tema na hora, sem View Transition', async () => {
+    preferirMovimento(true)
+    const iniciar = simularViewTransition()
+    renderizar('light')
+    await userEvent.click(screen.getByRole('button', { name: 'Alternar tema' }))
+    expect(iniciar).not.toHaveBeenCalled()
+    expect(document.documentElement).toHaveClass('dark')
+  })
+
+  it('sem a API (Firefox antigo), troca o tema na hora', async () => {
+    preferirMovimento(false)
+    renderizar('dark')
+    await userEvent.click(screen.getByRole('button', { name: 'Alternar tema' }))
+    expect(document.documentElement).toHaveClass('light')
   })
 
   // A classe .dark do <html> sai do script do next-themes antes da hidratação: o ícone certo aparece sem piscar.

@@ -4,6 +4,7 @@ import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { cn } from '@piluvitu/ui/cn'
 import { useEffect, useRef, useState } from 'react'
+import { PRESSIONAR } from './pressionar'
 
 export const TEMPO_DO_COPIADO = 1600
 
@@ -50,11 +51,16 @@ export function BotaoCopiar({
         className={cn(
           'border-border bg-muted text-foreground hover:bg-accent focus-visible:ring-ring inline-flex cursor-pointer items-center justify-center border outline-none focus-visible:ring-2',
           TAMANHO[tamanho].botao,
+          PRESSIONAR,
         )}
       >
         <FontAwesomeIcon
+          key={copiado ? 'copiado' : 'copiar'}
           icon={copiado ? faCheck : faCopy}
-          className={TAMANHO[tamanho].icone}
+          className={cn(
+            TAMANHO[tamanho].icone,
+            copiado && 'motion-safe:animate-botai-surgir',
+          )}
         />
       </button>
       <span role="status" className="sr-only">

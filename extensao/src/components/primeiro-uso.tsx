@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@piluvitu/ui/button'
 import { Card } from '@piluvitu/ui/card'
 import { cn } from '@piluvitu/ui/cn'
-import { CORPO, OVERLINE, PAINEL } from './tipografia'
+import { CORPO, OVERLINE, PAINEL, PRESSIONAR } from './tipografia'
 
 const GARANTIAS: readonly [string, string][] = [
   ['CPF/CNPJ', 'dígito verificador correto'],
@@ -33,7 +33,11 @@ export function PrimeiroUso({ onGerar }: { onGerar: () => void }) {
           </div>
         ))}
       </Card>
-      <Button size="lg" className="w-full gap-2" onClick={onGerar}>
+      <Button
+        size="lg"
+        className={cn('w-full gap-2', PRESSIONAR)}
+        onClick={onGerar}
+      >
         <FontAwesomeIcon icon={faUserPlus} className="text-[13px]" />
         Gerar pessoa
       </Button>

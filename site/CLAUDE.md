@@ -85,6 +85,12 @@ scripts/              conferir-rotas-estaticas.mjs (roda no build)
 - **Search Console:** `GOOGLE_SITE_VERIFICATION` vira `metadata.verification.google`. Cadastrar o domínio é passo do dono.
 - **Lighthouse:** não há ferramenta no repo nem no PATH; as checagens estão no `app/seo.e2e.ts` (título, descrição, canonical, OG com a imagem 1200×630, JSON-LD, `h1` único, níveis de título, `alt`, robots, sitemap, ícones, manifest e `axe-core` WCAG 2.1 A/AA nos dois temas) e a 320 px nos E2E das rotas.
 
+## Movimento
+
+- `@theme` do `app/globals.css`: `animate-botai-entrar` (painel do menu), `animate-botai-surgir` (ícone do copiar e do menu, com `key` novo a cada troca), sempre com `motion-safe:`; o pressionar é o `PRESSIONAR` de `components/pressionar.ts` (botões das lojas, copiar, tema e menu). Só `transform`/`scale` e `opacity`.
+- Troca de tema: o `BotaoTema` chama `document.startViewTransition` com `flushSync(() => setTheme(...))` (o `setTheme` do next-themes só aplica a classe num efeito; sem o `flushSync`, a foto "depois" sai igual à "antes"). O cross-fade dura 250 ms (`::view-transition-*` no `globals.css`). Sem a API ou com "reduzir movimento", troca na hora; o `disableTransitionOnChange` do `TemaProvider` continua.
+- Testes: Jest do `BotaoTema` (com e sem a preferência, sem a API) e o bloco "movimento e prefers-reduced-motion" do `pagina.e2e.ts` (animation-name do menu e contagem de View Transitions).
+
 ## Build
 
 - `pnpm build` = `next build` + o gate do `@source` (`../scripts/check-tailwind-source.mjs .next`; a classe que ele procura está em `SENTINEL_SELECTOR`, no topo do script) + `scripts/conferir-rotas-estaticas.mjs`, que falha se uma rota de `ROTAS` sumir do `prerender-manifest.json` ou ganhar `revalidate`. Rota nova entra em `ROTAS`.

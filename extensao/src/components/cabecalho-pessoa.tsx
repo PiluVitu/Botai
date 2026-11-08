@@ -89,7 +89,14 @@ function BotaoEstrela({
         bloqueada && 'cursor-not-allowed opacity-45',
       )}
     >
-      <Estrela preenchida={favorita} className="size-[17px]" />
+      <Estrela
+        key={favorita ? 'cheia' : 'vazia'}
+        preenchida={favorita}
+        className={cn(
+          'size-[17px]',
+          favorita && 'motion-safe:animate-botai-surgir',
+        )}
+      />
     </button>
   )
 }
@@ -108,7 +115,7 @@ function CampoApelido({
   }, [])
   return (
     <form
-      className="flex min-w-0 flex-1 flex-col gap-1.5"
+      className="motion-safe:animate-botai-aparecer flex min-w-0 flex-1 flex-col gap-1.5"
       onSubmit={(evento) => {
         evento.preventDefault()
         onSalvar()

@@ -22,7 +22,7 @@ Guia do Claude Code para o repositório do **Botaí** (`github.com/PiluVitu/Bota
 
 ## Stack
 
-pnpm 11.1.1 (workspaces `extensao`, `site`, `documentacao`, `packages/*`), Node 22 no CI (24.14.0 na reprodução da AMO e na publicação no npm), TypeScript strict, Tailwind CSS 4 + `@piluvitu/ui`, WXT 0.21.4 (Vite 8, Rolldown), Next 16, Docusaurus 3.10.2 (documentação, 3022), Jest 30 (core e site), Vitest 5 (extensão), Storybook 10 (extensão 6018, site 6019), Playwright 1.63.0. Distribuição do core (fase 2): Bun 1.4.2 (`.bun-version`, binários), Docker (imagem `ghcr.io/piluvitu/botai` sobre `node:24.21.0-alpine3.24`) e ShellCheck (`lint` do core). Motor DOM do core (fase 3): esbuild 0.28.2, a versão do Vite no lockfile, gera o `dist/navegador.iife.js`.
+pnpm 11.1.1 (workspaces `extensao`, `site`, `documentacao`, `packages/*`), Node 22 no CI (24.14.0 na reprodução da AMO e na publicação no npm), TypeScript 6 strict (o ts-jest dos `jest.config.ts` usa `moduleResolution: 'bundler'`, porque o `node10` saiu no TS 6, e o do site fixa o `rootDir` na raiz do repo, porque ele transforma os `.js` do `@piluvitu/ui` no `node_modules/.pnpm`), Tailwind CSS 4 + `@piluvitu/ui`, WXT 0.21.4 (Vite 8, Rolldown), Next 16, Docusaurus 3.10.2 (documentação, 3022), Jest 30 (core e site), Vitest 5 (extensão), Storybook 10 (extensão 6018, site 6019), Playwright 1.63.0. Distribuição do core (fase 2): Bun 1.4.2 (`.bun-version`, binários), Docker (imagem `ghcr.io/piluvitu/botai` sobre `node:24.21.0-alpine3.24`) e ShellCheck (`lint` do core). Motor DOM do core (fase 3): esbuild 0.28.2, a versão do Vite no lockfile, gera o `dist/navegador.iife.js`.
 
 ## Segurança de dependências (spec §5.3)
 

@@ -22,7 +22,7 @@ export function LinhaCopiavel({
     >
       <span className="text-muted-foreground text-xs" aria-live="polite">
         {copiado ? (
-          <span className="text-ok font-mono text-[11px] font-semibold">
+          <span className="text-ok motion-safe:animate-botai-aparecer font-mono text-[11px] font-semibold">
             copiado
           </span>
         ) : (
@@ -43,8 +43,12 @@ export function LinhaCopiavel({
         )}
       >
         <FontAwesomeIcon
+          key={copiado ? 'copiado' : 'copiar'}
           icon={copiado ? faCheck : faCopy}
-          className="text-xs"
+          className={cn(
+            'text-xs',
+            copiado && 'motion-safe:animate-botai-surgir',
+          )}
         />
       </button>
     </div>

@@ -117,7 +117,15 @@ describe('construirAviso', () => {
     expect(variaveis.filter((v) => !v.startsWith('--botai-'))).toEqual([])
     expect(css.match(/@keyframes\s+([\w-]+)/g)).toEqual([
       '@keyframes botai-tempo',
+      '@keyframes botai-entrar',
     ])
     expect(css).toContain('animation: botai-tempo ')
+  })
+
+  it('a entrada do aviso só roda sem "reduzir movimento"', () => {
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion: no-preference\) \{\s*\.botai-toast \{\s*animation: botai-entrar 200ms ease-out;/,
+    )
+    expect(css.match(/animation: botai-entrar/g)).toHaveLength(1)
   })
 })

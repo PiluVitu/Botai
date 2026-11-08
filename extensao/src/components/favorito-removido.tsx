@@ -8,7 +8,7 @@ export function FavoritoRemovido({
   return (
     <div role="status">
       {apelido !== null && (
-        <div className="bg-card text-muted-foreground mx-4 mb-2.5 flex items-center gap-2.5 rounded-xl border py-2 pr-2 pl-3 text-xs leading-normal">
+        <div className="bg-card text-muted-foreground motion-safe:animate-botai-entrar mx-4 mb-2.5 flex items-center gap-2.5 rounded-xl border py-2 pr-2 pl-3 text-xs leading-normal">
           <span className="min-w-0">
             <strong className="text-foreground font-semibold">{apelido}</strong>{' '}
             saiu dos favoritos.
