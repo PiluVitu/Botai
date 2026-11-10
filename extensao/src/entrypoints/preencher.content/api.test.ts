@@ -47,16 +47,16 @@ describe('criarApi', () => {
     expect(resultado.naoReconhecidos.map((l) => l.rotulo)).toEqual([
       'Código de indicação',
     ])
-    expect(outlineDoNome()).toBe('2px solid #38bdf8')
+    expect(outlineDoNome()).toBe('2px solid rgb(56, 189, 248)')
   })
 
   it('reinjetar (o atalho de novo) invalida a instância antiga e devolve o outline do site', () => {
     criarApi(new ContentScriptContext('preencher')).preencher(P, HOJE)
-    expect(outlineDoNome()).toBe('2px solid #38bdf8')
+    expect(outlineDoNome()).toBe('2px solid rgb(56, 189, 248)')
     const nova = new ContentScriptContext('preencher')
     expect(outlineDoNome()).toBe('1px dotted red')
     criarApi(nova).preencher(P, HOJE)
-    expect(outlineDoNome()).toBe('2px solid #38bdf8')
+    expect(outlineDoNome()).toBe('2px solid rgb(56, 189, 248)')
     nova.abort()
     expect(outlineDoNome()).toBe('1px dotted red')
   })
@@ -69,7 +69,7 @@ describe('criarApi', () => {
     nome().dispatchEvent(
       new Event('pointerdown', { bubbles: true, composed: true }),
     )
-    expect(outlineDoNome()).toBe('2px solid #38bdf8')
+    expect(outlineDoNome()).toBe('2px solid rgb(56, 189, 248)')
   })
 
   it('mostrar rola até o campo do idx; idx desconhecido devolve false', () => {
