@@ -127,7 +127,9 @@ describe('preencherDocumento', () => {
     expect(resultado.preenchidos).toEqual([])
     expect(uf.value).toBe('')
     expect(ouvinte).not.toHaveBeenCalled()
-    expect(uf.style.getPropertyValue('outline')).toBe('2px dashed #f5b82e')
+    expect(uf.style.getPropertyValue('outline')).toBe(
+      '2px dashed rgb(245, 184, 46)',
+    )
   })
 
   it('campo sem label usa o aria-label como rótulo, e o label visível vence o aria-label', () => {
@@ -176,13 +178,13 @@ describe('preencherDocumento', () => {
   it('contorna em ciano os preenchidos e em âmbar os demais, sem tirar o foco de onde está', () => {
     preencher()
     expect(campo('nome').style.getPropertyValue('outline')).toBe(
-      '2px solid #38bdf8',
+      '2px solid rgb(56, 189, 248)',
     )
     expect(campo('senha').style.getPropertyValue('outline')).toBe(
-      '2px dashed #f5b82e',
+      '2px dashed rgb(245, 184, 46)',
     )
     expect(campo('ref_code').style.getPropertyValue('outline')).toBe(
-      '2px dashed #f5b82e',
+      '2px dashed rgb(245, 184, 46)',
     )
     expect(campo('csrf').style.getPropertyValue('outline')).toBe('')
     expect(document.activeElement).toBe(document.body)

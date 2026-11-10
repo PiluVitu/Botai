@@ -21,8 +21,8 @@ describe('criarContornos', () => {
     const contornos = novos()
     contornos.marcar(el('a'), 'preenchido')
     contornos.marcar(el('b'), 'nao-reconhecido')
-    expect(outline('a')).toBe('2px solid #38bdf8')
-    expect(outline('b')).toBe('2px dashed #f5b82e')
+    expect(outline('a')).toBe('2px solid rgb(56, 189, 248)')
+    expect(outline('b')).toBe('2px dashed rgb(245, 184, 46)')
     expect(el('a').style.getPropertyValue('outline-offset')).toBe('1px')
   })
 
@@ -62,12 +62,12 @@ describe('criarContornos', () => {
       visto.push(outline('a'))
     }
     expect(visto).toEqual([
-      '2px dashed #f5b82e',
+      '2px dashed rgb(245, 184, 46)',
       '2px dashed transparent',
-      '2px dashed #f5b82e',
+      '2px dashed rgb(245, 184, 46)',
       '2px dashed transparent',
-      '2px dashed #f5b82e',
-      '2px solid #38bdf8',
+      '2px dashed rgb(245, 184, 46)',
+      '2px solid rgb(56, 189, 248)',
     ])
   })
 
@@ -131,9 +131,9 @@ describe('criarContornos', () => {
     vi.advanceTimersByTime(500)
     contornos.destacar(el('a'))
     vi.advanceTimersByTime(500)
-    expect(outline('a')).toBe('2px dashed #f5b82e')
+    expect(outline('a')).toBe('2px dashed rgb(245, 184, 46)')
     vi.advanceTimersByTime(500)
-    expect(outline('a')).toBe('2px solid #38bdf8')
+    expect(outline('a')).toBe('2px solid rgb(56, 189, 248)')
   })
 })
 

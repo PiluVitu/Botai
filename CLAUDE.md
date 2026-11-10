@@ -24,6 +24,11 @@ Guia do Claude Code para o repositório do **Botaí** (`github.com/PiluVitu/Bota
 
 pnpm 11.1.1 (workspaces `extensao`, `site`, `documentacao`, `packages/*`), Node 22 no CI (24.14.0 na reprodução da AMO e na publicação no npm), TypeScript 6 strict (o ts-jest dos `jest.config.ts` usa `moduleResolution: 'bundler'`, porque o `node10` saiu no TS 6, e o do site fixa o `rootDir` na raiz do repo, porque ele transforma os `.js` do `@piluvitu/ui` no `node_modules/.pnpm`), Tailwind CSS 4 + `@piluvitu/ui`, WXT 0.21.4 (Vite 8, Rolldown), Next 16, Docusaurus 3.10.2 (documentação, 3022), Jest 30 (core e site), Vitest 5 (extensão), Storybook 10 (extensão 6018, site 6019), Playwright 1.63.0. Distribuição do core (fase 2): Bun 1.4.2 (`.bun-version`, binários), Docker (imagem `ghcr.io/piluvitu/botai` sobre `node:24.21.0-alpine3.24`) e ShellCheck (`lint` do core). Motor DOM do core (fase 3): esbuild 0.28.2, a versão do Vite no lockfile, gera o `dist/navegador.iife.js`.
 
+## Majors adiadas (conferido em 2026-11-10)
+
+- **ESLint 10 só no `site/`:** a `extensao/` fica no 9.39.x porque o `eslint-plugin-react` 7.37.5 (o último; o `eslint-plugin-jsx-a11y` 6.10.2 também só declara até o 9) quebra no 10 (`context.getFilename is not a function`). Sobe quando o plugin do React lançar versão que aceite o 10.
+- **TypeScript 7 (compilador nativo) fora de todos os workspaces:** `ts-jest` (`<7`), `typescript-eslint` e `next` (`<6.1`) não o aceitam nos peers, e o pacote 7 não traz a API JS do compilador. Sobe quando esses três declararem o 7.
+
 ## Segurança de dependências (spec §5.3)
 
 - **pnpm ≥ 11** (`packageManager: pnpm@11.1.1`): script de instalação de dependência fica bloqueado; só os de `allowBuilds` rodam. Nunca `dangerouslyAllowAllBuilds`. Script de que o pacote não precisa fica negado com `false`, porque sem entrada nenhuma o pnpm 11 falha o install (`ERR_PNPM_IGNORED_BUILDS`). Hoje: `@parcel/watcher` (via `jest-haste-map`, desde o Jest 30.5), cujo script só compila com `npm_config_build_from_source=true`; o binário vem do pacote opcional da plataforma. E `core-js` (via `@docusaurus/core`, na `documentacao/`), cujo postinstall só imprime o pedido de doação.
