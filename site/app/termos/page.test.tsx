@@ -142,10 +142,10 @@ describe('/termos', () => {
     }))
       expect(link).toHaveAttribute('href', '/privacidade')
     expect(
-      screen.getByRole('link', { name: 'pilutechinformatica@gmail.com' }),
+      screen.getByRole('link', { name: 'help@pilutech.com.br' }),
     ).toHaveAttribute(
       'href',
-      'mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Termos%20de%20uso',
+      'mailto:help@pilutech.com.br?subject=%5BBota%C3%AD%5D%20Termos%20de%20uso',
     )
     expect(
       screen.getByRole('link', { name: 'histórico do código-fonte do site' }),

@@ -15,7 +15,7 @@ test.describe('/privacidade', () => {
     await expect(
       page
         .locator(
-          'a[href="mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Privacidade"]',
+          'a[href="mailto:help@pilutech.com.br?subject=%5BBota%C3%AD%5D%20Privacidade"]',
         )
         .first(),
     ).toBeVisible()

@@ -83,14 +83,13 @@ describe('documentos e código-fonte', () => {
 describe('contato e links da PiluTech', () => {
   // O dono filtra no Gmail com subject:Botaí: cada link diz de onde veio (RFC 6068, UTF-8).
   it('suporte, privacidade e termos vão para o e-mail da PiluTech com [Botaí] no assunto', () => {
-    expect(EMAIL_DE_SUPORTE).toBe('pilutechinformatica@gmail.com')
+    expect(EMAIL_DE_SUPORTE).toBe('help@pilutech.com.br')
     expect(MAILTO).toEqual({
-      suporte:
-        'mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Suporte',
+      suporte: 'mailto:help@pilutech.com.br?subject=%5BBota%C3%AD%5D%20Suporte',
       privacidade:
-        'mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Privacidade',
+        'mailto:help@pilutech.com.br?subject=%5BBota%C3%AD%5D%20Privacidade',
       termos:
-        'mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Termos%20de%20uso',
+        'mailto:help@pilutech.com.br?subject=%5BBota%C3%AD%5D%20Termos%20de%20uso',
     })
   })
 

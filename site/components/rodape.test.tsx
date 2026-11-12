@@ -69,7 +69,7 @@ describe('Rodape', () => {
     )
     expect(screen.getByRole('link', { name: 'Suporte' })).toHaveAttribute(
       'href',
-      'mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Suporte',
+      'mailto:help@pilutech.com.br?subject=%5BBota%C3%AD%5D%20Suporte',
     )
   })
 
