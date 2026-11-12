@@ -52,7 +52,7 @@ describe('textos da listagem', () => {
     const enderecos = textos.get('Endereços')
     expect(enderecos).toContain('https://botai.pilutech.com.br\n')
     expect(enderecos).toContain('https://botai.pilutech.com.br/privacidade')
-    expect(enderecos).toContain('pilutechinformatica@gmail.com')
+    expect(enderecos).toContain('help@pilutech.com.br')
     expect(enderecos).toContain('Publicador: PiluTech')
   })
 

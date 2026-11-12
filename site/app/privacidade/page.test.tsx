@@ -269,11 +269,11 @@ describe('/privacidade', () => {
 
   it('contato, termos e histórico', () => {
     for (const link of screen.getAllByRole('link', {
-      name: 'pilutechinformatica@gmail.com',
+      name: 'help@pilutech.com.br',
     }))
       expect(link).toHaveAttribute(
         'href',
-        'mailto:pilutechinformatica@gmail.com?subject=%5BBota%C3%AD%5D%20Privacidade',
+        'mailto:help@pilutech.com.br?subject=%5BBota%C3%AD%5D%20Privacidade',
       )
     expect(screen.getByRole('link', { name: 'termos de uso' })).toHaveAttribute(
       'href',

@@ -88,7 +88,7 @@ MIT. A AMO pede na primeira versão listed; as seguintes herdam.
 Site do produto e página de suporte: https://botai.pilutech.com.br
 Política de privacidade: https://botai.pilutech.com.br/privacidade
 Termos de uso: https://botai.pilutech.com.br/termos
-E-mail de suporte: pilutechinformatica@gmail.com
+E-mail de suporte: help@pilutech.com.br
 Publicador: PiluTech
 
 ## Política de privacidade (texto para a AMO)
