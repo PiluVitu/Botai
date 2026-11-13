@@ -16,6 +16,7 @@ export const ROTAS = [
   '/sitemap.xml',
   '/robots.txt',
   '/llms.txt',
+  '/llms-full.txt',
   '/manifest.webmanifest',
 ]
 

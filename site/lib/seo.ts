@@ -58,6 +58,7 @@ export const PAGINAS_DO_SITE: readonly PaginaDoSite[] = [
 
 export const CAMINHO_DO_SITEMAP = '/sitemap.xml'
 export const CAMINHO_DO_LLMS = '/llms.txt'
+export const CAMINHO_DO_LLMS_FULL = '/llms-full.txt'
 
 export function robotsTxt(siteUrl: string): string {
   return `${[
@@ -66,6 +67,7 @@ export function robotsTxt(siteUrl: string): string {
     '',
     `Sitemap: ${urlAbsoluta(CAMINHO_DO_SITEMAP, siteUrl)}`,
     `# llms.txt: ${urlAbsoluta(CAMINHO_DO_LLMS, siteUrl)}`,
+    `# llms-full.txt: ${urlAbsoluta(CAMINHO_DO_LLMS_FULL, siteUrl)}`,
   ].join('\n')}\n`
 }
 

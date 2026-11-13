@@ -12,7 +12,7 @@ Guia do Claude Code para o repositório do **Botaí** (`github.com/PiluVitu/Bota
 
 > **Regra de manutenção:** tecnologia nova ou fluxo mudado → atualize o `CLAUDE.md` do workspace onde mexeu (ou este, se for transversal).
 
-> **Padrões:** skill `padroes-produto-pilutech` (acessibilidade WCAG 2.2 AA, localização e `llms.txt`). O `/llms.txt` do site e o `/llms.txt` + `/llms-full.txt` da documentação saem no build dos mesmos dados das páginas (detalhes em `site/CLAUDE.md` e `documentacao/CLAUDE.md`, "SEO").
+> **Padrões:** skill `padroes-produto-pilutech` (acessibilidade WCAG 2.2 AA, localização e `llms.txt`). O `/llms.txt` + `/llms-full.txt` do site e da documentação saem no build dos mesmos dados das páginas; o `llms-full.txt` do site converte em Markdown o `<main>` das próprias páginas React (`/`, `/privacidade` e `/termos`), e componente cliente novo nelas precisa de regra no conversor (detalhes em `site/CLAUDE.md` e `documentacao/CLAUDE.md`, "SEO").
 
 > **`PRODUTO.md` é texto público:** o build do repo `PiluVitu/pilutech-sites` o puxa para a seção "Mais sobre" de `pilutech.com.br/apps/botai`. Mudar ele muda a página do catálogo: nada interno, sem preço, sem promessa, e cada fato tem de bater com o código e o `extensao/README.md`.
 

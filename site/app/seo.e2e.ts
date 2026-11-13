@@ -13,6 +13,42 @@ const ROTAS = PAGINAS_DO_SITE.map((pagina) => ({
 }))
 const TEXTO_UTF8 = 'text/plain; charset=utf-8'
 const ITEM_DO_LLMS = /^- \[[^\]]+\]\((https:\/\/|mailto:)[^)]+\): .+$/
+const LINK_MARKDOWN = /\[[^\]]*\]\(([^)\s]+)\)/g
+const URL_EM_LINHA = /^(?:URL|Índice das páginas): (\S+)$/gm
+
+// O que o llms-full.txt deixa de fora de propósito, com o motivo (o resto do main tem de estar nele):
+const FORA_DO_LLMS_FULL = [
+  // o que nem o leitor de tela lê;
+  '[aria-hidden="true"]',
+  '[hidden]',
+  // controles e mídia: o nome deles é aria-label ou alt, não texto da página;
+  'button',
+  'svg',
+  'img',
+  'input',
+  'select',
+  'textarea',
+  'script',
+  'style',
+  'noscript',
+  // da figure, tudo menos a legenda: as ilustrações do hero (o terminal e o formulário, com a tecla
+  // da TeclaLocal, que muda com o sistema de quem visita) e as capturas da seção Extensão.
+  'figure > :not(figcaption)',
+]
+// Além dos blocos, caption, pre, code e span: o comando do hero (div > code), a legenda da tabela de
+// atalhos e os textos soltos em span (o selo "semente 42", o número de cada seção) não ficam sem conferir.
+const TEXTO_DA_PAGINA =
+  'h1, h2, h3, h4, h5, h6, p, li, th, td, dt, dd, figcaption, caption, pre, code, span'
+
+function semMarcacao(markdown: string): string {
+  return markdown
+    .replace(/^[ \t]*`{3,}[^\n]*$/gm, '')
+    .replace(LINK_MARKDOWN, (link) => link.slice(1, link.indexOf('](')))
+    .replace(/^[ \t]*(?:(?:#{1,6}|>|[-*+]|\d+[.)])[ \t]+)+/gm, '')
+    .replace(/\\\|/g, '|')
+    .replace(/[*`]/g, '')
+    .replace(/\s+/g, ' ')
+}
 
 const naProducao = (caminho: string) =>
   new URL(caminho, `${SITE_DE_PRODUCAO}/`).href
@@ -200,7 +236,7 @@ test('JSON-LD de /termos: a trilha Botaí › Termos de uso', async ({ page }) =
   expect(itens.map((i) => i.name)).toEqual(['Botaí', 'Termos de uso'])
 })
 
-test('robots.txt: texto, libera tudo, aponta o sitemap e cita o llms.txt', async ({
+test('robots.txt: texto, libera tudo, aponta o sitemap e cita o llms.txt e o llms-full.txt', async ({
   request,
 }) => {
   const resposta = await request.get('/robots.txt')
@@ -209,10 +245,12 @@ test('robots.txt: texto, libera tudo, aponta o sitemap e cita o llms.txt', async
   const texto = await resposta.text()
   expect(texto).toContain('User-agent: *\nAllow: /\n')
   expect(texto).toContain(`Sitemap: ${SITE_DE_PRODUCAO}/sitemap.xml\n`)
-  expect(texto).toContain(`# llms.txt: ${SITE_DE_PRODUCAO}/llms.txt\n`)
+  expect(texto).toContain(
+    `# llms.txt: ${SITE_DE_PRODUCAO}/llms.txt\n# llms-full.txt: ${SITE_DE_PRODUCAO}/llms-full.txt\n`,
+  )
 })
 
-test('sitemap.xml: XML com as três rotas e o llms.txt, e cada uma responde', async ({
+test('sitemap.xml: XML com as três rotas, o llms.txt e o llms-full.txt, e cada um responde', async ({
   request,
 }) => {
   const resposta = await request.get('/sitemap.xml')
@@ -226,6 +264,7 @@ test('sitemap.xml: XML com as três rotas e o llms.txt, e cada uma responde', as
     `${SITE_DE_PRODUCAO}/privacidade`,
     `${SITE_DE_PRODUCAO}/termos`,
     `${SITE_DE_PRODUCAO}/llms.txt`,
+    `${SITE_DE_PRODUCAO}/llms-full.txt`,
   ])
   for (const loc of locs)
     expect((await request.get(new URL(loc).pathname)).status(), loc).toBe(200)
@@ -241,19 +280,106 @@ test('llms.txt: texto UTF-8 no formato do llmstxt.org', async ({ request }) => {
   const itens = texto.split('\n').filter((linha) => linha.startsWith('- '))
   expect(itens.length).toBeGreaterThan(0)
   for (const item of itens) expect(item).toMatch(ITEM_DO_LLMS)
+  expect(itens).toContain(
+    `- [llms-full.txt do site](${SITE_DE_PRODUCAO}/llms-full.txt): O conteúdo destas três páginas em Markdown, num arquivo só.`,
+  )
 })
+
+test('llms-full.txt: texto UTF-8, o cabeçalho e as três páginas, na ordem, com a URL e a descrição', async ({
+  request,
+}) => {
+  const resposta = await request.get('/llms-full.txt')
+  expect(resposta.status()).toBe(200)
+  expect(resposta.headers()['content-type']).toBe(TEXTO_UTF8)
+  const texto = await resposta.text()
+  expect(
+    texto.startsWith(
+      `# Botaí\n\n> ${DESCRICAO_DA_HOME}\n\nÍndice das páginas: ${SITE_DE_PRODUCAO}/llms.txt\n\n`,
+    ),
+  ).toBe(true)
+  expect(texto.match(/^# .+\n\nURL: .+\n\n> .+$/gm)).toEqual(
+    PAGINAS_DO_SITE.map(
+      ({ caminho, titulo, descricao }) =>
+        `# ${titulo}\n\nURL: ${naProducao(caminho)}\n\n> ${descricao}`,
+    ),
+  )
+  expect(texto).not.toMatch(/\n{3}|[ \t]$/m)
+  expect(texto).toMatch(/[^\n]\n$/)
+})
+
+// O texto de cada elemento de TEXTO_DA_PAGINA do main renderizado (menos FORA_DO_LLMS_FULL) tem de
+// estar no llms-full.txt: o arquivo sai da mesma árvore que o Next renderiza.
+for (const { caminho, titulo } of PAGINAS_DO_SITE)
+  test(`llms-full.txt traz o texto de ${caminho}`, async ({
+    page,
+    request,
+  }) => {
+    const completo = await (await request.get('/llms-full.txt')).text()
+    const inicio = completo.indexOf(
+      `\n# ${titulo}\n\nURL: ${naProducao(caminho)}\n`,
+    )
+    expect(inicio).toBeGreaterThan(0)
+    const fim = completo.indexOf('\n# ', inicio + 1)
+    const trecho = semMarcacao(
+      completo.slice(inicio, fim === -1 ? undefined : fim),
+    )
+    await page.goto(caminho)
+    const textos = await page.evaluate(
+      ({ fora, seletor }) => {
+        const ehBloco = (elemento: Element) => {
+          const exibicao = getComputedStyle(elemento).display
+          return !exibicao.startsWith('inline') && exibicao !== 'contents'
+        }
+        const textoDe = (no: Node): string => {
+          if (no.nodeType === Node.TEXT_NODE) return no.nodeValue ?? ''
+          if (!(no instanceof Element) || no.matches(fora)) return ''
+          const dentro = [...no.childNodes].map(textoDe).join('')
+          return ehBloco(no) ? ` ${dentro} ` : dentro
+        }
+        const main = document.querySelector('main')
+        if (!main) return []
+        return [...main.querySelectorAll(seletor)]
+          .filter((elemento) => !elemento.closest(fora))
+          .map((elemento) => textoDe(elemento).replace(/\s+/g, ' ').trim())
+          .filter(Boolean)
+      },
+      { fora: FORA_DO_LLMS_FULL.join(', '), seletor: TEXTO_DA_PAGINA },
+    )
+    expect(textos.length).toBeGreaterThan(20)
+    const faltando = textos
+      .map((texto) => texto.replace(/[*`]/g, ''))
+      .filter((texto) => !trecho.includes(texto))
+    expect(faltando).toEqual([])
+  })
 
 // O build do E2E não tem SITE_URL: os links do site saem com a origem de produção, e o servidor
 // local responde pelo caminho. O npm responde 403 a quem não é navegador (medido em 2026-11-12):
 // os pacotes são conferidos na API do registro.
-test('todo link do llms.txt responde', async ({ request }) => {
-  test.setTimeout(120_000)
-  const texto = await (await request.get('/llms.txt')).text()
-  const links = [...texto.matchAll(/^- \[[^\]]+\]\(([^)]+)\)/gm)].map(
-    ([, link]) => link,
+test('todo link do llms.txt e do llms-full.txt responde', async ({
+  request,
+}) => {
+  test.setTimeout(180_000)
+  const textos = await Promise.all(
+    ['/llms.txt', '/llms-full.txt'].map(async (caminho) =>
+      (await request.get(caminho)).text(),
+    ),
   )
+  const links = [
+    ...new Set(
+      textos.flatMap((texto) => [
+        ...[...texto.matchAll(LINK_MARKDOWN)].map(([, link]) => link),
+        ...[...texto.matchAll(URL_EM_LINHA)].map(([, link]) => link),
+      ]),
+    ),
+  ]
   const doSite = links.filter((link) => link.startsWith(`${SITE_DE_PRODUCAO}/`))
-  expect(doSite.length).toBe(PAGINAS_DO_SITE.length)
+  expect(new Set(doSite.map((link) => new URL(link).pathname))).toEqual(
+    new Set([
+      ...PAGINAS_DO_SITE.map(({ caminho }) => caminho),
+      '/llms.txt',
+      '/llms-full.txt',
+    ]),
+  )
   for (const link of doSite)
     expect((await request.get(new URL(link).pathname)).status(), link).toBe(200)
   // Os dois arquivos da documentação só existem depois do deploy deste PR; o build da
@@ -269,11 +395,13 @@ test('todo link do llms.txt responde', async ({ request }) => {
       !doSite.includes(link) &&
       !daDocumentacaoParaLlms.includes(link),
   )
-  expect(
-    links
-      .filter((link) => !link.startsWith('https://'))
-      .map((link) => link.split('?')[0]),
-  ).toEqual(['mailto:help@pilutech.com.br'])
+  expect([
+    ...new Set(
+      links
+        .filter((link) => !link.startsWith('https://'))
+        .map((link) => link.split('?')[0]),
+    ),
+  ]).toEqual(['mailto:help@pilutech.com.br'])
   for (const link of externos) {
     const url = new URL(link)
     const pedido =

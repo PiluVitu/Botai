@@ -38,9 +38,14 @@ test('a rota não é confundida com uma filha', () => {
   )
 })
 
-// Os arquivos do SEO (robots, sitemap, llms.txt) têm de sair prontos do build.
+// Os arquivos do SEO (robots, sitemap, llms.txt, llms-full.txt) têm de sair prontos do build.
 test('os arquivos de texto do SEO estão em ROTAS', () => {
-  for (const rota of ['/robots.txt', '/sitemap.xml', '/llms.txt'])
+  for (const rota of [
+    '/robots.txt',
+    '/sitemap.xml',
+    '/llms.txt',
+    '/llms-full.txt',
+  ])
     assert.ok(ROTAS.includes(rota), rota)
 })
 
@@ -50,6 +55,11 @@ test('todo route handler do app/ está em ROTAS', () => {
     .filter((arquivo) => /(^|[\\/])route\.ts$/.test(arquivo))
     .map((arquivo) => `/${dirname(arquivo).split(sep).join('/')}`)
     .sort()
-  assert.deepEqual(rotas, ['/favicon.ico', '/llms.txt', '/robots.txt'])
+  assert.deepEqual(rotas, [
+    '/favicon.ico',
+    '/llms-full.txt',
+    '/llms.txt',
+    '/robots.txt',
+  ])
   for (const rota of rotas) assert.ok(ROTAS.includes(rota), rota)
 })

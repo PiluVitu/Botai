@@ -34,15 +34,17 @@ it('PAGINAS_DO_SITE: as três rotas públicas, com o título e a descrição de 
 })
 
 describe('robotsTxt', () => {
-  it('libera tudo, aponta o sitemap e cita o llms.txt num comentário', () => {
+  it('libera tudo, aponta o sitemap e cita o llms.txt e o llms-full.txt em comentários', () => {
     expect(robotsTxt(SITE)).toBe(
-      `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n# llms.txt: ${SITE}/llms.txt\n`,
+      `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n# llms.txt: ${SITE}/llms.txt\n# llms-full.txt: ${SITE}/llms-full.txt\n`,
     )
   })
 
   it('os endereços saem da origem recebida', () => {
-    expect(robotsTxt('https://preview.exemplo.dev')).toContain(
-      'Sitemap: https://preview.exemplo.dev/sitemap.xml',
+    const robots = robotsTxt('https://preview.exemplo.dev')
+    expect(robots).toContain('Sitemap: https://preview.exemplo.dev/sitemap.xml')
+    expect(robots).toContain(
+      '# llms-full.txt: https://preview.exemplo.dev/llms-full.txt',
     )
   })
 })

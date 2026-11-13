@@ -8,12 +8,13 @@ afterAll(() => {
   if (SITE_URL_ORIGINAL !== undefined) process.env.SITE_URL = SITE_URL_ORIGINAL
 })
 
-it('lista /, /privacidade, /termos e o /llms.txt, no domínio de produção', () => {
+it('lista /, /privacidade, /termos, o /llms.txt e o /llms-full.txt, no domínio de produção', () => {
   expect(sitemap()).toEqual([
     { url: 'https://botai.pilutech.com.br/' },
     { url: 'https://botai.pilutech.com.br/privacidade' },
     { url: 'https://botai.pilutech.com.br/termos' },
     { url: 'https://botai.pilutech.com.br/llms.txt' },
+    { url: 'https://botai.pilutech.com.br/llms-full.txt' },
   ])
 })
 
@@ -24,5 +25,6 @@ it('SITE_URL troca a origem', () => {
     'https://preview.exemplo.dev/privacidade',
     'https://preview.exemplo.dev/termos',
     'https://preview.exemplo.dev/llms.txt',
+    'https://preview.exemplo.dev/llms-full.txt',
   ])
 })

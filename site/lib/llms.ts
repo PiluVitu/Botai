@@ -12,11 +12,18 @@ import {
   URL_DA_DOCUMENTACAO,
   URL_DA_PILUTECH,
 } from './conteudo'
+import type { ReactNode } from 'react'
 import { ROTULO_DA_LOJA } from './extensao'
+import { markdownDoMain } from './markdown'
 import { CONVITE } from './personas'
 import { lojasPublicadas, type Loja, type UrlsDasLojas } from './pilulabs'
 import { PORTAS } from './portas'
-import { DESCRICAO_DA_HOME, PAGINAS_DO_SITE } from './seo'
+import {
+  CAMINHO_DO_LLMS,
+  CAMINHO_DO_LLMS_FULL,
+  DESCRICAO_DA_HOME,
+  PAGINAS_DO_SITE,
+} from './seo'
 import { urlAbsoluta } from './site'
 
 export type ItemDoLlms = { titulo: string; url: string; descricao: string }
@@ -36,11 +43,19 @@ export function secoesDoLlms(
   return [
     {
       titulo: 'Páginas',
-      itens: PAGINAS_DO_SITE.map(({ caminho, titulo, descricao }) => ({
-        titulo,
-        url: urlAbsoluta(caminho, siteUrl),
-        descricao,
-      })),
+      itens: [
+        ...PAGINAS_DO_SITE.map(({ caminho, titulo, descricao }) => ({
+          titulo,
+          url: urlAbsoluta(caminho, siteUrl),
+          descricao,
+        })),
+        {
+          titulo: 'llms-full.txt do site',
+          url: urlAbsoluta(CAMINHO_DO_LLMS_FULL, siteUrl),
+          descricao:
+            'O conteúdo destas três páginas em Markdown, num arquivo só.',
+        },
+      ],
     },
     {
       titulo: 'Portas',
@@ -133,6 +148,34 @@ export function llmsTxt(siteUrl: string, urls: UrlsDasLojas): string {
             .join('\n'),
         ].join('\n\n'),
       ),
+  ]
+  return `${blocos.join('\n\n')}\n`
+}
+
+export function llmsFullTxt(
+  siteUrl: string,
+  arvores: Readonly<Record<string, ReactNode>>,
+): string {
+  const caminhos = PAGINAS_DO_SITE.map(({ caminho }) => caminho)
+  const sobrando = Object.keys(arvores).filter((c) => !caminhos.includes(c))
+  if (sobrando.length > 0)
+    throw new Error(
+      `O llms-full.txt recebeu página fora de PAGINAS_DO_SITE: ${sobrando.join(', ')}`,
+    )
+  const blocos = [
+    `# ${NOME}`,
+    `> ${DESCRICAO_DA_HOME}`,
+    `Índice das páginas: ${urlAbsoluta(CAMINHO_DO_LLMS, siteUrl)}`,
+    ...PAGINAS_DO_SITE.map(({ caminho, titulo, descricao }) => {
+      if (!Object.hasOwn(arvores, caminho))
+        throw new Error(`O llms-full.txt não recebeu a página ${caminho}.`)
+      return [
+        `# ${titulo}`,
+        `URL: ${urlAbsoluta(caminho, siteUrl)}`,
+        `> ${descricao}`,
+        markdownDoMain(arvores[caminho], { siteUrl, caminho, rebaixar: 1 }),
+      ].join('\n\n')
+    }),
   ]
   return `${blocos.join('\n\n')}\n`
 }
