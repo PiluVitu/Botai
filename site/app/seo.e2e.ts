@@ -3,37 +3,16 @@ import { lojasPublicadas } from '../lib/pilulabs'
 import type { AxeResults, RunOptions } from 'axe-core'
 import { lerUrlsDasLojas } from '../lib/lojas'
 import { faviconDoBotai } from '../lib/favicon'
-import {
-  DESCRICAO_DA_HOME,
-  DESCRICAO_DA_PRIVACIDADE,
-  DESCRICAO_DOS_TERMOS,
-  TITULO_DA_HOME,
-  TITULO_DA_PRIVACIDADE,
-  TITULO_DOS_TERMOS,
-} from '../lib/seo'
-import { REPOSITORIO } from '../lib/conteudo'
+import { DESCRICAO_DA_HOME, PAGINAS_DO_SITE } from '../lib/seo'
+import { REPOSITORIO, URL_DA_DOCUMENTACAO } from '../lib/conteudo'
 import { SITE_DE_PRODUCAO } from '../lib/site'
 
-const ROTAS = [
-  {
-    caminho: '/',
-    titulo: TITULO_DA_HOME,
-    descricao: DESCRICAO_DA_HOME,
-    imagem: '/opengraph-image',
-  },
-  {
-    caminho: '/privacidade',
-    titulo: TITULO_DA_PRIVACIDADE,
-    descricao: DESCRICAO_DA_PRIVACIDADE,
-    imagem: '/privacidade/opengraph-image',
-  },
-  {
-    caminho: '/termos',
-    titulo: TITULO_DOS_TERMOS,
-    descricao: DESCRICAO_DOS_TERMOS,
-    imagem: '/termos/opengraph-image',
-  },
-] as const
+const ROTAS = PAGINAS_DO_SITE.map((pagina) => ({
+  ...pagina,
+  imagem: `${pagina.caminho.replace(/\/$/, '')}/opengraph-image`,
+}))
+const TEXTO_UTF8 = 'text/plain; charset=utf-8'
+const ITEM_DO_LLMS = /^- \[[^\]]+\]\((https:\/\/|mailto:)[^)]+\): .+$/
 
 const naProducao = (caminho: string) =>
   new URL(caminho, `${SITE_DE_PRODUCAO}/`).href
@@ -221,17 +200,88 @@ test('JSON-LD de /termos: a trilha Botaí › Termos de uso', async ({ page }) =
   expect(itens.map((i) => i.name)).toEqual(['Botaí', 'Termos de uso'])
 })
 
-test('robots.txt libera tudo e aponta o sitemap', async ({ page }) => {
-  const texto = await (await page.request.get('/robots.txt')).text()
-  expect(texto).toContain('Allow: /')
-  expect(texto).toContain(`Sitemap: ${SITE_DE_PRODUCAO}/sitemap.xml`)
+test('robots.txt: texto, libera tudo, aponta o sitemap e cita o llms.txt', async ({
+  request,
+}) => {
+  const resposta = await request.get('/robots.txt')
+  expect(resposta.status()).toBe(200)
+  expect(resposta.headers()['content-type']).toBe(TEXTO_UTF8)
+  const texto = await resposta.text()
+  expect(texto).toContain('User-agent: *\nAllow: /\n')
+  expect(texto).toContain(`Sitemap: ${SITE_DE_PRODUCAO}/sitemap.xml\n`)
+  expect(texto).toContain(`# llms.txt: ${SITE_DE_PRODUCAO}/llms.txt\n`)
 })
 
-test('sitemap.xml lista as três rotas', async ({ page }) => {
-  const xml = await (await page.request.get('/sitemap.xml')).text()
-  expect(xml).toContain(`<loc>${SITE_DE_PRODUCAO}/</loc>`)
-  expect(xml).toContain(`<loc>${SITE_DE_PRODUCAO}/privacidade</loc>`)
-  expect(xml).toContain(`<loc>${SITE_DE_PRODUCAO}/termos</loc>`)
+test('sitemap.xml: XML com as três rotas e o llms.txt, e cada uma responde', async ({
+  request,
+}) => {
+  const resposta = await request.get('/sitemap.xml')
+  expect(resposta.status()).toBe(200)
+  expect(resposta.headers()['content-type']).toContain('xml')
+  const xml = await resposta.text()
+  expect(xml).toContain('<urlset')
+  const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => loc)
+  expect(locs).toEqual([
+    `${SITE_DE_PRODUCAO}/`,
+    `${SITE_DE_PRODUCAO}/privacidade`,
+    `${SITE_DE_PRODUCAO}/termos`,
+    `${SITE_DE_PRODUCAO}/llms.txt`,
+  ])
+  for (const loc of locs)
+    expect((await request.get(new URL(loc).pathname)).status(), loc).toBe(200)
+})
+
+test('llms.txt: texto UTF-8 no formato do llmstxt.org', async ({ request }) => {
+  const resposta = await request.get('/llms.txt')
+  expect(resposta.status()).toBe(200)
+  expect(resposta.headers()['content-type']).toBe(TEXTO_UTF8)
+  const texto = await resposta.text()
+  expect(texto.startsWith(`# Botaí\n\n> ${DESCRICAO_DA_HOME}\n\n`)).toBe(true)
+  expect(texto).toMatch(/[^\n]\n$/)
+  const itens = texto.split('\n').filter((linha) => linha.startsWith('- '))
+  expect(itens.length).toBeGreaterThan(0)
+  for (const item of itens) expect(item).toMatch(ITEM_DO_LLMS)
+})
+
+// O build do E2E não tem SITE_URL: os links do site saem com a origem de produção, e o servidor
+// local responde pelo caminho. O npm responde 403 a quem não é navegador (medido em 2026-11-12):
+// os pacotes são conferidos na API do registro.
+test('todo link do llms.txt responde', async ({ request }) => {
+  test.setTimeout(120_000)
+  const texto = await (await request.get('/llms.txt')).text()
+  const links = [...texto.matchAll(/^- \[[^\]]+\]\(([^)]+)\)/gm)].map(
+    ([, link]) => link,
+  )
+  const doSite = links.filter((link) => link.startsWith(`${SITE_DE_PRODUCAO}/`))
+  expect(doSite.length).toBe(PAGINAS_DO_SITE.length)
+  for (const link of doSite)
+    expect((await request.get(new URL(link).pathname)).status(), link).toBe(200)
+  // Os dois arquivos da documentação só existem depois do deploy deste PR; o build da
+  // documentação os confere.
+  const daDocumentacaoParaLlms = [
+    `${URL_DA_DOCUMENTACAO}/llms.txt`,
+    `${URL_DA_DOCUMENTACAO}/llms-full.txt`,
+  ]
+  expect(links).toEqual(expect.arrayContaining(daDocumentacaoParaLlms))
+  const externos = links.filter(
+    (link) =>
+      link.startsWith('https://') &&
+      !doSite.includes(link) &&
+      !daDocumentacaoParaLlms.includes(link),
+  )
+  expect(
+    links
+      .filter((link) => !link.startsWith('https://'))
+      .map((link) => link.split('?')[0]),
+  ).toEqual(['mailto:help@pilutech.com.br'])
+  for (const link of externos) {
+    const url = new URL(link)
+    const pedido =
+      url.hostname === 'www.npmjs.com'
+        ? `https://registry.npmjs.org/${url.pathname.replace(/^\/package\//, '')}`
+        : link
+    expect((await request.get(pedido)).status(), link).toBe(200)
+  }
 })
 
 // Quem não lê o <link rel="icon"> (favoritos, prévias de link, buscadores) pede o caminho padrão.

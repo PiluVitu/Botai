@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import config from './docusaurus.config.mjs'
+import llmsTxt from './plugins/llms-txt.mjs'
 
 const AQUI = dirname(fileURLToPath(import.meta.url))
 const [, classico] = config.presets.find(
@@ -23,12 +24,31 @@ test('só docs, na raiz de docs.botai.pilutech.com.br, em pt-BR', () => {
   assert.equal(classico.pages, false)
 })
 
-test('o sitemap fica ligado e o robots.txt aponta para ele', () => {
+test('o sitemap fica ligado e o robots.txt aponta para ele, com o llms.txt logo depois', () => {
   assert.notEqual(classico.sitemap, false)
   assert.match(
     readFileSync(join(AQUI, 'static/robots.txt'), 'utf8'),
-    /^Sitemap: https:\/\/docs\.botai\.pilutech\.com\.br\/sitemap\.xml$/m,
+    /^Sitemap: https:\/\/docs\.botai\.pilutech\.com\.br\/sitemap\.xml\n# llms\.txt: https:\/\/docs\.botai\.pilutech\.com\.br\/llms\.txt\n/m,
   )
+})
+
+test('o plugin do llms.txt está registrado', () => {
+  assert.ok(config.plugins.includes(llmsTxt))
+})
+
+test('o sitemap acrescenta o llms.txt ao fim dos itens padrão', async () => {
+  const padrao = [
+    { url: 'https://docs.botai.pilutech.com.br/', changefreq: 'weekly' },
+  ]
+  const itens = await classico.sitemap.createSitemapItems({
+    siteConfig: config,
+    routes: [],
+    defaultCreateSitemapItems: async () => padrao,
+  })
+  assert.deepEqual(itens, [
+    ...padrao,
+    { url: 'https://docs.botai.pilutech.com.br/llms.txt' },
+  ])
 })
 
 test('link, âncora e link de markdown quebrados derrubam o build', () => {

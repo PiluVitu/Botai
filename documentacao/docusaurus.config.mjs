@@ -1,4 +1,5 @@
 import { themes } from 'prism-react-renderer'
+import llmsTxt, { sitemapComLlms } from './plugins/llms-txt.mjs'
 
 const NA_PRODUCAO_DA_VERCEL = process.env.VERCEL_ENV === 'production'
 
@@ -23,6 +24,8 @@ export default {
 
   clientModules: NA_PRODUCAO_DA_VERCEL ? ['./src/medicao-da-vercel.js'] : [],
 
+  plugins: [llmsTxt],
+
   presets: [
     [
       'classic',
@@ -32,7 +35,7 @@ export default {
         blog: false,
         pages: false,
         theme: { customCss: './src/css/custom.css' },
-        sitemap: {},
+        sitemap: { createSitemapItems: sitemapComLlms },
       }),
     ],
   ],

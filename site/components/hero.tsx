@@ -3,7 +3,12 @@ import { faBookOpen } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@piluvitu/ui/button'
 import { cn } from '@piluvitu/ui/cn'
-import { NOME, POSICIONAMENTO, URL_DA_DOCUMENTACAO } from '@/lib/conteudo'
+import {
+  APRESENTACAO,
+  NOME,
+  POSICIONAMENTO,
+  URL_DA_DOCUMENTACAO,
+} from '@/lib/conteudo'
 import { COMANDO_DO_EXEMPLO } from '@/lib/exemplo'
 import { BotaoCopiar } from './botao-copiar'
 import { FormularioExemplo } from './formulario-exemplo'
@@ -27,11 +32,7 @@ export function Hero() {
         {POSICIONAMENTO}
       </h1>
       <p className="text-muted-foreground max-w-[720px] text-[clamp(17px,1.6vw,20px)] leading-[1.55] text-pretty">
-        O Botaí é um gerador de pessoa de teste: ele cria uma pessoa brasileira
-        fictícia e coerente, com CPF, CEP, celular e empresa que batem entre si,
-        e preenche formulários com ela. Um motor só, com oito portas: extensão,
-        CLI, biblioteca, HTTP, Docker, binários, Playwright e o motor direto na
-        página.
+        {APRESENTACAO}
       </p>
       <div className="mt-1 flex flex-wrap items-center gap-3">
         <Button asChild size="lg" className={cn(BOTAO_DO_HERO, 'px-[22px]')}>

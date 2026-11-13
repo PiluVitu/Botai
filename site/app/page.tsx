@@ -4,14 +4,10 @@ import { Landing } from '@/components/landing'
 import { lerUrlsDasLojas } from '@/lib/lojas'
 import { jsonLdDaHome } from '@/lib/json-ld'
 import { modeloDaLanding } from '@/lib/modelo'
-import { DESCRICAO_DA_HOME, metadataDaPagina, TITULO_DA_HOME } from '@/lib/seo'
+import { metadataDaPagina, PAGINA_INICIAL } from '@/lib/seo'
 import { urlDoSite } from '@/lib/site'
 
-export const metadata: Metadata = metadataDaPagina({
-  caminho: '/',
-  titulo: TITULO_DA_HOME,
-  descricao: DESCRICAO_DA_HOME,
-})
+export const metadata: Metadata = metadataDaPagina(PAGINA_INICIAL)
 
 export default function Home() {
   const urls = lerUrlsDasLojas()

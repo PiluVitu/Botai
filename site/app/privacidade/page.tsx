@@ -11,11 +11,7 @@ import {
   REPOSITORIO,
 } from '@/lib/conteudo'
 import { jsonLdDaTrilha } from '@/lib/json-ld'
-import {
-  DESCRICAO_DA_PRIVACIDADE,
-  metadataDaPagina,
-  TITULO_DA_PRIVACIDADE,
-} from '@/lib/seo'
+import { metadataDaPagina, PAGINA_DA_PRIVACIDADE } from '@/lib/seo'
 import { urlDoSite } from '@/lib/site'
 
 const VIGENCIA = { iso: '2026-10-11', texto: '11 de outubro de 2026' }
@@ -128,11 +124,7 @@ const TRATAMENTOS = [
   },
 ]
 
-export const metadata: Metadata = metadataDaPagina({
-  caminho: '/privacidade',
-  titulo: TITULO_DA_PRIVACIDADE,
-  descricao: DESCRICAO_DA_PRIVACIDADE,
-})
+export const metadata: Metadata = metadataDaPagina(PAGINA_DA_PRIVACIDADE)
 
 function Email() {
   return <a href={MAILTO.privacidade}>{EMAIL_DE_SUPORTE}</a>

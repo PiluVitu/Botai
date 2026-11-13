@@ -6,6 +6,8 @@ import {
   DESCRICAO_DOS_TERMOS,
   metadataDaPagina,
   metadataDoSite,
+  PAGINAS_DO_SITE,
+  robotsTxt,
   TITULO_DA_HOME,
   TITULO_DA_PRIVACIDADE,
   TITULO_DOS_TERMOS,
@@ -13,6 +15,37 @@ import {
 } from './seo'
 
 const SITE = 'https://botai.pilutech.com.br'
+
+// A lista única das páginas públicas: as metas de cada rota, o sitemap e o llms.txt saem dela.
+it('PAGINAS_DO_SITE: as três rotas públicas, com o título e a descrição de cada uma', () => {
+  expect(PAGINAS_DO_SITE).toEqual([
+    { caminho: '/', titulo: TITULO_DA_HOME, descricao: DESCRICAO_DA_HOME },
+    {
+      caminho: '/privacidade',
+      titulo: TITULO_DA_PRIVACIDADE,
+      descricao: DESCRICAO_DA_PRIVACIDADE,
+    },
+    {
+      caminho: '/termos',
+      titulo: TITULO_DOS_TERMOS,
+      descricao: DESCRICAO_DOS_TERMOS,
+    },
+  ])
+})
+
+describe('robotsTxt', () => {
+  it('libera tudo, aponta o sitemap e cita o llms.txt num comentário', () => {
+    expect(robotsTxt(SITE)).toBe(
+      `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n# llms.txt: ${SITE}/llms.txt\n`,
+    )
+  })
+
+  it('os endereços saem da origem recebida', () => {
+    expect(robotsTxt('https://preview.exemplo.dev')).toContain(
+      'Sitemap: https://preview.exemplo.dev/sitemap.xml',
+    )
+  })
+})
 
 describe('textos de busca', () => {
   it('título da home: até 60 caracteres, com o nome e o que ele gera', () => {

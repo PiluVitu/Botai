@@ -32,6 +32,7 @@ export type Porta = {
   icone: IconDefinition
   linha: string
   onde: string
+  documentacao: string
   comando: { linhas: string[]; copiavel: boolean }
   semente: boolean
 }
@@ -48,6 +49,7 @@ const DADOS: Dados[] = [
     linha:
       'Preenche o formulário da aba num atalho, ou um campo só pelo botão direito.',
     onde: `Chrome 123+ e Edge pela Chrome Web Store, Firefox 153+ pela Firefox Add-ons. Opera ${ESTADO_SEM_URL.opera}.`,
+    documentacao: '/extensao',
     comando: {
       linhas: [
         `${ATALHOS.chrome.mac} no Mac · ${ATALHOS.chrome.windows} no Windows e no Linux · ${ATALHOS.firefox.linux} no Firefox para Linux`,
@@ -63,6 +65,7 @@ const DADOS: Dados[] = [
     linha:
       'Uma pessoa ou um lote em JSON, NDJSON, CSV ou SQL, direto no banco.',
     onde: 'Onde houver Node.',
+    documentacao: '/cli',
     comando: {
       linhas: [
         `${NPX} pessoas -n 1000 --semente carga --hoje ${HOJE_DO_EXEMPLO} --formato sql | psql "$DATABASE_URL"`,
@@ -78,6 +81,7 @@ const DADOS: Dados[] = [
     linha:
       'Python, Go, Java ou qualquer linguagem que fale HTTP pede uma pessoa.',
     onde: 'Node, imagem ou binário.',
+    documentacao: '/servidor',
     comando: {
       linhas: [
         `curl 'http://127.0.0.1:8790/pessoa?semente=${SEMENTE_DO_EXEMPLO}&hoje=${HOJE_DO_EXEMPLO}'`,
@@ -92,6 +96,7 @@ const DADOS: Dados[] = [
     icone: faDocker,
     linha: 'O servidor numa imagem, que entra como service no CI.',
     onde: 'linux/amd64 e linux/arm64.',
+    documentacao: '/docker',
     comando: {
       linhas: [`docker run --rm -p 8790:8790 ${IMAGEM_DO_SERVIDOR}`],
       copiavel: true,
@@ -104,6 +109,7 @@ const DADOS: Dados[] = [
     icone: faMicrochip,
     linha: 'A CLI e o servidor sem instalar Node.',
     onde: 'macOS, Linux e Windows, x64 e arm64. No Windows, baixe o .exe do release.',
+    documentacao: '/binarios',
     comando: {
       linhas: [
         `curl -fsSL ${REPOSITORIO}/releases/latest/download/install.sh | sh`,
@@ -118,6 +124,7 @@ const DADOS: Dados[] = [
     icone: faCode,
     linha: 'O mesmo gerador no seu código JS ou TS, sem nenhuma dependência.',
     onde: 'Node, Bun, Deno e navegador.',
+    documentacao: '/biblioteca',
     comando: {
       linhas: [
         `import { gerarPessoa } from '${PACOTE_DO_CORE}'`,
@@ -134,6 +141,7 @@ const DADOS: Dados[] = [
     linha:
       'A semente é o nome do teste: o retry usa a mesma pessoa e a falha leva a pessoa no relatório.',
     onde: 'Chromium, Firefox e WebKit.',
+    documentacao: '/playwright',
     comando: { linhas: ['await botai.preencher(page)'], copiavel: true },
     semente: true,
   },
@@ -143,6 +151,7 @@ const DADOS: Dados[] = [
     icone: faWindowMaximize,
     linha: 'Um script de 40 KB que preenche o formulário da página.',
     onde: 'Qualquer ferramenta que execute JS na página. Testado com Playwright e CDP.',
+    documentacao: '/navegador',
     comando: {
       linhas: [
         'window.__botaiNavegador.preencher(document, pessoa, hoje, { segundaPassada: true })',
