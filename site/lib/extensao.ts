@@ -8,6 +8,13 @@ export const NOME_DO_NAVEGADOR: Record<Loja, string> = {
   opera: 'Opera',
 }
 
+export const ROTULO_DA_LOJA: Record<Loja, string> = {
+  chrome: 'Chrome Web Store',
+  firefox: 'Firefox Add-ons',
+  edge: 'Microsoft Edge Add-ons',
+  opera: 'Opera add-ons',
+}
+
 export const REQUISITOS_DA_EXTENSAO =
   'Chrome 123+ e Edge pela Chrome Web Store · Firefox 153+'
 

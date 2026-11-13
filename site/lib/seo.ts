@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { NOME } from './conteudo'
+import { urlAbsoluta } from './site'
 
 export const TITULO_DA_HOME =
   'Botaí: gerador de CPF, CNPJ e CEP para testar formulários'
@@ -32,6 +33,42 @@ export type PaginaDoSite = {
   caminho: string
   titulo: string
   descricao: string
+}
+
+export const PAGINA_INICIAL: PaginaDoSite = {
+  caminho: '/',
+  titulo: TITULO_DA_HOME,
+  descricao: DESCRICAO_DA_HOME,
+}
+export const PAGINA_DA_PRIVACIDADE: PaginaDoSite = {
+  caminho: '/privacidade',
+  titulo: TITULO_DA_PRIVACIDADE,
+  descricao: DESCRICAO_DA_PRIVACIDADE,
+}
+export const PAGINA_DOS_TERMOS: PaginaDoSite = {
+  caminho: '/termos',
+  titulo: TITULO_DOS_TERMOS,
+  descricao: DESCRICAO_DOS_TERMOS,
+}
+export const PAGINAS_DO_SITE: readonly PaginaDoSite[] = [
+  PAGINA_INICIAL,
+  PAGINA_DA_PRIVACIDADE,
+  PAGINA_DOS_TERMOS,
+]
+
+export const CAMINHO_DO_SITEMAP = '/sitemap.xml'
+export const CAMINHO_DO_LLMS = '/llms.txt'
+export const CAMINHO_DO_LLMS_FULL = '/llms-full.txt'
+
+export function robotsTxt(siteUrl: string): string {
+  return `${[
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${urlAbsoluta(CAMINHO_DO_SITEMAP, siteUrl)}`,
+    `# llms.txt: ${urlAbsoluta(CAMINHO_DO_LLMS, siteUrl)}`,
+    `# llms-full.txt: ${urlAbsoluta(CAMINHO_DO_LLMS_FULL, siteUrl)}`,
+  ].join('\n')}\n`
 }
 
 export function metadataDaPagina({

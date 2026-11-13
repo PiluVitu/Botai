@@ -5,12 +5,13 @@ import {
   faFirefoxBrowser,
   faOpera,
 } from '@fortawesome/free-brands-svg-icons'
+import { ROTULO_DA_LOJA } from '@/lib/extensao'
 import type { Loja } from '@/lib/pilulabs'
 
 export const LOJA_UI: Record<Loja, { rotulo: string; icone: IconDefinition }> =
   {
-    chrome: { rotulo: 'Chrome Web Store', icone: faChrome },
-    firefox: { rotulo: 'Firefox Add-ons', icone: faFirefoxBrowser },
-    edge: { rotulo: 'Microsoft Edge Add-ons', icone: faEdge },
-    opera: { rotulo: 'Opera add-ons', icone: faOpera },
+    chrome: { rotulo: ROTULO_DA_LOJA.chrome, icone: faChrome },
+    firefox: { rotulo: ROTULO_DA_LOJA.firefox, icone: faFirefoxBrowser },
+    edge: { rotulo: ROTULO_DA_LOJA.edge, icone: faEdge },
+    opera: { rotulo: ROTULO_DA_LOJA.opera, icone: faOpera },
   }

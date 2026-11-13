@@ -7,6 +7,7 @@ import {
   PACOTE_DO_CORE,
   PACOTE_DO_PLAYWRIGHT,
   REPOSITORIO,
+  RESUMO_DO_PROJETO,
   URL_DA_DOCUMENTACAO,
   URL_DA_PILUTECH,
 } from '@/lib/conteudo'
@@ -72,7 +73,7 @@ export function Rodape() {
           </span>
         </div>
         <p className="text-muted-foreground text-sm leading-[1.55]">
-          Dados de teste brasileiros. Código aberto, licença MIT.
+          {RESUMO_DO_PROJETO}
         </p>
         <a
           href={URL_DA_PILUTECH}

@@ -13,6 +13,9 @@ export const PROPOSTA =
   'Gerador de dados fake para formulários (CPF, CNPJ, CEP)'
 export const POSICIONAMENTO =
   'Dados de teste brasileiros em todo lugar que o seu teste roda.'
+export const APRESENTACAO = `O ${NOME} é um gerador de pessoa de teste: ele cria uma pessoa brasileira fictícia e coerente, com CPF, CEP, celular e empresa que batem entre si, e preenche formulários com ela. Um motor só, com oito portas: extensão, CLI, biblioteca, HTTP, Docker, binários, Playwright e o motor direto na página.`
+export const RESUMO_DO_PROJETO =
+  'Dados de teste brasileiros. Código aberto, licença MIT.'
 export const URL_DA_PILUTECH = 'https://pilutech.com.br'
 export const URL_DA_DOCUMENTACAO = 'https://docs.botai.pilutech.com.br'
 export const EMAIL_DE_SUPORTE = EMAIL_DA_PILUTECH

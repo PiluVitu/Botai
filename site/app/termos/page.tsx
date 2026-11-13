@@ -11,19 +11,15 @@ import {
 } from '@/lib/conteudo'
 import { jsonLdDaTrilha } from '@/lib/json-ld'
 import {
-  DESCRICAO_DOS_TERMOS,
   metadataDaPagina,
+  PAGINA_DOS_TERMOS,
   TITULO_DOS_TERMOS,
 } from '@/lib/seo'
 import { urlDoSite } from '@/lib/site'
 
 const VIGENCIA = { iso: '2026-10-02', texto: '2 de outubro de 2026' }
 
-export const metadata: Metadata = metadataDaPagina({
-  caminho: '/termos',
-  titulo: TITULO_DOS_TERMOS,
-  descricao: DESCRICAO_DOS_TERMOS,
-})
+export const metadata: Metadata = metadataDaPagina(PAGINA_DOS_TERMOS)
 
 export default function TermosPage() {
   return (

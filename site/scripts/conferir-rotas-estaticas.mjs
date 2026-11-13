@@ -15,6 +15,8 @@ export const ROTAS = [
   '/termos/twitter-image',
   '/sitemap.xml',
   '/robots.txt',
+  '/llms.txt',
+  '/llms-full.txt',
   '/manifest.webmanifest',
 ]
 

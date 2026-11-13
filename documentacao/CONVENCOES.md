@@ -47,7 +47,7 @@ sidebar_position: 2
 ```
 
 - O `title` vira o `<h1>` e o título da aba: não escreva outro `# Título` no corpo. Seções começam em `##`.
-- A `description` vai para o `<meta name="description">` e para o cartão da página da pasta.
+- A `description` vai para o `<meta name="description">`, para o cartão da página da pasta e para o item da página no `llms.txt` (e no `llms-full.txt`). O `intro.md` começa por um parágrafo: ele vira o parágrafo do `llms.txt`.
 - `sidebar_label` só quando o título for longo demais para a barra lateral. `slug` só no `intro.md`.
 
 ## 4. Formato do arquivo e links
