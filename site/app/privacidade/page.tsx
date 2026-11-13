@@ -18,9 +18,9 @@ import {
 } from '@/lib/seo'
 import { urlDoSite } from '@/lib/site'
 
-const VIGENCIA = { iso: '2026-10-11', texto: '11 de outubro de 2026' }
+const VIGENCIA = { iso: '2026-11-12', texto: '12 de novembro de 2026' }
 const POLITICA_DA_VERCEL = 'https://vercel.com/legal/privacy-policy'
-const POLITICA_DO_GOOGLE = 'https://policies.google.com/privacy'
+const POLITICA_DA_ZOHO = 'https://www.zoho.com/pt-br/privacy.html'
 const ANPD = 'https://www.gov.br/anpd/pt-br'
 
 const PERMISSOES = [
@@ -122,7 +122,7 @@ const TRATAMENTOS = [
     dado: 'O que você manda ao suporte por e-mail',
     paraQue: 'Responder ao seu pedido.',
     base: 'Legítimo interesse em atender quem nos procura (art. 7º, IX) e, nos pedidos sobre os seus dados, cumprimento de obrigação legal (art. 7º, II).',
-    comQuem: 'Google, que hospeda o e-mail da PiluTech (Gmail).',
+    comQuem: 'Zoho, que hospeda o e-mail da PiluTech (Zoho Mail).',
     prazo:
       'Enquanto for útil para o atendimento. Você pode pedir para apagar a qualquer momento.',
   },
@@ -331,14 +331,10 @@ export default function PrivacidadePage() {
         <p>
           Se você mandar um e-mail, recebemos o seu endereço, o nome que aparece
           nele e o que você escrever, e usamos isso só para responder. O e-mail
-          da PiluTech é hospedado pelo Google (Gmail), que pode guardar as
+          da PiluTech é hospedado pela Zoho (Zoho Mail), que pode guardar as
           mensagens fora do Brasil (veja a{' '}
-          <a
-            href={POLITICA_DO_GOOGLE}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            política de privacidade do Google
+          <a href={POLITICA_DA_ZOHO} target="_blank" rel="noopener noreferrer">
+            política de privacidade da Zoho
           </a>
           ). Não mande o que não for necessário, como documentos seus.
         </p>

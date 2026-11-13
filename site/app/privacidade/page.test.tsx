@@ -15,11 +15,11 @@ describe('/privacidade', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Política de privacidade do Botaí',
     )
-    // A data muda com o texto: é a do Vercel Web Analytics no site (a 1.2.0, da preferência
-    // do cartão de teste, e a 1.1.0, dos favoritos, são de 2026-10-09).
-    const data = screen.getByText('11 de outubro de 2026')
+    // A data muda com o texto: é a da troca do e-mail para o help@, na Zoho (a do Vercel Web
+    // Analytics é 2026-10-11; a 1.2.0, da preferência do cartão, e a 1.1.0, dos favoritos, 2026-10-09).
+    const data = screen.getByText('12 de novembro de 2026')
     expect(data.tagName).toBe('TIME')
-    expect(data).toHaveAttribute('dateTime', '2026-10-11')
+    expect(data).toHaveAttribute('dateTime', '2026-11-12')
   })
 
   it('as seções da política, na ordem', () => {
@@ -70,7 +70,21 @@ describe('/privacidade', () => {
     expect(listas[6]).toHaveTextContent('Vercel Speed Insights')
     expect(listas[6]).toHaveTextContent('24 horas')
     expect(listas[7]).toHaveTextContent('art. 7º, II')
-    expect(listas[7]).toHaveTextContent('Gmail')
+    expect(listas[7]).toHaveTextContent(
+      'Zoho, que hospeda o e-mail da PiluTech (Zoho Mail).',
+    )
+  })
+
+  // Desde 2026-11-11 o e-mail público é o help@pilutech.com.br, numa caixa do Zoho Mail; o Gmail saiu.
+  it('o e-mail de suporte é o help@, hospedado pela Zoho, e o Gmail não aparece mais', () => {
+    expect(document.body).toHaveTextContent(
+      'O e-mail da PiluTech é hospedado pela Zoho (Zoho Mail), que pode guardar as mensagens fora do Brasil',
+    )
+    expect(
+      screen.getByRole('link', { name: 'política de privacidade da Zoho' }),
+    ).toHaveAttribute('href', 'https://www.zoho.com/pt-br/privacy.html')
+    expect(document.body).not.toHaveTextContent(/Gmail|Google/)
+    expect(document.querySelector('a[href*="google"]')).toBeNull()
   })
 
   // Desde 2026-10-11 o site e a documentação (só eles) medem as visitas com o Vercel Web
