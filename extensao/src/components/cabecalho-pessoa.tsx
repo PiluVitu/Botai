@@ -128,6 +128,7 @@ function CampoApelido({
         <Input
           ref={campo}
           id={id}
+          aria-describedby={`${id}-dica`}
           value={rascunho}
           maxLength={APELIDO_MAX}
           autoComplete="off"
@@ -148,7 +149,7 @@ function CampoApelido({
           Salvar
         </Button>
       </div>
-      <span className={META_MONO}>
+      <span id={`${id}-dica`} className={META_MONO}>
         {rascunho.length}/{APELIDO_MAX} · Enter salva, Esc cancela
       </span>
     </form>

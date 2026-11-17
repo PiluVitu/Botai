@@ -55,6 +55,17 @@ beforeEach(() => {
 })
 
 describe('background', () => {
+  it('erro inesperado do atalho ou do menu é registrado, sem virar rejeição solta', async () => {
+    executar.mockRejectedValue(new Error('No tab with id: 7.'))
+    const registrar = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined)
+    await onCommand.disparar('botai-preencher', { id: 7 })
+    await onClicked.disparar({ menuItemId: 'botai-preencher' }, { id: 7 })
+    await vi.waitFor(() => expect(registrar).toHaveBeenCalledTimes(2))
+    registrar.mockRestore()
+  })
+
   it('cria os menus na instalação e na abertura do navegador', async () => {
     await fakeBrowser.runtime.onInstalled.trigger({ reason: 'install' })
     await vi.waitFor(() =>

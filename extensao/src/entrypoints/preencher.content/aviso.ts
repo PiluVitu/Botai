@@ -20,5 +20,7 @@ export async function montarAviso(
     },
     onRemove: aoSair,
   })
+  ui.shadowHost.setAttribute('popover', 'manual')
   ui.mount()
+  ui.shadowHost.showPopover()
 }

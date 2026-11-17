@@ -147,6 +147,15 @@ describe('CabecalhoPessoa: editando o apelido', () => {
     ).toBeInTheDocument()
   })
 
+  it('o contador e a dica de teclado descrevem o campo', () => {
+    render(
+      <ComEdicao inicial="Maria" aoSalvar={vi.fn()} aoCancelar={vi.fn()} />,
+    )
+    expect(campo()).toHaveAccessibleDescription(
+      '5/24 · Enter salva, Esc cancela',
+    )
+  })
+
   it('o contador acompanha o que se digita', async () => {
     render(<ComEdicao inicial="" aoSalvar={vi.fn()} aoCancelar={vi.fn()} />)
     await userEvent.setup().type(campo(), 'admin do staging')

@@ -77,6 +77,12 @@ describe('textos da listagem', () => {
     },
   )
 
+  it('a descrição fala do que funciona, sem nome de framework nem de biblioteca', () => {
+    expect(textos.get('Descrição')).not.toMatch(
+      /React|Vue|Angular|Svelte|imask|jQuery|react-number-format/i,
+    )
+  })
+
   it('uma justificativa por permissão, menus inclusive', () => {
     expect(permissoesJustificadas(textos).sort()).toEqual([
       'activeTab',
@@ -120,6 +126,34 @@ describe('textos da listagem', () => {
       GRAFIA_ERRADA,
     )
     expect(semRepo(`Instale o Botai: ${REPOSITORIO}`)).toMatch(GRAFIA_ERRADA)
+  })
+})
+
+describe('CHROMEWEBSTORE.md (índice da ficha da Chrome)', () => {
+  const indice = ler('../CHROMEWEBSTORE.md')
+
+  it('cada permissão da Chrome aponta para a sua justificativa no textos.md', () => {
+    for (const permissao of permissoesJustificadas(textos).filter(
+      (p) => p !== 'menus',
+    ))
+      expect(indice).toContain(`| \`${permissao}\` | permissions | textos.md › Justificativa: ${permissao} |`)
+  })
+
+  it('cada seção do textos.md citada existe', () => {
+    const citadas = [...indice.matchAll(/textos\.md › ([^|\n]+?)\s*(?:\||$)/gm)].map(
+      (m) => m[1].trim(),
+    )
+    expect(citadas.length).toBeGreaterThan(5)
+    for (const secao of citadas) expect(textos.has(secao)).toBe(true)
+  })
+
+  it('a última versão do histórico é a do package.json', () => {
+    const { version } = JSON.parse(ler('../package.json')) as { version: string }
+    expect(indice).toMatch(new RegExp(`^\\| ${version.replaceAll('.', '\\.')} \\|`, 'm'))
+  })
+
+  it('não escreve a marca com a grafia errada', () => {
+    expect(semRepo(indice)).not.toMatch(GRAFIA_ERRADA)
   })
 })
 

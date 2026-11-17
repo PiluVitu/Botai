@@ -29,7 +29,7 @@ Como usar
 • Depois de preencher, o popup mostra quantos campos entraram e leva até os que ficaram de fora.
 • A pessoa fica guardada até você pedir outra, para repetir o mesmo cadastro.
 
-Funciona com React, Vue, máscaras (imask, jQuery Mask, react-number-format e outras) e sites que buscam o endereço pelo CEP.
+Funciona nos formulários dos sites modernos, em campos com máscara (CPF, telefone, data) e em sites que buscam o endereço pelo CEP.
 
 Privacidade: o Botaí só age na aba em que você o aciona, guarda a pessoa de teste no próprio navegador e não envia nada a ninguém.
 

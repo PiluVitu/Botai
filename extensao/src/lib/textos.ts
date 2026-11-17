@@ -18,6 +18,10 @@ const MOTIVOS_DA_FALHA: Record<MotivoFalhaInserir, string> = {
 
 export const AVISO_SEM_CAMPOS = 'Nenhum campo nesta página'
 
+export function avisoNovaPessoa(primeiroNome: string): string {
+  return `Nova pessoa: ${primeiroNome}`
+}
+
 export function avisoFalhaInserir(motivo: MotivoFalhaInserir): string {
   return `Não deu para inserir aqui: ${MOTIVOS_DA_FALHA[motivo]}`
 }

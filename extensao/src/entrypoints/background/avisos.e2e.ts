@@ -21,6 +21,12 @@ const SO_DIGITOS = `<!doctype html>
     codigo.value = codigo.value.replace(/[^0-9]/g, '')
   })
 </script>`
+const DIALOGO_MODAL = `<!doctype html>
+<meta charset="utf-8" />
+<dialog id="cadastro"><label>CPF <input name="cpf" /></label></dialog>
+<script>
+  document.getElementById('cadastro').showModal()
+</script>`
 const SO_TEXTO =
   '<!doctype html><meta charset="utf-8"><p>Só texto, sem formulário.</p>'
 
@@ -141,5 +147,28 @@ test.describe('avisos de falha, sem popup', () => {
     expect(resposta).toEqual({ ok: false, motivo: 'proibida' })
     await expect(aba.locator('botai-aviso')).toHaveCount(0)
     await expect(aba.locator('input[name="cpf"]')).toHaveValue('')
+  })
+
+  test('com um <dialog> modal aberto, o aviso fica por cima dele e o Fechar responde', async ({
+    context,
+    sw,
+    extensionId,
+  }) => {
+    await servir(context, { '/dialogo': { corpo: DIALOGO_MODAL } })
+    const popup = await abrirPopup(context, extensionId)
+    const aba = await context.newPage()
+    await aba.goto(`${ORIGEM}/dialogo`)
+    await aba.bringToFront()
+    const tabId = await idDaAba(sw, `${ORIGEM}/dialogo`)
+
+    await enviarMensagem(popup, { tipo: 'preencher', tabId })
+
+    await expect(aba.locator('input[name="cpf"]')).not.toHaveValue('')
+    await expect(aba.locator('botai-aviso .botai-titulo')).toHaveText(
+      '1 de 1 campo preenchido',
+    )
+    // Atrás do diálogo (ou inerte por causa dele), o clique cai no <dialog> e o Playwright espera até o timeout.
+    await aba.locator('botai-aviso .botai-fechar').click({ timeout: 3000 })
+    await expect(aba.locator('botai-aviso')).toHaveCount(0)
   })
 })
