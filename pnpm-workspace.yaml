@@ -78,3 +78,9 @@ auditConfig:
     # @storybook/nextjs e do eslint-config-next (lint) e pelo chokidar 3 do @docusaurus/core (o observador de arquivos
     # do build e do dev da documentacao/), com padrões nossos. Não vai no build da landing nem da extensão.
     - GHSA-vfj7-8cjw-p6xm
+    # picomatch 2.3.2 e 4.0.7 (ReDoS, high; a 4.0.8 corrigida ainda não existe no npm em 2026-11-17): só em ferramentas
+    # de build, lint e dev, com padrões nossos: lint-staged, vite > tinyglobby > fdir (wxt, Storybook, Vitest) e chokidar 3 >
+    # anymatch do @docusaurus/core (o build da documentacao/, que sai como HTML estático). Não vai no pacote da extensão,
+    # no build da landing nem nos pacotes do npm. Sai quando a 4.0.8 sair (o Dependabot avisa): suba as cópias e rode o
+    # audit sem esta linha; se a 2.3.x ainda acusar, fica até a 2.x ter correção ou os pais deixarem a 2.x.
+    - GHSA-fc5q-39xc-vjpf
