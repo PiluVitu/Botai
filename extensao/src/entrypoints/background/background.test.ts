@@ -142,9 +142,26 @@ describe('background', () => {
     )
   })
 
+  // O sendMessage do fakeBrowser manda o remetente vazio ({}), que o background
+  // recusa: o teste dispara o onMessage com o remetente que o popup teria.
   it('a mensagem do popup volta com a resposta do background', async () => {
+    const resposta = new Promise((responder) => {
+      void fakeBrowser.runtime.onMessage.trigger(
+        { tipo: 'preencher', tabId: 7 },
+        {
+          id: fakeBrowser.runtime.id,
+          url: fakeBrowser.runtime.getURL('/popup.html'),
+        },
+        responder,
+      )
+    })
+    await expect(resposta).resolves.toMatchObject({ ok: true })
+  })
+
+  it('mensagem com remetente vazio (fora de uma página da extensão) fica sem resposta', async () => {
     await expect(
       fakeBrowser.runtime.sendMessage({ tipo: 'preencher', tabId: 7 }),
-    ).resolves.toMatchObject({ ok: true })
+    ).resolves.toBeUndefined()
+    expect(executar).not.toHaveBeenCalled()
   })
 })

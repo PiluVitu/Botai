@@ -131,25 +131,42 @@ describe('textos da listagem', () => {
 
 describe('CHROMEWEBSTORE.md (índice da ficha da Chrome)', () => {
   const indice = ler('../CHROMEWEBSTORE.md')
+  // O Prettier alinha as tabelas: compara as células, não o espaçamento.
+  const linhas = indice
+    .split('\n')
+    .filter((linha) => linha.startsWith('|'))
+    .map((linha) =>
+      linha
+        .slice(1, -1)
+        .split('|')
+        .map((celula) => celula.trim()),
+    )
 
   it('cada permissão da Chrome aponta para a sua justificativa no textos.md', () => {
     for (const permissao of permissoesJustificadas(textos).filter(
       (p) => p !== 'menus',
     ))
-      expect(indice).toContain(`| \`${permissao}\` | permissions | textos.md › Justificativa: ${permissao} |`)
+      expect(linhas).toContainEqual([
+        `\`${permissao}\``,
+        'permissions',
+        `textos.md › Justificativa: ${permissao}`,
+      ])
   })
 
   it('cada seção do textos.md citada existe', () => {
-    const citadas = [...indice.matchAll(/textos\.md › ([^|\n]+?)\s*(?:\||$)/gm)].map(
-      (m) => m[1].trim(),
-    )
+    const citadas = linhas
+      .flat()
+      .filter((celula) => celula.startsWith('textos.md › '))
+      .map((celula) => celula.slice('textos.md › '.length))
     expect(citadas.length).toBeGreaterThan(5)
     for (const secao of citadas) expect(textos.has(secao)).toBe(true)
   })
 
   it('a última versão do histórico é a do package.json', () => {
-    const { version } = JSON.parse(ler('../package.json')) as { version: string }
-    expect(indice).toMatch(new RegExp(`^\\| ${version.replaceAll('.', '\\.')} \\|`, 'm'))
+    const { version } = JSON.parse(ler('../package.json')) as {
+      version: string
+    }
+    expect(linhas.map((celulas) => celulas[0])).toContain(version)
   })
 
   it('não escreve a marca com a grafia errada', () => {

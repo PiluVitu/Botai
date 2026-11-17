@@ -214,8 +214,17 @@ describe('aoReceberMensagem', () => {
   }
 
   it.each([
-    ['um content script (página da web)', { id: fakeBrowser.runtime.id, url: 'https://exemplo.com/' }],
-    ['outra extensão', { id: 'outra-extensao', url: 'chrome-extension://outra-extensao/popup.html' }],
+    [
+      'um content script (página da web)',
+      { id: fakeBrowser.runtime.id, url: 'https://exemplo.com/' },
+    ],
+    [
+      'outra extensão',
+      {
+        id: 'outra-extensao',
+        url: 'chrome-extension://outra-extensao/popup.html',
+      },
+    ],
     ['remetente sem url', { id: fakeBrowser.runtime.id }],
   ])('recusa mensagem de %s', (_quem, remetente) => {
     expect(
@@ -228,7 +237,10 @@ describe('aoReceberMensagem', () => {
     ['sem objeto', null],
     ['tabId que não é inteiro', { tipo: 'preencher', tabId: '7' }],
     ['mostrar sem documentId', { tipo: 'mostrar', tabId: 7, idx: 1 }],
-    ['mostrar com idx quebrado', { tipo: 'mostrar', tabId: 7, documentId: 'd', idx: 1.5 }],
+    [
+      'mostrar com idx quebrado',
+      { tipo: 'mostrar', tabId: 7, documentId: 'd', idx: 1.5 },
+    ],
   ])('recusa mensagem fora do formato: %s', (_caso, mensagem) => {
     expect(aoReceberMensagem(mensagem, POPUP, vi.fn())).toBeUndefined()
     expect(executar).not.toHaveBeenCalled()
@@ -280,7 +292,11 @@ describe('aoReceberMensagem', () => {
 
   it('mensagem desconhecida não segura o canal', () => {
     expect(
-      aoReceberMensagem({ tipo: 'outra' } as unknown as Mensagem, POPUP, vi.fn()),
+      aoReceberMensagem(
+        { tipo: 'outra' } as unknown as Mensagem,
+        POPUP,
+        vi.fn(),
+      ),
     ).toBeUndefined()
   })
 

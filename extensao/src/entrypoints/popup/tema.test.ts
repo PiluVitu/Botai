@@ -52,8 +52,10 @@ describe('color-scheme', () => {
   it('o popup declara light dark no <head>', () => {
     const doc = new DOMParser().parseFromString(ler('index.html'), 'text/html')
     expect(
-      doc.head.querySelector('meta[name="color-scheme"]'),
-    ).toHaveAttribute('content', 'light dark')
+      doc.head
+        .querySelector('meta[name="color-scheme"]')
+        ?.getAttribute('content'),
+    ).toBe('light dark')
   })
 
   it('o :root aceita os dois esquemas, e o .dark fixa o escuro', () => {
