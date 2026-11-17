@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Browser } from 'wxt/browser'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import { cartaoItem, favoritosItem, pessoaItem } from '../../lib/armazenamento'
-import type { Favorito } from '../../lib/favoritos'
+import { primeiroNome, type Favorito } from '../../lib/favoritos'
 import type { Mensagem } from '../../lib/mensagens'
 import { PESSOA_DOURADA as P } from '../../test/pessoa-dourada'
 import {
@@ -113,6 +113,35 @@ describe('aoClicarMenu', () => {
     expect(await pessoaItem.getValue()).not.toEqual(P)
   })
 
+  it('"Nova pessoa" confirma na página, com o primeiro nome da nova', async () => {
+    await aoClicarMenu(clique('botai-nova-pessoa', 3), ABA)
+    const nova = await pessoaItem.getValue()
+    expect(chamada(0)).toEqual({
+      target: { tabId: 7, frameIds: [0] },
+      files: ['/content-scripts/preencher.js'],
+    })
+    expect(chamada(1).target).toEqual({ tabId: 7, frameIds: [0] })
+    expect(chamada(1).args).toEqual([
+      { titulo: `Nova pessoa: ${primeiroNome(nova!)}` },
+    ])
+  })
+
+  it('"Nova pessoa" em página que o navegador recusa troca a pessoa sem aviso nem erro', async () => {
+    executar.mockRejectedValue(
+      new Error('Cannot access contents of url "chrome://newtab/".'),
+    )
+    await expect(
+      aoClicarMenu(clique('botai-nova-pessoa'), ABA),
+    ).resolves.toBeUndefined()
+    expect(await pessoaItem.getValue()).not.toEqual(P)
+  })
+
+  it('"Nova pessoa" sem aba só troca a pessoa', async () => {
+    await aoClicarMenu(clique('botai-nova-pessoa'), undefined)
+    expect(await pessoaItem.getValue()).not.toEqual(P)
+    expect(executar).not.toHaveBeenCalled()
+  })
+
   it('"Nova pessoa" do menu gera com o cartão escolhido no popup', async () => {
     await cartaoItem.setValue({ provedor: 'stripe', cenario: 'pendente' })
     await aoClicarMenu(clique('botai-nova-pessoa'), ABA)
@@ -179,10 +208,48 @@ describe('aoClicarMenu', () => {
 })
 
 describe('aoReceberMensagem', () => {
+  const POPUP: Browser.runtime.MessageSender = {
+    id: fakeBrowser.runtime.id,
+    url: fakeBrowser.runtime.getURL('/popup.html'),
+  }
+
+  it.each([
+    [
+      'um content script (página da web)',
+      { id: fakeBrowser.runtime.id, url: 'https://exemplo.com/' },
+    ],
+    [
+      'outra extensão',
+      {
+        id: 'outra-extensao',
+        url: 'chrome-extension://outra-extensao/popup.html',
+      },
+    ],
+    ['remetente sem url', { id: fakeBrowser.runtime.id }],
+  ])('recusa mensagem de %s', (_quem, remetente) => {
+    expect(
+      aoReceberMensagem({ tipo: 'preencher', tabId: 7 }, remetente, vi.fn()),
+    ).toBeUndefined()
+    expect(executar).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['sem objeto', null],
+    ['tabId que não é inteiro', { tipo: 'preencher', tabId: '7' }],
+    ['mostrar sem documentId', { tipo: 'mostrar', tabId: 7, idx: 1 }],
+    [
+      'mostrar com idx quebrado',
+      { tipo: 'mostrar', tabId: 7, documentId: 'd', idx: 1.5 },
+    ],
+  ])('recusa mensagem fora do formato: %s', (_caso, mensagem) => {
+    expect(aoReceberMensagem(mensagem, POPUP, vi.fn())).toBeUndefined()
+    expect(executar).not.toHaveBeenCalled()
+  })
+
   it('preencher responde por sendResponse e devolve true literal', async () => {
     const responder = vi.fn()
     expect(
-      aoReceberMensagem({ tipo: 'preencher', tabId: 7 }, {}, responder),
+      aoReceberMensagem({ tipo: 'preencher', tabId: 7 }, POPUP, responder),
     ).toBe(true)
     await vi.waitFor(() =>
       expect(responder).toHaveBeenCalledWith({
@@ -200,7 +267,7 @@ describe('aoReceberMensagem', () => {
     expect(
       aoReceberMensagem(
         { tipo: 'mostrar', tabId: 7, documentId: 'doc-1', idx: 4 },
-        {},
+        POPUP,
         responder,
       ),
     ).toBe(true)
@@ -215,17 +282,21 @@ describe('aoReceberMensagem', () => {
       frameId: 0,
       kind: 'cpf',
     }
-    expect(aoReceberMensagem(inserir, {}, responder)).toBeUndefined()
+    expect(aoReceberMensagem(inserir, POPUP, responder)).toBeUndefined()
     expect(executar).not.toHaveBeenCalled()
     vi.stubEnv('MODE', 'e2e')
-    expect(aoReceberMensagem(inserir, {}, responder)).toBe(true)
+    expect(aoReceberMensagem(inserir, POPUP, responder)).toBe(true)
     await vi.waitFor(() => expect(responder).toHaveBeenCalledTimes(1))
     expect(chamada(1).args).toEqual([P, 'cpf', null])
   })
 
   it('mensagem desconhecida não segura o canal', () => {
     expect(
-      aoReceberMensagem({ tipo: 'outra' } as unknown as Mensagem, {}, vi.fn()),
+      aoReceberMensagem(
+        { tipo: 'outra' } as unknown as Mensagem,
+        POPUP,
+        vi.fn(),
+      ),
     ).toBeUndefined()
   })
 
@@ -235,7 +306,7 @@ describe('aoReceberMensagem', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => undefined)
     const responder = vi.fn()
-    aoReceberMensagem({ tipo: 'preencher', tabId: 7 }, {}, responder)
+    aoReceberMensagem({ tipo: 'preencher', tabId: 7 }, POPUP, responder)
     await vi.waitFor(() => expect(responder).toHaveBeenCalledWith(undefined))
     expect(registrar).toHaveBeenCalled()
   })

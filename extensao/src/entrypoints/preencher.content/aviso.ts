@@ -3,6 +3,9 @@ import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root'
 import css from './aviso.css?inline'
 import { construirAviso, type OpcoesAviso } from './aviso-dom'
 
+const dialogoModalAberto = () =>
+  [...document.querySelectorAll('dialog:modal')].at(-1)
+
 export async function montarAviso(
   ctx: ContentScriptContext,
   opcoes: Omit<OpcoesAviso, 'onFechar'> & { aoSair: () => void },
@@ -11,7 +14,7 @@ export async function montarAviso(
   const ui = await createShadowRootUi(ctx, {
     name: 'botai-aviso',
     position: 'inline',
-    anchor: 'html',
+    anchor: () => dialogoModalAberto() ?? document.documentElement,
     css,
     onMount(recipiente) {
       recipiente.append(
@@ -20,5 +23,7 @@ export async function montarAviso(
     },
     onRemove: aoSair,
   })
+  ui.shadowHost.setAttribute('popover', 'manual')
   ui.mount()
+  ui.shadowHost.showPopover()
 }

@@ -1,4 +1,9 @@
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
+const ler = (arquivo: string) =>
+  readFileSync(path.join(import.meta.dirname, arquivo), 'utf8')
 
 // tema.ts roda no import (é o primeiro import do popup); cada teste reimporta o módulo.
 function simularPreferencia(escuro: boolean) {
@@ -39,5 +44,23 @@ describe('tema', () => {
     expect(document.documentElement).not.toHaveClass('dark')
     preferencia.trocar(true)
     expect(document.documentElement).toHaveClass('dark')
+  })
+})
+
+// O meta vale antes de qualquer CSS ou JS: sem ele, o popup pinta claro e só depois escurece.
+describe('color-scheme', () => {
+  it('o popup declara light dark no <head>', () => {
+    const doc = new DOMParser().parseFromString(ler('index.html'), 'text/html')
+    expect(
+      doc.head
+        .querySelector('meta[name="color-scheme"]')
+        ?.getAttribute('content'),
+    ).toBe('light dark')
+  })
+
+  it('o :root aceita os dois esquemas, e o .dark fixa o escuro', () => {
+    const css = ler('../../styles.css')
+    expect(css).toMatch(/:root\s*\{[^}]*color-scheme:\s*light dark;/)
+    expect(css).toMatch(/\.dark\s*\{[^}]*color-scheme:\s*dark;/)
   })
 })

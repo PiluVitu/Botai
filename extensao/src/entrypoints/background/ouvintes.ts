@@ -7,14 +7,21 @@ import {
   pessoaItem,
   usarFavorito,
 } from '../../lib/armazenamento'
-import type { Mensagem } from '../../lib/mensagens'
+import { primeiroNome } from '../../lib/favoritos'
+import { ehMensagem, type Mensagem } from '../../lib/mensagens'
 import {
   criarMenus,
   MENU,
   PREFIXO_INSERIR,
   PREFIXO_PREENCHER_COM,
 } from '../../lib/menus'
-import { inserirNoCampo, mostrarCampo, preencherPagina } from './acoes'
+import { avisoNovaPessoa } from '../../lib/textos'
+import {
+  avisarNaPagina,
+  inserirNoCampo,
+  mostrarCampo,
+  preencherPagina,
+} from './acoes'
 
 export const COMANDO_PREENCHER = 'botai-preencher'
 
@@ -47,7 +54,11 @@ export async function aoClicarMenu(
 ): Promise<void> {
   const id = String(info.menuItemId)
   if (id === MENU.novaPessoa) {
-    await gerarPessoaNova()
+    const pessoa = await gerarPessoaNova()
+    if (aba?.id !== undefined)
+      await avisarNaPagina(aba.id, {
+        titulo: avisoNovaPessoa(primeiroNome(pessoa)),
+      })
     return
   }
   if (id === MENU.abrirCaixa) {
@@ -73,8 +84,17 @@ export async function aoClicarMenu(
   }
 }
 
+function vemDeUmaPaginaDaExtensao(
+  remetente: Browser.runtime.MessageSender,
+): boolean {
+  return (
+    remetente.id === browser.runtime.id &&
+    remetente.url?.startsWith(browser.runtime.getURL('/')) === true
+  )
+}
+
 function executar(mensagem: Mensagem): Promise<unknown> | undefined {
-  switch (mensagem?.tipo) {
+  switch (mensagem.tipo) {
     case 'preencher':
       return preencherPagina(mensagem.tabId)
     case 'mostrar':
@@ -95,10 +115,12 @@ function executar(mensagem: Mensagem): Promise<unknown> | undefined {
 
 // `return true` literal + sendResponse, nunca Promise: o Chrome só aceita Promise no onMessage a partir do 148.
 export function aoReceberMensagem(
-  mensagem: Mensagem,
-  _remetente: Browser.runtime.MessageSender,
+  mensagem: unknown,
+  remetente: Browser.runtime.MessageSender,
   responder: (resposta?: unknown) => void,
 ): true | undefined {
+  if (!vemDeUmaPaginaDaExtensao(remetente) || !ehMensagem(mensagem))
+    return undefined
   const tarefa = executar(mensagem)
   if (!tarefa) return undefined
   tarefa.then(responder, (erro: unknown) => {

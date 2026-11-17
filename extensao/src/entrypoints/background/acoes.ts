@@ -115,22 +115,34 @@ export async function preencherPagina(
   }
 }
 
-async function avisarFalhaAoInserir(
+export async function avisarNaPagina(
   tabId: number,
-  frameIdDoClique: number,
-  motivo: MotivoFalhaInserir,
+  aviso: Aviso,
+  injetar = true,
 ): Promise<void> {
   try {
-    if (frameIdDoClique !== 0) {
+    if (injetar) {
       await browser.scripting.executeScript({
         target: { tabId, frameIds: [0] },
         files: [ARQUIVO_CONTENT],
       })
     }
-    await avisar(tabId, { titulo: avisoFalhaInserir(motivo), erro: true })
+    await avisar(tabId, aviso)
   } catch (erro) {
     if (!erroEhPaginaProibida(mensagemDo(erro))) throw erro
   }
+}
+
+function avisarFalhaAoInserir(
+  tabId: number,
+  frameIdDoClique: number,
+  motivo: MotivoFalhaInserir,
+): Promise<void> {
+  return avisarNaPagina(
+    tabId,
+    { titulo: avisoFalhaInserir(motivo), erro: true },
+    frameIdDoClique !== 0,
+  )
 }
 
 export async function inserirNoCampo(

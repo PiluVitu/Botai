@@ -9,16 +9,18 @@ import {
   recriarMenus,
 } from './ouvintes'
 
+const registrarErro = (erro: unknown) => console.error(erro)
+
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => void recriarMenus())
   browser.runtime.onStartup.addListener(() => void recriarMenus())
   pessoaItem.watch((pessoa) => void atualizarTitulosMenu(pessoa))
   favoritosItem.watch(() => void recriarMenus())
   browser.commands.onCommand.addListener(
-    (comando, aba) => void aoComando(comando, aba),
+    (comando, aba) => void aoComando(comando, aba).catch(registrarErro),
   )
   browser.contextMenus.onClicked.addListener(
-    (info, aba) => void aoClicarMenu(info, aba),
+    (info, aba) => void aoClicarMenu(info, aba).catch(registrarErro),
   )
   browser.runtime.onMessage.addListener(aoReceberMensagem)
 })

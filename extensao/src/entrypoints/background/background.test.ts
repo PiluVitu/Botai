@@ -55,6 +55,17 @@ beforeEach(() => {
 })
 
 describe('background', () => {
+  it('erro inesperado do atalho ou do menu é registrado, sem virar rejeição solta', async () => {
+    executar.mockRejectedValue(new Error('No tab with id: 7.'))
+    const registrar = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined)
+    await onCommand.disparar('botai-preencher', { id: 7 })
+    await onClicked.disparar({ menuItemId: 'botai-preencher' }, { id: 7 })
+    await vi.waitFor(() => expect(registrar).toHaveBeenCalledTimes(2))
+    registrar.mockRestore()
+  })
+
   it('cria os menus na instalação e na abertura do navegador', async () => {
     await fakeBrowser.runtime.onInstalled.trigger({ reason: 'install' })
     await vi.waitFor(() =>
@@ -131,9 +142,26 @@ describe('background', () => {
     )
   })
 
+  // O sendMessage do fakeBrowser manda o remetente vazio ({}), que o background
+  // recusa: o teste dispara o onMessage com o remetente que o popup teria.
   it('a mensagem do popup volta com a resposta do background', async () => {
+    const resposta = new Promise((responder) => {
+      void fakeBrowser.runtime.onMessage.trigger(
+        { tipo: 'preencher', tabId: 7 },
+        {
+          id: fakeBrowser.runtime.id,
+          url: fakeBrowser.runtime.getURL('/popup.html'),
+        },
+        responder,
+      )
+    })
+    await expect(resposta).resolves.toMatchObject({ ok: true })
+  })
+
+  it('mensagem com remetente vazio (fora de uma página da extensão) fica sem resposta', async () => {
     await expect(
       fakeBrowser.runtime.sendMessage({ tipo: 'preencher', tabId: 7 }),
-    ).resolves.toMatchObject({ ok: true })
+    ).resolves.toBeUndefined()
+    expect(executar).not.toHaveBeenCalled()
   })
 })
